@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { createPublicKey, verify } from 'node:crypto';
+import { createPublicKey, verify, randomBytes } from 'node:crypto';
 import { createRequire } from 'node:module';
 import { readFileSync, existsSync } from 'node:fs';
 import { dirname, resolve, join } from 'node:path';
@@ -28,6 +28,7 @@ try {
 // No NearLink delivery or native ArkUI/CryptoArchitectureKit is claimed by this test.
 const cryptoKit = {
   cryptoFramework: {
+    createRandom() { return { generateRandomSync(length) { return { data: new Uint8Array(randomBytes(length)) }; } }; },
     createAsyKeyGenerator(algorithm) {
       assert.equal(algorithm, 'ECC256');
       return { async convertKey(publicBlob, privateBlob) {
@@ -67,6 +68,7 @@ class TestTransport {
     this.sent.push({ packet, address });
     return true;
   }
+  async stop() {}
 }
 class TestStore {
   constructor() { this.values = new Map(); this.fail = false; this.writes = []; }
@@ -105,6 +107,7 @@ function loadEts(filename) {
   return module.exports;
 }
 const protocol = loadEts(resolve(root, 'entry/src/main/ets/model/AlertProtocol.ets'));
+const deliveryProtocol = loadEts(resolve(root, 'entry/src/main/ets/model/DeliveryProtocol.ets'));
 const fixtures = loadEts(resolve(root, 'entry/src/main/ets/model/DemoAlerts.ets'));
 const { AlertViewModel } = loadEts(resolve(root, 'entry/src/main/ets/viewmodel/AlertViewModel.ets'));
 const { RelayViewModel } = loadEts(resolve(root, 'entry/src/main/ets/viewmodel/RelayViewModel.ets'));
@@ -116,12 +119,24 @@ const exerciseNow = fresh().payload.issuedAt + 60_000;
 const realNow = Date.now;
 Date.now = () => exerciseNow;
 const views = [];
+const relays = [];
 function createAlerts(store = new TestStore()) {
   const alerts = new AlertViewModel(store);
   views.push(alerts);
   return alerts;
 }
-afterEach(() => {
+function createRelay(alerts) {
+  const relay = new RelayViewModel(alerts);
+  relays.push(relay);
+  return relay;
+}
+async function connectPeer(transport, address = 'peer-B') {
+  transport.callbacks.onPeer({ address, name: address, connected: true });
+  await nextTurn();
+}
+afterEach(async () => {
+  for (const relay of relays) await relay.stop();
+  relays.length = 0;
   for (const alerts of views) alerts.dispose();
   views.length = 0;
   transports.length = 0;
@@ -176,7 +191,8 @@ test('disk failure leaves the authenticated in-memory alert intact and reports s
 
 test('forged and malformed packets produce no outgoing radio traffic', async () => {
   const alerts = createAlerts();
-  const relay = new RelayViewModel(alerts), transport = transports.at(-1);
+  const relay = createRelay(alerts), transport = transports.at(-1);
+  await connectPeer(transport);
   await relay.receive('attacker', protocol.encodeEnvelope(fixtures.createTamperedAlert()));
   await relay.receive('attacker', '{}');
   assert.equal(transport.sent.length, 0);
@@ -186,11 +202,12 @@ test('forged and malformed packets produce no outgoing radio traffic', async () 
 
 test('a genuine arrival forwards its exact signature at hop one while excluding its sender', async () => {
   const alerts = createAlerts();
-  const relay = new RelayViewModel(alerts), transport = transports.at(-1);
+  const relay = createRelay(alerts), transport = transports.at(-1);
+  await connectPeer(transport);
   await relay.receive('peer-A', protocol.encodeEnvelope(fresh()));
   assert.equal(transport.sent.length, 1);
-  assert.equal(transport.sent[0].address, 'peer-A');
-  const forwarded = protocol.decodeEnvelope(transport.sent[0].packet);
+  assert.equal(transport.sent[0].address, 'peer-B');
+  const forwarded = deliveryProtocol.decodeDataPacket(transport.sent[0].packet).envelope;
   assert.equal(forwarded.hops, 1);
   assert.equal(forwarded.signature, fresh().signature);
   assert.equal((await new protocol.RelayEngine().ingest(forwarded)).status, 'accepted');
@@ -198,7 +215,8 @@ test('a genuine arrival forwards its exact signature at hop one while excluding 
 
 test('concurrent arrivals forward once and busy remains set until persistence finishes', async () => {
   const alerts = createAlerts();
-  const relay = new RelayViewModel(alerts), transport = transports.at(-1);
+  const relay = createRelay(alerts), transport = transports.at(-1);
+  await connectPeer(transport);
   await Promise.all([
     relay.receive('peer-A', protocol.encodeEnvelope(fresh())),
     relay.receive('peer-B', protocol.encodeEnvelope(fresh()))
@@ -229,17 +247,18 @@ test('concurrent arrivals forward once and busy remains set until persistence fi
 
 test('fire-and-forget receive/send failures are handled without losing verified content', async () => {
   const alerts = createAlerts();
-  const relay = new RelayViewModel(alerts), transport = transports.at(-1);
+  const relay = createRelay(alerts), transport = transports.at(-1);
+  await connectPeer(transport);
   transport.fail = true;
   transport.callbacks.onMessage('peer-A', protocol.encodeEnvelope(fresh()));
   await nextTurn();
   assert.equal(alerts.received, true);
-  assert.match(relay.lastPacketStatus, /processing failed/);
+  assert.equal(relay.pendingCount, 1);
   await assert.doesNotReject(() => relay.share());
-  assert.match(relay.hardwareStatus, /send failed/);
-  transport.callbacks.onPeer({ address: 'peer-B', name: 'B', connected: true });
+  assert.equal(relay.deliveryStatus, 'awaiting_ack');
+  transport.callbacks.onPeer({ address: 'peer-C', name: 'C', connected: true });
   await nextTurn();
-  assert.match(relay.hardwareStatus, /Peer send failed/);
+  assert.equal(relay.pendingCount, 2);
   assert.match(alerts.verification, /Signature verified/);
 });
 
