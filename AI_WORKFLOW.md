@@ -1,6 +1,6 @@
 # AI Workflow
 
-SafeMesh was developed with substantial AI assistance on 2026-10-03. This disclosure describes the work actually performed and the evidence used to evaluate it. The original civilian emergency-information concept and request came from the human participant; the coding agent carried out research, design, implementation and automated validation. Human acceptance of the final submission is not implied by automated checks.
+SafeMesh was developed with substantial AI assistance on 2026-10-03 and 2026-10-04. This disclosure describes the work actually performed and the evidence used to evaluate it. The original civilian emergency-information concept and request came from the human participant; the coding agent carried out research, design, implementation and automated validation. Human acceptance of the final submission is not implied by automated checks.
 
 ## Tools used
 
@@ -21,6 +21,9 @@ SafeMesh was developed with substantial AI assistance on 2026-10-03. This disclo
 | `ohos-system-app-dev` skill | Locally installed challenge skill, privilege preflight only | Check whether NearLink required system privileges; exact permission metadata showed ordinary-app access suffices. No system-app signing was used. |
 | `hmos-arkts-knowledge-retriever` | Locally installed challenge skill and bundled references | ArkTS syntax/API grounding and strict typing guidance. |
 | `hmos-arkui-develop-skill`, `hmos-arkui-scenario-development`, `hmos-arkui-mvvm-pattern` | Locally installed challenge skills | ArkUI component, state ownership and ViewModel implementation guidance. |
+| Claude Code (Anthropic) | Claude Opus 5.5 (`claude-opus-5-5`), Claude Code CLI on Windows, 2026-10-04 | Review of the project against the Huawei challenge rules and judging criteria, then the v1.4.1 completion pass: language default, NearLink diagnostics fixes and a regression test, check/build/deploy, the three-emulator recorder and scripted demo video, and documentation, licence and release preparation. |
+| Claude Code delegated agent | Same model, read-only research plus one new file | Wrote the first draft of `docs/PHYSICAL_TESTING.md` from the source, resources, research notes and local HarmonyOS docs (`devecocli docs search/read`). It found the pre-1.4.1 NearLink diagnostics gaps listed below. The main agent fixed those gaps and edited the runbook. |
+| Pillow, Studio FFmpeg | Pillow 12.3 on the host; FFmpeg from the Studio JAR | Render the demo's title card, device labels, captions and end card, and compose them over the unedited capture. The bundled FFmpeg has no `drawtext`, so text is rendered as images. |
 
 No external product MCP server is required by SafeMesh, and no external MCP integration is recorded in this implementation's evidence. Session orchestration provided web, shell/file and agent-collaboration tools. The app does not call Codex, a chatbot or an AI service at runtime.
 
@@ -56,6 +59,10 @@ The challenge's setup repository was consulted for compatible SDK guidance and t
 | 2026-10-03 | Foreground relay delivery | Full-cache peer synchronization, per-connection random receipt tokens, bounded serialized writes, retries and expiry; restore failure pauses radio startup. | Fourteen host delivery checks cover delayed peers/reconnect, mismatched and stale ACKs, packet/ACK loss, no re-flood, bounds, expiry, bounded native sends and stop/startup failures. The updated native exercise passed 6/6 checks; hardware transport showed no radio, zero peers and zero queue counters. Native radio remains untested. |
 | 2026-10-03 | Recording and test setup | Standard-library Python capture of only the Emulator.exe client window, bundled FFmpeg encoding, reproducible check helper and native Settings navigation notes. | Final live emulator demonstration: 90 seconds, H.264, 478×1030, 15 fps, 1,350 frames, zero late frames. Huge 1.45 was exercised; the device was restored to Normal/Light and the app to System/Polish on Home. |
 | 2026-10-03 | Submission cover | Conceptual illustration generated with the built-in image-generation tool. | Generation prompt: `artifacts/cover/PROMPT.txt`; final asset: `artifacts/cover/SafeMesh-cover.png`. The illustration communicates the concept and is not a screenshot or proof of radio delivery. |
+| 2026-10-03/04 | v1.2–v1.4: mesh lab, localized signed alerts, authority console and inbox | Local WebSocket hub and `EmulatorTransport` for three separate emulator apps; signed PL/EN alert variants; authenticated loopback exercise issuer, recipient inbox, unread state and automatic relay. Recorded in commits `30ab0ce` to `ad45ebf`. The tools listed above were used. The repository does not record which agent and model ran each of these sessions; the team should confirm this row. | 96, then 130, then 167 host tests per checkpoint. Native evidence: [v1.2 lab report](artifacts/research/mesh-lab.md), [v1.3 report](artifacts/research/ui-v13-validation.md) and [v1.4 report](artifacts/research/authority-v14-validation.md), with 17/17 assertions over captured v1.4 evidence. |
+| 2026-10-04 | Challenge review (Claude Code) | Read-only analysis of the code, evidence, public repository and the Huawei challenge rules, details and workshop slides. It found: no v1.4 video, and the old video did not show the relay; no HAP reachable from the repository; Polish-only first launch; challenge area not stated; stale `SUBMISSION.md` and form guide; no licence. | Host tests rerun read-only: 167/167. Findings were checked against the rules PDFs (byte-identical to the organizer URLs) and the public GitHub API. |
+| 2026-10-04 | v1.4.1 completion (Claude Code) | First launch follows the system language. `RelayViewModel.loadDrill()` shares with connected peers, with a new regression test. NearLink delivery counters and verdict in diagnostics. `SAFEMESH_TRANSPORT_*` hilog lines. `scripts/record-mesh-demo.py`. Documentation and Apache-2.0 `LICENSE`. | `check.ps1 -Build`: 168/168 host tests, ArkTS 21 files / 0 errors, Code Linter 0 issues, build successful ([log](artifacts/logs/v141-checks-build.log)). The same HAP was installed on three API 24 emulators with cleared data. First launch showed English on the `en-Latn-US` system. The scripted scenario passed: publish on A, hop 1 on B, C isolated, hop 2 on C after A left, forged copy shown as rejected on C with no ACK in the hub counters, map search and the NearLink check. |
+| 2026-10-04 | Demo video (Claude Code) | A Python driver used `uitest uiInput` and `uitest dumpLayout` to operate the three apps while `record-mesh-demo.py` captured them in one loop. A composition script added the title card, labels, captions, a marked 3× segment and the end card. | Single take, 142.5 s live at 12 fps, zero late frames ([capture](artifacts/logs/v141-demo-capture.json)). The [action log](artifacts/logs/v141-demo-actions.log) masks the activation code, and a token scan of the new logs found no match. Frames were reviewed at key moments before publishing. |
 
 ## Workflow
 
@@ -81,12 +88,16 @@ AI review is not independent security certification. No human field verification
 
 ### Testing and debugging
 
-The final verified application source is **`1bd015dc9ca3cea9c230b78b0253abfc61a8bcae`**. All **61 host tests across seven suites passed**, with zero failures; see [v1.1 checks](artifacts/logs/v11-checks.log). Final native-symbol navigation verification reported **no ArkTS errors in 17 files**, with separate permission/exception advisories, **zero lint issues**, successful HAP build and emulator install/launch **Smoke: PASS**. Evidence: [ArkTS](artifacts/logs/v11-release-arkts.log), [lint](artifacts/logs/v11-release-lint.log), [build](artifacts/logs/v11-release-build.log), [run](artifacts/logs/v11-release-run.log). Earlier 40-test, 58-test and Settings-build results remain historical checkpoints.
+**Current checkpoint, v1.4.1:** 168/168 host tests, ArkTS 21 files / 0 errors, Code Linter 0 issues, build successful, three-emulator demo run on the same HAP (SHA-256 `a2cf126786d6a1dce58fe96020fc31c63b776dd7a4593eb2e95d8c9e361ffd3e`). See the [checks log](artifacts/logs/v141-checks-build.log) and the README section *v1.4.1*. The v1.4.0 native scenario and its 17/17 evidence assertions are in the [v1.4 report](artifacts/research/authority-v14-validation.md).
+
+The paragraphs below describe the **historical v1.1 checkpoint**. Its source commit `1bd015dc…` was a pre-publication local commit and is **not** in the published GitHub history; the published history starts at `61dcf03`. The v1.1 logs it refers to remain in `artifacts/logs/`.
+
+The v1.1 verified application source was **`1bd015dc9ca3cea9c230b78b0253abfc61a8bcae`**. All **61 host tests across seven suites passed**, with zero failures; see [v1.1 checks](artifacts/logs/v11-checks.log). Final native-symbol navigation verification reported **no ArkTS errors in 17 files**, with separate permission/exception advisories, **zero lint issues**, successful HAP build and emulator install/launch **Smoke: PASS**. Evidence: [ArkTS](artifacts/logs/v11-release-arkts.log), [lint](artifacts/logs/v11-release-lint.log), [build](artifacts/logs/v11-release-build.log), [run](artifacts/logs/v11-release-run.log). Earlier 40-test, 58-test and Settings-build results remain historical checkpoints.
 
 A fresh local clone checked out that exact source and independently reran `scripts/check.ps1 -Build`: **61 host PASS, ArkTS 17/0, lint 0, build PASS**. See [clean-checkout log](artifacts/logs/v11-clean-checkout.log) and [summary](artifacts/logs/v11-clean-checkout-summary.txt). This used the same computer and existing SDK/CLI/cache, not a clean second machine. The tooling changed only lockfile line endings; normalized content matched the commit. No byte-identical-build claim is made. The release HAP SHA-256 is `42406469e63c55df70ba3d9472b48df4b7c3a9a4722f560128fb9e9f2d5cc005`.
 
 ```powershell
-$env:DEVECO_CLI_STUDIO_PATH = 'C:\Users\user\DevEcoStudio'
+$env:DEVECO_CLI_STUDIO_PATH = Join-Path $env:USERPROFILE 'DevEcoStudio'
 node --test tests/protocol.test.mjs tests/nearlink.test.mjs tests/map.test.mjs tests/integration.test.mjs tests/storage.test.mjs tests/location.test.mjs tests/delivery.test.mjs
 devecocli.cmd check arkts --project .
 devecocli.cmd check lint --format json .
@@ -120,6 +131,8 @@ Evidence lives in [artifacts/logs](artifacts/logs/), [artifacts/screenshots](art
 - **Initial audit gaps:** native components and passing drill checks did not establish full UX readiness. The follow-up replaced undersized controls and weak semantics, moved alert information first, added theme/language resources and adaptive layout, and corrected saved-point state after write failures. Recorded native checks now cover final navigation and selected configuration/persistence paths; ScreenReader and landscape remain separate validation gates.
 - **Newest-message-only synchronization:** the original connection callback only sent the currently selected alert. The delivery follow-up synchronizes the verified bounded cache, correlates receipts and retries a bounded number of times. Host packet-loss tests validate policy; they do not prove radio delivery.
 - **Video capture availability:** DevEco CLI exposed screenshots but no video command, and the emulator lacked `screenrecord`. The implemented Windows helper records only the emulator window with installed Studio FFmpeg; there is no fallback to the private desktop.
+- **Demo automation on 2026-10-04:** `devecocli ui click --id` took about 2.5 s per tap because it dumps the layout each time. The driver switched to `uitest dumpLayout` plus `uitest uiInput click`, about 1.3 s per tap. The first takes failed because the open soft keyboard hid lower fields, so the driver now taps `KeyHideKbd`. They also failed because the console and detail screens have no bottom tab bar, so the driver now goes back first. Only the final, complete take was used.
+- **Background relaying (rejected on 2026-10-04):** the local HarmonyOS documentation shows that the NearLink continuous-task mode (`MODE_NEARLINK`) exists only from API 26. The modes available on API 20–24 (`dataTransfer`, `bluetoothInteraction`) are checked for consistency by the system. A mismatched task would be suspended and would look added for show, so no background mode or notification was added.
 
 ## Known limitations
 
@@ -134,7 +147,7 @@ The initial read-only design review and subsequent implementation status are rec
 - Fixture validity is 72 hours; regenerate with `node scripts/generate-demo-alerts.mjs`, rebuild and restart the demo when presenting later.
 - The unsigned HAP used successfully on the emulator still requires appropriate signing/provisioning for a physical phone.
 - ScreenReader interaction, landscape and physical GPS remain untested. Large text was measured at 1.45; the source cap of 2.0 is not a validation result.
-- Final native-symbol navigation verification, the live emulator video and same-host clean-checkout build are complete. Validation on another computer and public source publication remain outstanding; the user has authorized local commits only.
+- The source is public on GitHub, and v1.4.1 with its HAP and demo video is published as a GitHub Release. Validation on another computer has not been done; all builds used this Windows host.
 - AI-generated code and AI review may miss defects. This prototype requires further independent review and physical/operational validation before real emergency use.
 
 ## Lessons learned
@@ -146,7 +159,10 @@ The initial read-only design review and subsequent implementation status are rec
 - Public map provenance and source availability categories are part of product correctness, not optional presentation details.
 - Save reproducible tests and runtime artifacts alongside code so reviewers can distinguish measured behavior from intended behavior.
 
-## Submission-form guide (2026-10-03)
+## Submission-form guide (2026-10-03, superseded)
+
+On 2026-10-04 the team entered the project in the **Huawei** challenge. The Polish form guide described below suggested the DEFENCE category and v1.1 numbers. It was therefore removed from the repository; it remains in Git history at `5804dc3`. The current paste-ready text is [SUBMISSION.md](SUBMISSION.md).
+
 
 Codex reviewed the existing project documentation, validation evidence and main source components to prepare `artifacts/submission/SafeMesh-jak-wypelnic-Hacktribe.pdf` and a companion UTF-8 text file. The guide contains Polish field instructions and English copy for the Hacktribe form. The participant stated that nothing existed before the event; the guide uses that account for the new-project chronology and asks the team to verify it before submission. Team size and unpublished links are not invented.
 

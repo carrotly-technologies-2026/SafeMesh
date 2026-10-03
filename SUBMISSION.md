@@ -1,53 +1,74 @@
-# SafeMesh hackathon submission
+# SafeMesh: hackathon submission
 
-Copy the sections below into the submission form. The project is a working native HarmonyOS emulator prototype; physical NearLink exchange is the next validation milestone.
+Paste-ready text for the HackYeah 2026 submission form. Challenge: **Huawei, “Imagine What’s Next”**. All jury-facing material is in English.
+
+## Links
+
+- Code repository: https://github.com/carrotly-technologies-2026/SafeMesh
+- Release with the HAP and demo video: https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/v1.4.1
+- Demo video file: https://github.com/carrotly-technologies-2026/SafeMesh/releases/download/v1.4.1/SafeMesh-1.4.1-demo.mp4 (the form asks for a YouTube link: upload this file as *Unlisted* or *Public* and paste that link)
+- Cover image: [artifacts/cover/SafeMesh-cover.png](artifacts/cover/SafeMesh-cover.png). Alt text: *Three connected phones above a stylized city map, illustrating signed alerts, offline maps and nearby-device relaying.* The cover is a conceptual illustration generated with an image tool; its [prompt](artifacts/cover/PROMPT.txt) is included. It is not an app screenshot.
+
+## Challenge area
+
+**Human-Centric Technology** (lead) and **Spatial Experiences**. SafeMesh keeps trustworthy safety information available when mobile networks fail. Every phone verifies the issuer's signature, so forged or altered warnings are rejected. The UI is inclusive (PL/EN, dark mode, large text, screen-reader announcements) and privacy-preserving (location is never stored or relayed). The relay follows physical proximity, A → B → C, and an offline map shows nearby protective points.
 
 ## Problem
 
-When mobile networks fail during a crisis, people can lose access to both emergency warnings and the information needed to act on them. An alert may tell someone to seek shelter without explaining where nearby protective locations are. Forwarded messages introduce another risk: recipients cannot easily tell whether the content has been altered. SafeMesh addresses these connected problems: keeping warnings accessible, checking their authenticity and providing practical offline reference information.
+During a crisis, a mobile-network outage can cut people off from warnings and from the information they need to act on them. This is a documented risk: ITU's December 2022 interim assessment of Ukraine reported that almost 11% of mobile operators' base stations were out of service. Forwarded messages add a second problem, because recipients cannot tell whether the text was altered. People need warnings they can trust and local protective-point information that works without connectivity.
 
 ## Solution
 
-SafeMesh is a native HarmonyOS application built with ArkTS and ArkUI. It combines digitally signed alerts, an offline map and a relay engine designed to pass verified messages between nearby phones. Every receiving device checks the issuer's signature before accepting or forwarding an alert. The bundled map covers central Kraków and contains 40 protective-point records published by Poland's State Fire Service (PSP), with address search and saved places. Polish and English interfaces and Light, Dark and System themes make the app adaptable to users' preferences. A NearLink adapter is implemented; the current emulator demonstrates relay logic through a clearly labelled simulation.
+SafeMesh is a native HarmonyOS app built with ArkTS and ArkUI. An authenticated issuer publishes a signed alert, and phones pass it on to nearby phones that are in range. Each phone verifies the ECDSA P-256 signature on the device, with a pinned public key, before it stores, displays, acknowledges or forwards the alert. Altered, expired and duplicate packets are rejected or suppressed. A phone that received an alert keeps it and later hands it to phones that were never in range of the issuer (store-and-forward, with app-level ACKs and bounded retries).
 
-## Cover Image
+The app also bundles an offline map of 40 State Fire Service (PSP) protective points in central Kraków, with search and a saved place. It offers Polish and English, light and dark themes and large-text support.
 
-Upload [SafeMesh-cover.png](artifacts/cover/SafeMesh-cover.png).
-
-Suggested alt text: Three connected phones above a stylized city map, illustrating signed alerts, offline maps and nearby-device relaying.
-
-The cover is a conceptual illustration generated with the built-in imagegen tool. It does not depict measured radio coverage or actual app screens. The [generation prompt](artifacts/cover/PROMPT.txt) is included for transparency.
+The NearLink (星闪) radio adapter is implemented with NearLink Kit. On emulators, which have no radio, a clearly labelled local test link connects three separate app processes.
 
 ## What's done so far and goal of the project
 
-We have built and run a native HarmonyOS prototype with on-device signature verification, rejection of altered and expired alerts, duplicate suppression and persistent alert storage. It includes an offline Kraków map, search across all 40 bundled points, saved places, language settings and theme preferences. The relay engine includes cached-message synchronization, bounded retries and receiving-app acknowledgements. Validation includes 61 automated host tests, six native signature/relay checks and a recorded emulator demonstration.
+Before the event, nothing existed; the whole project was created at HackYeah on 3–4 October 2026, with AI coding agents disclosed in AI_WORKFLOW.md.
 
-Our next goal is a controlled trial on compatible physical phones: phone A passes an alert to B, A disconnects, and B later delivers it to C without internet. We then want to improve usability and work with public-safety organisations on trustworthy issuing and practical deployment. Physical NearLink exchange remains unverified. Current alerts are signed exercises, with no official RCB integration, and listed protective points do not guarantee current access or condition.
+Done and demonstrated on three API 24 emulators (release v1.4.1):
+- Authenticated exercise-issuer console and signed custom alerts.
+- Automatic relay A → B → C, with C receiving at hop 2 after A has left.
+- App ACKs with retries, and rejection of forged content.
+- Inbox with unread state that survives restarts.
+- Offline PSP map with search.
+- PL/EN, light/dark and large-text support.
+
+Evidence: 168 automated host tests, a clean ArkTS check and Code Linter, 17/17 assertions over recorded native evidence for the v1.4 multi-emulator scenario, and a captioned demo video of the final build.
+
+Next step: the first physical NearLink test on HarmonyOS phones, following docs/PHYSICAL_TESTING.md. After that: background relaying with the API 26 NearLink continuous-task mode, and work with public-safety organisations on authorised issuing and data maintenance.
+
+Current limits, stated in the app and README:
+- Alerts are signed exercises, with no official RCB integration.
+- Relaying works while the app is in the foreground.
+- Map records do not confirm current access.
 
 ## Instructions on how to open the project
 
-1. Extract `SafeMesh-source.zip` and open its `SafeMesh` folder in **DevEco Studio**. Select the folder containing `build-profile.json5` and `oh-package.json5`.
-2. Use the tested toolchain: **DevEco Studio 6.1.1**, **Huawei HarmonyOS SDK API 24 including HMS kits**, **Node.js 24** and **DevEco CLI 1.3.4** with the organizer's patches. Complete the fresh-machine setup in [README](README.md#run-on-windows) if these are not installed.
-3. Start an **API 24 phone emulator**. Open PowerShell in the extracted project folder and run the commands below, replacing the Studio path and device serial as needed.
+1. **Quickest check, install the prebuilt HAP.** Start any API 20+ HarmonyOS phone emulator in DevEco Studio, download `SafeMesh-1.4.1.hap` from the release, then run:
+   ```powershell
+   $hdc = Join-Path $env:USERPROFILE 'DevEcoStudio\sdk\default\openharmony\toolchains\hdc.exe'
+   & $hdc list targets
+   & $hdc -t <serial> install -r .\SafeMesh-1.4.1.hap
+   & $hdc -t <serial> shell aa start -b org.safemesh.alerts -a EntryAbility
+   ```
+2. **Build from source.** Clone the repository and open it in **DevEco Studio 6.1.1** with the **HarmonyOS SDK API 24 including HMS kits** (NearLink Kit is not in a plain OpenHarmony SDK). Install **Node.js 24** and **DevEco CLI 1.3.4** with the organizers' patches, following README → *Run on Windows*. Then run `.\scripts\check.ps1 -Build` (tests, ArkTS check, lint, build) and `.\scripts\run-demo.ps1 -Device <serial>` (build, install, launch).
+3. **Single emulator, about 2 minutes.**
+   - The app starts in English on a non-Polish system; the gear icon switches PL/EN.
+   - Gear → Tests and diagnostics → **Load exercise message**, then open it from the banner.
+   - **Map**: search "Bracka" and open a point.
+   - **Run verification test**: expect 6/6 checks.
+   - **Check NearLink support**: the emulator reports no radio.
+4. **Three emulators with a custom alert.** Follow README → *Publish a custom alert to three emulators*. `scripts/start-authority-demo.ps1` starts the local issuer and test hub and installs the same HAP on A, B and C.
 
-```powershell
-$env:DEVECO_CLI_STUDIO_PATH = 'C:\path\to\DevEcoStudio'
-devecocli.cmd device list --format json
-powershell -ExecutionPolicy Bypass -File scripts/run-demo.ps1 -Device '127.0.0.1:5555' -RefreshDrill
-```
+The bundled exercise fixture is valid until **2026-10-06 19:57:54 UTC**. Custom alerts carry their own 15-minute to 24-hour validity. README → *Refresh an expired exercise* regenerates the fixture.
 
-The helper refreshes the time-limited exercise fixtures, builds the HAP, installs it and launches the app. Use the actual serial printed by `device list`.
+## Files
 
-4. On **Home**, receive a signed exercise. Open **Map** to browse and search the offline points. On **Relay**, run the signed relay drill; the expected result is **6/6 checks passed**. Use the upper-right gear to change the language or theme. The default language is Polish; **Ustawienia → English** switches the interface.
+- `SafeMesh-1.4.1.hap`, `SafeMesh-1.4.1-demo.mp4` and `SafeMesh-1.4.1.sha256.txt`, attached to GitHub Release v1.4.1.
+- `artifacts/cover/SafeMesh-cover.png`: cover image.
 
-The supplied `SafeMesh-demo.hap` is an unsigned debug package validated on the emulator. Physical phones require development signing and compatible NearLink hardware. The prebuilt exercise expires on **2026-10-06 at 15:19:32 UTC**; the refresh command above creates a new 72-hour exercise and rebuilds it.
-
-## Files to attach
-
-- `artifacts/cover/SafeMesh-cover.png` — cover image.
-- `dist/SafeMesh-source.zip` — complete tracked source and documentation.
-- `dist/SafeMesh-demo.hap` — emulator application package.
-- `dist/SafeMesh-demo.mp4` — 90-second native emulator demonstration.
-- `dist/SHA256SUMS.txt` — checksums for the three files in `dist` above.
-
-Project authors: **Tomek and Hubert**. Development-tool assistance is documented in [AI_WORKFLOW.md](AI_WORKFLOW.md). The source has local commits; no public repository has been published.
+Project authors: **Tomek and Hubert**. AI-assisted development is documented in [AI_WORKFLOW.md](AI_WORKFLOW.md).
