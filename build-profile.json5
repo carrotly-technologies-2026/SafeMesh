@@ -1,13 +1,26 @@
 {
   "app": {
-    "signingConfigs": [],
+    "signingConfigs": [
+      {
+        "name": "default",
+        "material": {
+          "certpath": "./signatures/OpenHarmonyProfileRelease.pem",
+          "storePassword": "00000016c11d0a4c9c9da484e4a9ac9d83adf4fbc8560f10b2032e6134381d8719a58c60d7d4",
+          "keyAlias": "openharmony application profile release",
+          "keyPassword": "000000160b401a32f7b0e158fd0dfa4fd8c2fd1e12d576ee9e3a57fe61f4f3eda7afddb6e6dc",
+          "profile": "./signatures/app1-profile.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "./signatures/OpenHarmony.p12"
+        }
+      }
+    ],
     "products": [
       {
         "name": "default",
         "signingConfig": "default",
-        "targetSdkVersion": "6.1.1(24)",
-        "compatibleSdkVersion": "6.0.0(20)",
-        "runtimeOS": "HarmonyOS",
+        "compileSdkVersion": 23,
+        "compatibleSdkVersion": 20,
+        "runtimeOS": "OpenHarmony",
         "buildOption": {
           "strictMode": {
             "caseSensitiveCheck": true,
@@ -18,7 +31,7 @@
     ],
     "buildModeSet": [
       {
-        "name": "debug",
+        "name": "debug"
       },
       {
         "name": "release"
