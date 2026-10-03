@@ -71,4 +71,4 @@ The bundled exercise fixture is valid until **2026-10-06 19:57:54 UTC**. Custom 
 - `SafeMesh-1.4.1.hap`, `SafeMesh-1.4.1-demo.mp4` and `SafeMesh-1.4.1.sha256.txt`, attached to GitHub Release v1.4.1.
 - `artifacts/cover/SafeMesh-cover.png`: cover image.
 
-Project authors: **Tomek and Hubert**. AI-assisted development is documented in [AI_WORKFLOW.md](AI_WORKFLOW.md).
+Built by the SafeMesh team at HackYeah 2026. AI-assisted development is documented in [AI_WORKFLOW.md](AI_WORKFLOW.md).
