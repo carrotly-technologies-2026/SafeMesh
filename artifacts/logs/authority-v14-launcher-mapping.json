@@ -1,0 +1,57 @@
+{
+    "passed":  true,
+    "count":  11,
+    "powerShellVersion":  "5.1.26100.8875",
+    "actualSourceSha256":  "AF7ACFF67BD9D489FCD7B18F556732F96671F4C2A2302585E076CAB0A2DE604E",
+    "cliFixtureSha256":  "DDD623F67FAA0DC2900B6F15BCAE78B1113BE0A3B4FE1579041822F7AF55686A",
+    "legacySelectionCount":  9,
+    "fixedSelectionCount":  3,
+    "reorderedIssuer":  "127.0.0.1:5557",
+    "devicesMutated":  false,
+    "checks":  [
+                   {
+                       "name":  "three_flat_default_devices",
+                       "passed":  true
+                   },
+                   {
+                       "name":  "issuer_a_reordered_to_safemesh_b",
+                       "passed":  true
+                   },
+                   {
+                       "name":  "cli_order_does_not_choose_issuer",
+                       "passed":  true
+                   },
+                   {
+                       "name":  "ansi_json_is_supported",
+                       "passed":  true
+                   },
+                   {
+                       "name":  "missing_name_rejected",
+                       "passed":  true
+                   },
+                   {
+                       "name":  "ambiguous_name_rejected",
+                       "passed":  true
+                   },
+                   {
+                       "name":  "duplicate_serial_rejected",
+                       "passed":  true
+                   },
+                   {
+                       "name":  "nested_json_array_rejected",
+                       "passed":  true
+                   },
+                   {
+                       "name":  "non_emulator_rejected",
+                       "passed":  true
+                   },
+                   {
+                       "name":  "remote_serial_rejected",
+                       "passed":  true
+                   },
+                   {
+                       "name":  "duplicate_requested_names_rejected",
+                       "passed":  true
+                   }
+               ]
+}

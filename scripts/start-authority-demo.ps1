@@ -231,6 +231,39 @@ function Start-OrReuseAuthority {
         ConvertTo-Json | Set-Content -LiteralPath (Join-Path $sessionDirectory 'authority-session.json') -Encoding UTF8
 }
 
+function Resolve-AuthorityDevices {
+    param([string]$DeviceOutput, [string[]]$Names)
+    if ($Names.Count -ne 3 -or @($Names | Sort-Object -Unique).Count -ne 3) {
+        throw 'Choose three different existing emulator names.'
+    }
+    try {
+        # Windows PowerShell 5 emits a JSON array as one pipeline object. Assign
+        # it first, then enumerate the resulting array; wrapping the pipeline in
+        # @() directly would leave a nested array and match every device at once.
+        $decoded = ConvertFrom-Json -InputObject ($DeviceOutput -replace '\x1B\[[0-?]*[ -/]*[@-~]', '')
+        if ($decoded -isnot [Array]) { throw 'Expected a device array' }
+        $devices = @($decoded)
+        foreach ($device in $devices) {
+            if ($device -isnot [pscustomobject] -or $device.name -isnot [string] -or
+                $device.kind -isnot [string] -or $device.serial -isnot [string]) {
+                throw 'Invalid device record'
+            }
+        }
+    } catch { throw 'Device inspection did not return a valid flat device array.' }
+    $selected = @()
+    foreach ($name in $Names) {
+        $matching = @($devices | Where-Object { $_.name -ceq $name -and $_.kind -eq 'emulator' })
+        if ($matching.Count -ne 1 -or $matching[0].serial -notmatch '^127\.0\.0\.1:\d+$') {
+            throw 'Expected exactly one connected local emulator per requested name. No authority reverse port was created.'
+        }
+        $selected += $matching[0]
+    }
+    if ($selected.Count -ne 3 -or @($selected.serial | Sort-Object -Unique).Count -ne 3) {
+        throw 'Requested emulator names resolved to duplicate serials. No authority reverse port was created.'
+    }
+    return $selected
+}
+
 Push-Location -LiteralPath $projectRoot
 try {
     Write-Host "SafeMesh local exercise authority launcher. Logs: $sessionDirectory"
@@ -265,6 +298,9 @@ try {
         '-DeviceTimeoutSeconds', [string]$DeviceTimeoutSeconds)
     if ($canSkipBuild) { $meshArguments += '-SkipBuild' }
     $meshOutput = Invoke-AuthorityCommand $powerShellPath $meshArguments 'mesh-build-deploy' (1200 + $DeviceTimeoutSeconds)
+    # Includes the reused hub's topology/loss-control warning. The delegated
+    # mesh launcher never receives the authority key or operator credential.
+    Write-Host $meshOutput
     if ($meshOutput -notmatch 'MESH_LAB_READY=1') { throw "Mesh launcher did not report readiness. Logs: $sessionDirectory" }
     if (-not (Test-AuthorityPin $metadata) -or $pinHash -ne (Get-FileHash -LiteralPath $pinPath -Algorithm SHA256).Hash -or
         $metadataHash -ne (Get-FileHash -LiteralPath $appMetadataPath -Algorithm SHA256).Hash) {
@@ -275,19 +311,7 @@ try {
         Set-Content -LiteralPath $buildReceiptPath -Encoding UTF8
 
     $deviceOutput = Invoke-AuthorityCommand $cliPath @('device', 'list', '--format', 'json') 'verify-devices'
-    try { $devices = @($deviceOutput -replace '\x1B\[[0-?]*[ -/]*[@-~]', '' | ConvertFrom-Json) }
-    catch { throw "Device inspection did not return JSON. Logs: $sessionDirectory" }
-    $selectedDevices = @()
-    foreach ($name in @($EmulatorA, $EmulatorB, $EmulatorC)) {
-        $matchesForName = @($devices | Where-Object { $_.name -ceq $name -and $_.kind -eq 'emulator' })
-        if ($matchesForName.Count -ne 1 -or $matchesForName[0].serial -notmatch '^127\.0\.0\.1:\d+$') {
-            throw 'Expected exactly one connected local emulator per requested name. No authority reverse port was created.'
-        }
-        $selectedDevices += $matchesForName[0]
-    }
-    if (@($selectedDevices.serial | Sort-Object -Unique).Count -ne 3) {
-        throw 'Requested emulator names resolved to duplicate serials. No authority reverse port was created.'
-    }
+    $selectedDevices = @(Resolve-AuthorityDevices $deviceOutput @($EmulatorA, $EmulatorB, $EmulatorC))
     $issuerDevice = [string]$selectedDevices[0].serial
     # Inspect all three target devices before granting A. Existing unexpected
     # authority grants cause a failure; the helper never removes other mappings.
