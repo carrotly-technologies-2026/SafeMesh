@@ -1,0 +1,137 @@
+import { MapViewModel, MapShape, MapVertex, SafePointViewModel } from '../viewmodel/MapViewModel';
+import { MAP_BOUNDS } from '../model/OfflineMapData';
+
+@Component
+export struct OfflineMap {
+  @ObjectLink vm: MapViewModel;
+  @Prop @Watch('onRevisionChanged') revision: number = 0;
+  @Prop compact: boolean = false;
+  onSelect: (id: string) => void = () => {};
+  private canvas: CanvasRenderingContext2D = new CanvasRenderingContext2D(new RenderingContextSettings(true));
+  private widthValue: number = 360;
+  private heightValue: number = 280;
+  private canvasReady: boolean = false;
+
+  onRevisionChanged(): void { this.draw(); }
+  aboutToDisappear(): void { this.canvasReady = false; }
+
+  x(lon: number): number {
+    return this.widthValue / 2 + (lon - this.vm.centerLon) * this.widthValue / (0.042 / this.vm.zoom);
+  }
+  y(lat: number): number {
+    const span: number = (0.042 / this.vm.zoom) * this.heightValue / this.widthValue * 0.642;
+    return this.heightValue / 2 - (lat - this.vm.centerLat) * this.heightValue / span;
+  }
+
+  path(shape: MapShape): void {
+    this.canvas.beginPath();
+    this.trace(shape);
+  }
+
+  private visible(shape: MapShape): boolean {
+    return this.x(shape.maxLon) >= 0 && this.x(shape.minLon) <= this.widthValue &&
+      this.y(shape.minLat) >= 0 && this.y(shape.maxLat) <= this.heightValue;
+  }
+
+  private trace(shape: MapShape): void {
+    shape.points.forEach((point: MapVertex, index: number) => {
+      if (index === 0) { this.canvas.moveTo(this.x(point.lon), this.y(point.lat)); }
+      else { this.canvas.lineTo(this.x(point.lon), this.y(point.lat)); }
+    });
+  }
+
+  draw(): void {
+    if (!this.canvasReady || this.widthValue <= 0 || this.heightValue <= 0) { return; }
+    this.canvas.fillStyle = '#F1F2EE';
+    this.canvas.fillRect(0, 0, this.widthValue, this.heightValue);
+    const left: number = this.x(MAP_BOUNDS.west);
+    const top: number = this.y(MAP_BOUNDS.north);
+    const mapWidth: number = this.x(MAP_BOUNDS.east) - left;
+    const mapHeight: number = this.y(MAP_BOUNDS.south) - top;
+    this.canvas.save();
+    this.canvas.beginPath();
+    this.canvas.rect(left, top, mapWidth, mapHeight);
+    this.canvas.clip();
+    this.canvas.fillStyle = '#E8EDE2';
+    this.canvas.fillRect(left, top, mapWidth, mapHeight);
+    this.vm.areas.forEach((area: MapShape) => {
+      if (!this.visible(area)) { return; }
+      this.path(area); this.canvas.closePath();
+      this.canvas.fillStyle = area.kind.includes('water') ? '#A9CED0' : '#CDDDBE';
+      this.canvas.fill();
+    });
+    this.canvas.beginPath();
+    this.vm.rivers.forEach((river: MapShape) => {
+      if (this.visible(river)) { this.trace(river); }
+    });
+    this.canvas.strokeStyle = '#A9CED0';
+    this.canvas.lineWidth = 18 * this.vm.zoom;
+    this.canvas.stroke();
+    // Batch all streets of the same visual width into a single stroke.
+    // The old loop submitted almost 3,000 separate strokes on each redraw.
+    for (let layer: number = 0; layer < 2; layer++) {
+      this.canvas.beginPath();
+      for (const street of this.vm.streets) {
+        const major: boolean = street.kind === 'primary' || street.kind === 'secondary';
+        if (major === (layer === 1) && this.visible(street)) { this.trace(street); }
+      }
+      this.canvas.strokeStyle = '#FCFDF8';
+      this.canvas.lineWidth = layer === 1 ? 4 : 2;
+      this.canvas.stroke();
+    }
+    this.canvas.font = 'bold 12px sans-serif';
+    this.canvas.fillStyle = '#76887B';
+    this.canvas.fillText('STARE MIASTO', this.x(19.936) - 30, this.y(50.061) - 27);
+    this.canvas.fillText('KAZIMIERZ', this.x(19.947) - 25, this.y(50.051));
+    this.canvas.restore();
+    this.canvas.strokeStyle = '#B7C2B6';
+    this.canvas.lineWidth = 1;
+    this.canvas.strokeRect(left, top, mapWidth, mapHeight);
+    this.vm.points.forEach((point: SafePointViewModel) => {
+      const selected: boolean = point.id === this.vm.selectedId;
+      const px: number = this.x(point.lon); const py: number = this.y(point.lat);
+      if (px < 0 || px > this.widthValue || py < 0 || py > this.heightValue) { return; }
+      this.canvas.beginPath(); this.canvas.arc(px, py, selected ? 12 : 5.5, 0, Math.PI * 2);
+      this.canvas.fillStyle = selected ? '#164D40' : '#FFFFFF'; this.canvas.fill();
+      this.canvas.strokeStyle = '#164D40'; this.canvas.lineWidth = 1.5; this.canvas.stroke();
+      if (selected) {
+        this.canvas.fillStyle = '#D9FF82'; this.canvas.font = 'bold 15px sans-serif';
+        this.canvas.fillText('+', px - 4.5, py + 5);
+      }
+    });
+    const ox: number = this.x(this.vm.originLon); const oy: number = this.y(this.vm.originLat);
+    this.canvas.beginPath(); this.canvas.arc(ox, oy, 10, 0, Math.PI * 2);
+    this.canvas.fillStyle = '#4467CF33'; this.canvas.fill();
+    this.canvas.beginPath(); this.canvas.arc(ox, oy, 4, 0, Math.PI * 2);
+    this.canvas.fillStyle = '#4467CF'; this.canvas.fill();
+  }
+
+  pick(x: number, y: number): void {
+    let closestId: string = '';
+    let distance: number = 28;
+    for (const point of this.vm.points) {
+      const px: number = this.x(point.lon); const py: number = this.y(point.lat);
+      if (px < 0 || px > this.widthValue || py < 0 || py > this.heightValue) { continue; }
+      const d: number = Math.hypot(px - x, py - y);
+      if (d < distance) { closestId = point.id; distance = d; }
+    }
+    if (closestId.length > 0) { this.onSelect(closestId); }
+  }
+
+  build() {
+    Canvas(this.canvas)
+      .width('100%').height('100%')
+      .onReady(() => { this.canvasReady = true; this.draw(); })
+      .onAreaChange((_old: Area, area: Area) => {
+        const width: number = Number(area.width); const height: number = Number(area.height);
+        if (width > 0 && height > 0 && (width !== this.widthValue || height !== this.heightValue)) {
+          this.widthValue = width; this.heightValue = height; this.draw();
+        }
+      })
+      .onTouch((event: TouchEvent) => {
+        if (event.type === TouchType.Up && event.changedTouches.length > 0) {
+          this.pick(event.changedTouches[0].x, event.changedTouches[0].y);
+        }
+      })
+  }
+}

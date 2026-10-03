@@ -1,0 +1,20 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "Signed offline alerts and protective locations"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "SafeMesh offline preparedness demo"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "SafeMesh"
+    },
+    {
+      "name": "nearlink_reason",
+      "value": "Connect to nearby SafeMesh phones to exchange verified exercise messages without internet."
+    }
+  ]
+}
