@@ -1,0 +1,91 @@
+{
+    "capturedAtUtc":  "2026-10-03T18:31:28.5798157Z",
+    "oldPid":  "32164",
+    "newPid":  "10540",
+    "elapsedSeconds":  12.257047799999999,
+    "administrativeDisconnect":  false,
+    "state":  {
+                  "protocol":  1,
+                  "transport":  "local-emulator-websocket",
+                  "host":  "127.0.0.1",
+                  "port":  8765,
+                  "connected":  [
+                                    "A",
+                                    "C"
+                                ],
+                  "links":  [
+                                [
+                                    "A",
+                                    "B"
+                                ],
+                                [
+                                    "B",
+                                    "C"
+                                ]
+                            ],
+                  "routes":  {
+                                 "A-\u003eB":  {
+                                                   "attempted":  2,
+                                                   "forwarded":  2,
+                                                   "dropped":  0,
+                                                   "blocked":  0,
+                                                   "offline":  0,
+                                                   "backpressure":  0,
+                                                   "injected":  0
+                                               },
+                                 "A-\u003eC":  {
+                                                   "attempted":  0,
+                                                   "forwarded":  0,
+                                                   "dropped":  0,
+                                                   "blocked":  0,
+                                                   "offline":  0,
+                                                   "backpressure":  0,
+                                                   "injected":  0
+                                               },
+                                 "B-\u003eA":  {
+                                                   "attempted":  2,
+                                                   "forwarded":  2,
+                                                   "dropped":  0,
+                                                   "blocked":  0,
+                                                   "offline":  0,
+                                                   "backpressure":  0,
+                                                   "injected":  0
+                                               },
+                                 "B-\u003eC":  {
+                                                   "attempted":  2,
+                                                   "forwarded":  2,
+                                                   "dropped":  0,
+                                                   "blocked":  0,
+                                                   "offline":  0,
+                                                   "backpressure":  0,
+                                                   "injected":  0
+                                               },
+                                 "C-\u003eA":  {
+                                                   "attempted":  0,
+                                                   "forwarded":  0,
+                                                   "dropped":  0,
+                                                   "blocked":  0,
+                                                   "offline":  0,
+                                                   "backpressure":  0,
+                                                   "injected":  0
+                                               },
+                                 "C-\u003eB":  {
+                                                   "attempted":  2,
+                                                   "forwarded":  2,
+                                                   "dropped":  0,
+                                                   "blocked":  0,
+                                                   "offline":  0,
+                                                   "backpressure":  0,
+                                                   "injected":  0
+                                               }
+                             },
+                  "dropNext":  [
+
+                               ],
+                  "limits":  {
+                                 "clients":  3,
+                                 "messageBytes":  65536,
+                                 "packetBytes":  16384
+                             }
+              }
+}

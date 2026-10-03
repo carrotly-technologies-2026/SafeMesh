@@ -1,0 +1,28 @@
+SafeMesh: three emulator apps over a local test link (not physical NearLink).
+Logs: C:\Users\user\SafeMesh\.cache\mesh-lab\20261003-203253-272
+[emulator-list]
+[device-list]
+Reusing the existing verified loopback hub; its current test controls are preserved.
+[ports-A]
+[run-A]
+Node A: installed and launched on HackYeahPhone [127.0.0.1:5555].
+[ports-B]
+[run-B]
+Node B: installed and launched on SafeMeshB [127.0.0.1:5557].
+[ports-C]
+[run-C]
+Node C: installed and launched on SafeMeshC [127.0.0.1:5559].
+
+Node Name          Serial         RemotePort
+---- ----          ------         ----------
+A    HackYeahPhone 127.0.0.1:5555       8765
+B    SafeMeshB     127.0.0.1:5557       8766
+C    SafeMeshC     127.0.0.1:5559       8767
+
+
+
+Hub links: A-B, B-C
+On each emulator: open Relay / Lacznosc, choose the emulator test link, then select its A/B/C role.
+Start A and B. Load a signed drill on A and share it. Start C later to test forwarding from B.
+The hub stays running on 127.0.0.1:8765. This launcher does not click UI controls or clear app data.
+MESH_LAB_READY=1 | Logs: C:\Users\user\SafeMesh\.cache\mesh-lab\20261003-203253-272

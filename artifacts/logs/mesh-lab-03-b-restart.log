@@ -1,0 +1,14 @@
+devecocli.cmd : Ensure the project source is trusted before proceeding.
+At line:5 char:1
++ devecocli.cmd run --skip-build --module entry --device '127.0.0.1:555 ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Ensure the proj...ore proceeding.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+
+Installing artifacts to device 127.0.0.1:5557...
+App installed successfully
+Launching org.safemesh.alerts/EntryAbility...
+
+Application 'org.safemesh.alerts': start ability successfully.
+Smoke: PASS

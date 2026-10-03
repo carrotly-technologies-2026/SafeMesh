@@ -1,0 +1,28 @@
+{
+    "capturedAtUtc":  "2026-10-03T18:21:23.1519569Z",
+    "bundleName":  "org.safemesh.alerts",
+    "method":  "SDK hdc shell pidof org.safemesh.alerts; no full process enumeration",
+    "currentProcesses":  [
+                             {
+                                 "node":  "A",
+                                 "deviceSerial":  "127.0.0.1:5555",
+                                 "appPid":  1114
+                             },
+                             {
+                                 "node":  "B",
+                                 "deviceSerial":  "127.0.0.1:5557",
+                                 "appPid":  32164
+                             },
+                             {
+                                 "node":  "C",
+                                 "deviceSerial":  "127.0.0.1:5559",
+                                 "appPid":  22808
+                             }
+                         ],
+    "priorStage":  {
+                       "node":  "B",
+                       "appPid":  23058,
+                       "evidence":  "mesh-lab-02-b-receive.log",
+                       "note":  "Prior A-to-B accepted/duplicate stage, before root reinstalled/relaunched B."
+                   }
+}
