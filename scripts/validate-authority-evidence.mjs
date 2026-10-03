@@ -307,6 +307,7 @@ check('tamper_rejected_without_ack', 'Changed signed content fails crypto, recei
   }
   const layout = assertInbox('c-after-tampered.json', issued(), 0, false);
   assert.equal(texts(layout).some(text => text.includes(packet.envelope.payload.body)), false);
+  assertDetail('c-second-detail-after-tampered.json', original, 'B', 2);
 });
 
 const passed = checks.filter(item => item.passed).length;
