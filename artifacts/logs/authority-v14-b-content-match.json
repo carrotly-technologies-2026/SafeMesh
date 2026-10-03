@@ -1,0 +1,12 @@
+[
+  {
+    "alertId": "authority-eca37358bc903343c461d2526d00f434",
+    "titleBodyAreaExactMatch": true,
+    "bodyCharacters": 137
+  },
+  {
+    "alertId": "authority-848aa13a930ee34429911ec68d38661d",
+    "titleBodyAreaExactMatch": true,
+    "bodyCharacters": 155
+  }
+]

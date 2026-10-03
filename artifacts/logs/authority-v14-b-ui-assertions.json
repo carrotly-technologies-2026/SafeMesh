@@ -1,0 +1,20 @@
+{
+  "first-unread": {
+    "unread": 1,
+    "messages": 1
+  },
+  "two-unread": {
+    "unread": 2,
+    "messages": 2
+  },
+  "one-unread": {
+    "unread": 1,
+    "messages": 2
+  },
+  "all-read": {
+    "unread": 0,
+    "messages": 2
+  },
+  "relayManualSendAbsent": true,
+  "englishOriginalLanguageNotice": true
+}

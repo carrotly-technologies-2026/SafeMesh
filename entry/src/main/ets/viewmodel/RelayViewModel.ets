@@ -287,7 +287,7 @@ export class RelayViewModel {
         this.logReceive('malformed');
         return;
       }
-      const result: RelayResult = await this.alertVM.receive(envelope);
+      const result: RelayResult = await this.alertVM.receive(envelope, address);
       if (this.stopped || generation !== this.generation) { return; }
       this.lastPacketState = result.status;
       this.logReceive(result.status, envelope.payload.alertId, envelope.hops);

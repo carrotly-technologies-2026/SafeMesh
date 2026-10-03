@@ -1,0 +1,373 @@
+﻿[
+  {
+    "bounds": [
+      0,
+      0,
+      1320,
+      2856
+    ],
+    "children": [
+      {
+        "type": "root",
+        "bounds": [
+          0,
+          137,
+          1320,
+          2856
+        ],
+        "children": [
+          {
+            "type": "Column",
+            "bounds": [
+              0,
+              137,
+              1320,
+              2758
+            ],
+            "children": [
+              {
+                "type": "Row",
+                "bounds": [
+                  0,
+                  137,
+                  1320,
+                  332
+                ],
+                "children": [
+                  {
+                    "id": "backSettings",
+                    "type": "Button",
+                    "bounds": [
+                      28,
+                      150,
+                      196,
+                      318
+                    ],
+                    "clickable": true,
+                    "children": [
+                      {
+                        "type": "SymbolGlyph",
+                        "bounds": [
+                          74,
+                          196,
+                          151,
+                          273
+                        ],
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Text",
+                    "text": "Alert",
+                    "bounds": [
+                      210,
+                      187,
+                      1292,
+                      281
+                    ],
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "type": "Row",
+                "bounds": [
+                  0,
+                  332,
+                  1320,
+                  611
+                ],
+                "children": [
+                  {
+                    "id": "readIncoming",
+                    "type": "Button",
+                    "bounds": [
+                      28,
+                      332,
+                      1110,
+                      608
+                    ],
+                    "clickable": true,
+                    "children": [
+                      {
+                        "type": "Column",
+                        "bounds": [
+                          28,
+                          332,
+                          1110,
+                          608
+                        ],
+                        "children": [
+                          {
+                            "type": "Text",
+                            "text": "Odebrano zweryfikowany komunikat ćwiczebny.",
+                            "bounds": [
+                              70,
+                              374,
+                              1068,
+                              423
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Text",
+                            "text": "Ćwiczenie 02 · komunikat dla grupy",
+                            "bounds": [
+                              70,
+                              437,
+                              1068,
+                              499
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Text",
+                            "text": "Przeczytaj alert",
+                            "bounds": [
+                              70,
+                              513,
+                              1068,
+                              566
+                            ],
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dismissIncoming",
+                    "type": "Button",
+                    "bounds": [
+                      1124,
+                      386,
+                      1292,
+                      554
+                    ],
+                    "clickable": true,
+                    "children": [
+                      {
+                        "type": "SymbolGlyph",
+                        "bounds": [
+                          1170,
+                          432,
+                          1247,
+                          509
+                        ],
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "Scroll",
+                "bounds": [
+                  0,
+                  611,
+                  1320,
+                  2758
+                ],
+                "scrollable": true,
+                "children": [
+                  {
+                    "type": "Column",
+                    "bounds": [
+                      0,
+                      611,
+                      1320,
+                      2758
+                    ],
+                    "children": [
+                      {
+                        "type": "Column",
+                        "bounds": [
+                          70,
+                          653,
+                          1250,
+                          2681
+                        ],
+                        "children": [
+                          {
+                            "type": "Row",
+                            "bounds": [
+                              70,
+                              653,
+                              1250,
+                              730
+                            ],
+                            "children": [
+                              {
+                                "type": "SymbolGlyph",
+                                "bounds": [
+                                  70,
+                                  653,
+                                  147,
+                                  730
+                                ],
+                                "children": []
+                              },
+                              {
+                                "id": "verificationBadge",
+                                "type": "Text",
+                                "text": "Podpis poprawny · nadawca ćwiczebny",
+                                "bounds": [
+                                  175,
+                                  665,
+                                  1250,
+                                  718
+                                ],
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "id": "alertTitle",
+                            "type": "Text",
+                            "text": "Ćwiczenie 01 · punkt informacyjny",
+                            "bounds": [
+                              70,
+                              793,
+                              1250,
+                              1023
+                            ],
+                            "children": []
+                          },
+                          {
+                            "id": "messageIssuer",
+                            "type": "Text",
+                            "text": "SafeMesh · nadawca ćwiczeń · ĆWICZENIE",
+                            "bounds": [
+                              70,
+                              1086,
+                              1250,
+                              1139
+                            ],
+                            "children": []
+                          },
+                          {
+                            "id": "messageArea",
+                            "type": "Text",
+                            "text": "Kraków centrum",
+                            "bounds": [
+                              70,
+                              1202,
+                              1250,
+                              1272
+                            ],
+                            "children": []
+                          },
+                          {
+                            "id": "alertBody",
+                            "type": "Text",
+                            "text": "ĆWICZENIE. Punkt informacyjny przy Rynku Głównym. Pozostań z grupą i sprawdzaj podpisane komunikaty. To symulacja, nie rzeczywisty alert.",
+                            "bounds": [
+                              70,
+                              1335,
+                              1250,
+                              1615
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Divider",
+                            "bounds": [
+                              70,
+                              1678,
+                              1250,
+                              1680
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Text",
+                            "text": "Ostrzeżenie",
+                            "bounds": [
+                              70,
+                              1743,
+                              1250,
+                              1800
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Text",
+                            "text": "Wydano 3 paź, 20:12 UTC\nWażny do 4 paź, 20:12 UTC",
+                            "bounds": [
+                              70,
+                              1863,
+                              1250,
+                              1969
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Text",
+                            "text": "Odbiór w teście lokalnym",
+                            "bounds": [
+                              70,
+                              2060,
+                              1250,
+                              2113
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Text",
+                            "text": "Odebrano 3 paź, 20:12 UTC",
+                            "bounds": [
+                              70,
+                              2190,
+                              1250,
+                              2243
+                            ],
+                            "children": []
+                          },
+                          {
+                            "id": "messageRoute",
+                            "type": "Text",
+                            "text": "Odebrano z urządzenia A · Przekazania: 1",
+                            "bounds": [
+                              70,
+                              2306,
+                              1250,
+                              2359
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Text",
+                            "text": "Nadawca podpisał treść alertu. Czas odbioru, poprzednie urządzenie i liczba przekazań to dane lokalnego testu, nie uwierzytelniona trasa.",
+                            "bounds": [
+                              70,
+                              2422,
+                              1250,
+                              2569
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Text",
+                            "text": "Aplikacja ćwiczebna · nie jest to oficjalny alert",
+                            "bounds": [
+                              70,
+                              2632,
+                              1250,
+                              2681
+                            ],
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -8,8 +8,8 @@ const DEMO_ALERT: SignedAlertEnvelope = {
     "keyId": "safemesh-demo-authority-v1",
     "alertId": "krakow-hackyeah-exercise-001",
     "revision": 1,
-    "issuedAt": 1791053385616,
-    "expiresAt": 1791312585616,
+    "issuedAt": 1791057474231,
+    "expiresAt": 1791316674231,
     "severity": "warning",
     "area": "Kraków centrum",
     "title": "Przerwa w łączności",
@@ -27,7 +27,7 @@ const DEMO_ALERT: SignedAlertEnvelope = {
       }
     ]
   },
-  "signature": "MEQCIE4Ma0S1fVAliOK6JJL5dn2eFPfv233Kz42icgc78rwZAiBT6Z7X9XH2umsvxeFteb9veuKXwCndo3YgHCdVZn3bqQ==",
+  "signature": "MEUCIQCXMRClhk2X47HwvBDpcmvE3vb5BKc14BTVSBjiv3U8VwIgDDoWM/VqR6iBPFzDAC4pV1VUg5mxxOruTsMlyqq4tao=",
   "hops": 0
 };
 
@@ -37,8 +37,8 @@ const EXPIRED_ALERT: SignedAlertEnvelope = {
     "keyId": "safemesh-demo-authority-v1",
     "alertId": "krakow-expired-exercise-001",
     "revision": 1,
-    "issuedAt": 1790790645616,
-    "expiresAt": 1791049845616,
+    "issuedAt": 1790794734231,
+    "expiresAt": 1791053934231,
     "severity": "warning",
     "area": "Kraków centrum",
     "title": "Przerwa w łączności",
@@ -56,7 +56,7 @@ const EXPIRED_ALERT: SignedAlertEnvelope = {
       }
     ]
   },
-  "signature": "MEUCIQCJS2mZ8KzVfPFsvRQk/evkv9FmPOn4o2GooMoX785mjwIgDvosKR8GwSy2AuuDOILiFzR6WyKEK2yltMPprjK8IWg=",
+  "signature": "MEQCIHkwp5vrUTqguR3+CKYZWDbsjLaC3uB2f4ZfHUFVmmd3AiBWCCD7PzN3n9qnk09TWHAjGnsfUmS9n9KQk6lV9+YLsg==",
   "hops": 0
 };
 

@@ -286,7 +286,7 @@
     },
     {
       "name": "relay_intro",
-      "value": "Connect test devices to exchange signed messages."
+      "value": "Connect to receive and automatically relay signed alerts."
     },
     {
       "name": "simulation",
@@ -995,6 +995,282 @@
     {
       "name": "connect_devices",
       "value": "Connect devices"
+    },
+    {
+      "name": "relay_automatic",
+      "value": "Verified alerts are relayed automatically while connected."
+    },
+    {
+      "name": "message_detail",
+      "value": "Alert"
+    },
+    {
+      "name": "read_message",
+      "value": "Read alert"
+    },
+    {
+      "name": "unread_short",
+      "value": "Unread"
+    },
+    {
+      "name": "unread_count",
+      "value": "Unread alerts"
+    },
+    {
+      "name": "issued_at",
+      "value": "Issued"
+    },
+    {
+      "name": "received_at",
+      "value": "Received"
+    },
+    {
+      "name": "message_unavailable",
+      "value": "This alert is no longer current."
+    },
+    {
+      "name": "back_to_inbox",
+      "value": "Back to alerts"
+    },
+    {
+      "name": "read_save_failed",
+      "value": "The alert is open, but its read status could not be saved."
+    },
+    {
+      "name": "issuer_authority",
+      "value": "SafeMesh exercise authority"
+    },
+    {
+      "name": "receipt_local",
+      "value": "Local test receipt"
+    },
+    {
+      "name": "receipt_peer",
+      "value": "Received from device"
+    },
+    {
+      "name": "receipt_hops",
+      "value": "Relay hops"
+    },
+    {
+      "name": "receipt_local_source",
+      "value": "Added on this device"
+    },
+    {
+      "name": "receipt_notice",
+      "value": "The sender signed the alert content. Receipt time, previous device and hop count are local test data, not an authenticated route."
+    },
+    {
+      "name": "severity_info",
+      "value": "Information"
+    },
+    {
+      "name": "severity_warning",
+      "value": "Warning"
+    },
+    {
+      "name": "severity_critical",
+      "value": "Urgent"
+    },
+    {
+      "name": "authority_console",
+      "value": "Exercise authority"
+    },
+    {
+      "name": "authority_console_hint",
+      "value": "Sign in to publish a custom exercise alert"
+    },
+    {
+      "name": "authority_intro",
+      "value": "A local exercise console. Publication requires an activation code; selecting device A does not grant access."
+    },
+    {
+      "name": "authority_login_title",
+      "value": "Sign in to the demo console"
+    },
+    {
+      "name": "authority_authenticated",
+      "value": "Exercise publisher signed in"
+    },
+    {
+      "name": "authority_token",
+      "value": "Activation code"
+    },
+    {
+      "name": "authority_token_hint",
+      "value": "Code from the local test operator"
+    },
+    {
+      "name": "authority_token_notice",
+      "value": "The code stays in memory for this session. It is cleared when you sign out or close the app."
+    },
+    {
+      "name": "authority_login",
+      "value": "Sign in"
+    },
+    {
+      "name": "authority_signing_in",
+      "value": "Signing in…"
+    },
+    {
+      "name": "authority_logout",
+      "value": "Sign out"
+    },
+    {
+      "name": "message_language",
+      "value": "Alert language"
+    },
+    {
+      "name": "message_language_hint",
+      "value": "The text is signed in this language. Other devices show this original version."
+    },
+    {
+      "name": "draft_title",
+      "value": "Title"
+    },
+    {
+      "name": "draft_title_hint",
+      "value": "What happened?"
+    },
+    {
+      "name": "draft_body",
+      "value": "Instructions"
+    },
+    {
+      "name": "draft_body_hint",
+      "value": "Describe the situation and what recipients should do."
+    },
+    {
+      "name": "draft_area",
+      "value": "Area"
+    },
+    {
+      "name": "draft_area_hint",
+      "value": "For example, central Kraków"
+    },
+    {
+      "name": "draft_severity",
+      "value": "Priority"
+    },
+    {
+      "name": "draft_validity",
+      "value": "Valid for"
+    },
+    {
+      "name": "validity_15",
+      "value": "15 minutes"
+    },
+    {
+      "name": "validity_60",
+      "value": "1 hour"
+    },
+    {
+      "name": "validity_240",
+      "value": "4 hours"
+    },
+    {
+      "name": "validity_1440",
+      "value": "24 hours"
+    },
+    {
+      "name": "authority_publish_hint",
+      "value": "This publishes a signed exercise alert. Connected devices relay it automatically."
+    },
+    {
+      "name": "authority_publish",
+      "value": "Publish alert"
+    },
+    {
+      "name": "authority_publishing",
+      "value": "Publishing…"
+    },
+    {
+      "name": "view_published",
+      "value": "View published alert"
+    },
+    {
+      "name": "authority_state_signed_out",
+      "value": "Enter the local activation code to continue."
+    },
+    {
+      "name": "authority_state_signing_in",
+      "value": "Checking access to the exercise authority…"
+    },
+    {
+      "name": "authority_state_ready",
+      "value": "Ready to publish exercise alerts."
+    },
+    {
+      "name": "authority_state_publishing",
+      "value": "Signing and verifying the alert…"
+    },
+    {
+      "name": "authority_state_published",
+      "value": "Signed and queued for nearby devices."
+    },
+    {
+      "name": "authority_state_published_waiting",
+      "value": "Signed and saved; waiting for nearby devices."
+    },
+    {
+      "name": "authority_state_invalid_token",
+      "value": "The activation code was not accepted."
+    },
+    {
+      "name": "authority_state_unavailable",
+      "value": "The local exercise authority is unavailable. Check that the test service is running."
+    },
+    {
+      "name": "authority_state_wrong_authority",
+      "value": "This service does not match the trusted exercise authority."
+    },
+    {
+      "name": "authority_state_invalid_draft",
+      "value": "Check the title, instructions, area and validity."
+    },
+    {
+      "name": "authority_state_too_large",
+      "value": "The alert is too long. Shorten the text and try again."
+    },
+    {
+      "name": "authority_state_rate_limited",
+      "value": "Too many requests. Wait a moment before trying again."
+    },
+    {
+      "name": "authority_state_request_conflict",
+      "value": "This publication request conflicts with an earlier request. Start a new alert."
+    },
+    {
+      "name": "authority_state_storage_failed",
+      "value": "Could not save the signed message. Retry."
+    },
+    {
+      "name": "authority_state_invalid_response",
+      "value": "The exercise service returned an invalid response."
+    },
+    {
+      "name": "authority_state_verification_failed",
+      "value": "The returned alert could not be verified. It was not published to other devices."
+    },
+    {
+      "name": "authority_state_failed",
+      "value": "Publication failed. Check the test connection and try again."
+    },
+    {
+      "name": "authority_state_cancelled",
+      "value": "The operation was cancelled."
+    },
+    {
+      "name": "receipt_authority_source",
+      "value": "Signed by the local exercise authority"
+    },
+    {
+      "name": "receipt_unknown_source",
+      "value": "Receipt source not recorded"
+    },
+    {
+      "name": "authority_state_request_expired",
+      "value": "The previous publishing attempt expired. Review the message and publish again."
     }
   ]
 }
