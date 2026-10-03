@@ -19,11 +19,41 @@ try {
     $ErrorActionPreference = 'Stop'
     if ($testExit -ne 0) { throw "Host tests failed ($testExit)." }
 
-    $ErrorActionPreference = 'Continue'
-    & devecocli.cmd check arkts --project $projectRoot
-    $arktsExit = $LASTEXITCODE
-    $ErrorActionPreference = 'Stop'
-    if ($arktsExit -ne 0) { throw "ArkTS check failed ($arktsExit)." }
+    # DevEco CLI 1.3.4 checks only src/main and cannot resolve target sourceRoots imports
+    # ('entry/transport/NearLinkTransport'). Check each product's source set in a temporary mirror
+    # with the adapter placed in src/main, as hvigor compiles it for that target.
+    foreach ($variant in @('harmonyos', 'oniro')) {
+        $mirror = Join-Path ([IO.Path]::GetTempPath()) ("safemesh-arkts-$variant-" + [Guid]::NewGuid().ToString('N'))
+        try {
+            [void](New-Item -ItemType Directory -Path $mirror -Force)
+            foreach ($item in @('build-profile.json5', 'oh-package.json5', 'hvigorfile.ts', 'code-linter.json5')) {
+                Copy-Item -LiteralPath (Join-Path $projectRoot $item) -Destination (Join-Path $mirror $item)
+            }
+            foreach ($directory in @('AppScope', 'hvigor')) {
+                Copy-Item -LiteralPath (Join-Path $projectRoot $directory) -Destination (Join-Path $mirror $directory) -Recurse
+            }
+            $mirrorEntry = Join-Path $mirror 'entry'
+            [void](New-Item -ItemType Directory -Path (Join-Path $mirrorEntry 'src') -Force)
+            foreach ($item in @('build-profile.json5', 'oh-package.json5', 'hvigorfile.ts')) {
+                Copy-Item -LiteralPath (Join-Path $projectRoot "entry\$item") -Destination (Join-Path $mirrorEntry $item)
+            }
+            Copy-Item -LiteralPath (Join-Path $projectRoot 'entry\src\main') -Destination (Join-Path $mirrorEntry 'src\main') -Recurse
+            $adapter = Get-Content -LiteralPath (Join-Path $projectRoot "entry\src\$variant\transport\NearLinkTransport.ets") -Raw -Encoding UTF8
+            $adapter = $adapter.Replace("'../../main/ets/transport/RelayTransport'", "'./RelayTransport'")
+            [IO.File]::WriteAllText((Join-Path $mirrorEntry 'src\main\ets\transport\NearLinkTransport.ets'), $adapter, [Text.UTF8Encoding]::new($false))
+            $relayPath = Join-Path $mirrorEntry 'src\main\ets\viewmodel\RelayViewModel.ets'
+            $relay = (Get-Content -LiteralPath $relayPath -Raw -Encoding UTF8).Replace("'entry/transport/NearLinkTransport'", "'../transport/NearLinkTransport'")
+            [IO.File]::WriteAllText($relayPath, $relay, [Text.UTF8Encoding]::new($false))
+            Write-Output "ArkTS check: $variant source set"
+            $ErrorActionPreference = 'Continue'
+            & devecocli.cmd check arkts --project $mirror
+            $arktsExit = $LASTEXITCODE
+            $ErrorActionPreference = 'Stop'
+            if ($arktsExit -ne 0) { throw "ArkTS check failed for the $variant source set ($arktsExit)." }
+        } finally {
+            Remove-Item -LiteralPath $mirror -Recurse -Force -ErrorAction SilentlyContinue
+        }
+    }
 
     $ErrorActionPreference = 'Continue'
     & devecocli.cmd check lint --format json $projectRoot

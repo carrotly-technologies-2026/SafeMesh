@@ -1,6 +1,7 @@
 import { common } from '@kit.AbilityKit';
-import { NearLinkTransport, NearLinkStatus, NearLinkPeer, NearLinkCallbacks } from '../transport/NearLinkTransport';
-import { RelayTransport } from '../transport/RelayTransport';
+// Resolved per build target: src/harmonyos (NearLink Kit) or src/oniro (stub without NearLink Kit).
+import { NearLinkTransport } from 'entry/transport/NearLinkTransport';
+import { NearLinkStatus, NearLinkPeer, NearLinkCallbacks, RelayTransport } from '../transport/RelayTransport';
 import { EmulatorTransport } from '../transport/EmulatorTransport';
 import { RelayEngine, RelayResult, SignedAlertEnvelope, decodeEnvelope } from '../model/AlertProtocol';
 import { createDemoAlert, createTamperedAlert, createExpiredAlert } from '../model/DemoAlerts';

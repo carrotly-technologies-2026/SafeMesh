@@ -49,7 +49,7 @@ Our adapter therefore offers exact-name discovery for controlled physical-device
 
 ## Adapter usage contract
 
-Source: `entry/src/main/ets/transport/NearLinkTransport.ets`.
+Source: `entry/src/harmonyos/transport/NearLinkTransport.ets` (moved from `entry/src/main/ets/transport/` in v1.5.0, when the OpenHarmony / Oniro product got its own stub).
 
 Create `new NearLinkTransport(callbacks)`, where callbacks implement:
 

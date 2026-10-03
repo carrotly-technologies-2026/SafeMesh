@@ -1,8 +1,25 @@
 {
   "app": {
-    "signingConfigs": [],
+    // Only the Oniro/OpenHarmony product is signed here, with the public OpenHarmony SDK debug key
+    // (scripts/oniro/sign.sh creates the git-ignored .p12/.p7b). The HarmonyOS product stays
+    // unsigned for emulators; phones are signed locally in DevEco Studio and never committed.
+    "signingConfigs": [
+      {
+        "name": "oniro",
+        "material": {
+          "certpath": "./signatures/OpenHarmonyProfileRelease.pem",
+          "storePassword": "00000016c11d0a4c9c9da484e4a9ac9d83adf4fbc8560f10b2032e6134381d8719a58c60d7d4",
+          "keyAlias": "openharmony application profile release",
+          "keyPassword": "000000160b401a32f7b0e158fd0dfa4fd8c2fd1e12d576ee9e3a57fe61f4f3eda7afddb6e6dc",
+          "profile": "./signatures/app1-profile.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "./signatures/OpenHarmony.p12"
+        }
+      }
+    ],
     "products": [
       {
+        // HarmonyOS phones and the DevEco emulator: NearLink Kit, API 24 target, API 20 minimum.
         "name": "default",
         "signingConfig": "default",
         "targetSdkVersion": "6.1.1(24)",
@@ -14,11 +31,25 @@
             "useNormalizedOHMUrl": true
           }
         }
+      },
+      {
+        // OpenHarmony / Oniro emulator: no NearLink Kit, so the oniro target uses a stub transport.
+        "name": "oniro",
+        "signingConfig": "oniro",
+        "compileSdkVersion": 23,
+        "compatibleSdkVersion": 20,
+        "runtimeOS": "OpenHarmony",
+        "buildOption": {
+          "strictMode": {
+            "caseSensitiveCheck": true,
+            "useNormalizedOHMUrl": true
+          }
+        }
       }
     ],
     "buildModeSet": [
       {
-        "name": "debug",
+        "name": "debug"
       },
       {
         "name": "release"
@@ -34,6 +65,12 @@
           "name": "default",
           "applyToProducts": [
             "default"
+          ]
+        },
+        {
+          "name": "oniro",
+          "applyToProducts": [
+            "oniro"
           ]
         }
       ]
