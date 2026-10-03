@@ -23,9 +23,8 @@ export default class EntryAbility extends UIAbility {
   private mainWindow: window.Window | undefined = undefined;
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     try {
-      // Follow system light/dark mode; Polish is the initial language for this Kraków demo.
+      // Follow system light/dark mode. Index applies the saved or system-derived PL/EN language.
       this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET);
-      this.context.getApplicationContext().setLanguage('pl');
       this.publishConfiguration(this.context.config);
     } catch (err) {
       hilog.error(DOMAIN, 'testTag', 'Failed to set colorMode. Cause: %{public}s', JSON.stringify(err));

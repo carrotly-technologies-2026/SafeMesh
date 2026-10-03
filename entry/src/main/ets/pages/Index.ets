@@ -1,6 +1,6 @@
 import { common, ConfigurationConstant } from '@kit.AbilityKit';
 import { accessibility } from '@kit.AccessibilityKit';
-import { intl } from '@kit.LocalizationKit';
+import { i18n, intl } from '@kit.LocalizationKit';
 import { LocalStore } from '../model/LocalStore';
 import { AlertViewModel, AlertInboxItem } from '../viewmodel/AlertViewModel';
 import { AuthorityViewModel } from '../viewmodel/AuthorityViewModel';
@@ -27,7 +27,7 @@ struct Index {
   @State tab: number = 0;
   @State mapRevision: number = 0;
   @State notice: string = '';
-  @State language: string = 'pl';
+  @State language: string = 'en';
   @State themePreference: string = 'system';
   @State settingsBusy: boolean = true;
   @State initialized: boolean = false;
@@ -85,7 +85,7 @@ struct Index {
     try {
       await this.store.init(context);
       const savedLanguage: string = await this.store.read('ui_language');
-      this.language = savedLanguage === 'en' ? 'en' : 'pl';
+      this.language = savedLanguage === 'pl' || savedLanguage === 'en' ? savedLanguage : this.systemLanguage();
       this.authority.draftLanguage = this.language;
       context.getApplicationContext().setLanguage(this.language);
       this.alerts.setLanguage(this.language);
@@ -102,6 +102,12 @@ struct Index {
       this.notice = this.t('init_failed');
     }
     finally { this.initialized = true; this.settingsBusy = false; }
+  }
+
+  /** Without a saved choice, a Polish system starts in Polish and every other locale in English. */
+  private systemLanguage(): string {
+    try { return i18n.System.getSystemLanguage().toLowerCase().startsWith('pl') ? 'pl' : 'en'; }
+    catch (error) { return 'en'; }
   }
 
   private async chooseLanguage(language: string): Promise<void> {
@@ -170,7 +176,7 @@ struct Index {
 
   private async loadDrill(): Promise<void> {
     try {
-      await this.alerts.loadDrill();
+      await this.relay.loadDrill();
       if (!this.alerts.received) { this.notice = this.t('verify_failed'); this.announce(this.notice); }
     } catch (error) { this.notice = this.t('verify_failed'); }
   }
@@ -862,6 +868,12 @@ struct Index {
             this.action(() => peer.name + ' · ' + this.t(peer.connected ? 'connected_short' : 'connect'),
               'peer_' + peer.address, () => { this.relay.connect(peer.address); }, () => !peer.connected, false)
           }, (peer: PeerViewModel) => peer.address)
+          Row({ space: 8 }) {
+            this.metric(() => this.relay.pendingCount, 'queue_pending')
+            this.metric(() => this.relay.acknowledgedCount, 'queue_acked')
+            this.metric(() => this.relay.retryCount, 'queue_retry')
+          }.id('nearlinkMetrics').width('100%').alignItems(VerticalAlign.Top)
+          Text(this.t('packet_' + this.relay.lastPacketState)).id('nearlinkPacketStatus').fontSize(13).fontColor(MUTED).width('100%')
           this.action(() => this.t('stop_relay'), 'stopRelay', () => { this.relay.stop(); }, () => true, false)
         }
       }
