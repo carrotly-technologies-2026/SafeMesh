@@ -1,0 +1,50 @@
+    0.0s hub reset
+    0.0s hub links AB
+    0.0s CAPTION Three separate SafeMesh apps on three HarmonyOS (API 24) emulators. A local test link stands in for NearLink radio: A-B are in range, C is out of range.
+    6.0s CAPTION Each phone joins the relay in its role. Recipients have no Send button: verified alerts are stored and relayed automatically.
+    7.4s 5559 tap tab2
+    7.5s 5557 tap tab2
+    7.5s 5555 tap tab2
+    9.4s 5559 tap labNodeC
+    9.5s 5557 tap labNodeB
+    9.5s 5555 tap labNodeA
+   11.3s 5559 tap labStart
+   11.3s 5557 tap labStart
+   11.3s 5555 tap labStart
+   15.8s CAPTION A is an authenticated exercise issuer. A separate signing service holds the private key; the app only receives the signed alert and verifies it on the device.
+   20.1s 5555 tap openDiagnostics
+   22.2s 5555 tap openAuthority
+   28.0s 5555 type authorityToken <masked>
+   31.2s 5555 tap authorityLogin
+   33.8s 5555 saw authorityLogout
+   35.5s 5557 tap tab0
+   35.5s 5559 tap tab0
+   37.4s 5555 tap draftLanguageEn
+   42.0s 5555 type draftTitle 'Exercise: network outage in central Krakow'
+   54.0s 5555 type draftBody 'EXERCISE ONLY. Mobile network down in central Krakow. Go to the nearest protective point on the offline map and stay with your group.'
+   57.0s CAPTION A publishes an English exercise alert (ECDSA P-256 signature, valid 1 hour).
+   61.2s 5555 tap severityCritical
+   66.1s 5555 tap publishAlert
+   68.3s 5557 saw readIncoming
+   68.3s CAPTION B verifies the signature, saves the alert, sends an app-level ACK and shows a banner. C is still out of range, so it has nothing.
+   74.7s 5557 tap readIncoming
+   81.7s CAPTION A leaves the area. B now meets C. No internet and no cellular network are involved.
+   81.8s hub links BC
+   82.8s 5559 saw readIncoming
+   82.8s CAPTION C receives the alert from B at hop 2. A and C were never connected: store-and-forward.
+   88.2s 5559 tap readIncoming
+   96.3s CAPTION Someone injects a forged copy (text changed after signing). C rejects it: no ACK, not stored, not forwarded.
+   98.9s 5559 tap backSettings
+  101.2s 5559 tap tab2
+  108.6s hub inject B C C:\Users\user\SafeMesh\.cache\mesh-lab\fixtures\tampered.json
+  109.5s 5559 labPacketStatus = 'Invalid signature rejected'
+  114.5s CAPTION Offline map: 40 State Fire Service (PSP) protective points in central Krakow are bundled in the app. Search works without Polish diacritics.
+  115.9s 5555 tap backSettings
+  117.0s 5557 tap backSettings
+  119.6s 5557 tap tab1
+  121.3s 5555 tap checkNearLink
+  122.8s 5557 type searchPoints 'Bracka'
+  128.4s 5557 tap point_OZO-D2070846351C
+  135.4s CAPTION The NearLink adapter (NearLink Kit) is built in. Emulators have no radio and say so; a physical phone-to-phone NearLink test is the next step.
+  142.4s stopping recorder
+RECORDED: C:\Users\user\AppData\Local\Temp\claude\C--Users-user\f58d2186-9239-4e6b-9866-ab47d6ce2f92\scratchpad\mesh-demo-raw.mp4 (1710 frames, 142.5s)
