@@ -17,10 +17,15 @@ function constant(source, name) {
 
 // Same domain-separated signed fields as AlertProtocol.canonicalPayload.
 function canonical(payload) {
-  return JSON.stringify(['SafeMesh.Alert.v1', payload.keyId, payload.alertId,
+  const fields = [payload.version === 2 ? 'SafeMesh.Alert.v2' : 'SafeMesh.Alert.v1', payload.keyId, payload.alertId,
     String(payload.revision), String(payload.issuedAt), String(payload.expiresAt),
     payload.severity, payload.area, payload.title, payload.body,
-    JSON.stringify(payload.shelterIds), payload.drill ? '1' : '0', String(payload.maxHops)]);
+    JSON.stringify(payload.shelterIds), payload.drill ? '1' : '0', String(payload.maxHops)];
+  if (payload.version === 2) {
+    fields.push(payload.language, JSON.stringify((payload.translations ?? [])
+      .map(item => [item.language, item.area, item.title, item.body])));
+  }
+  return JSON.stringify(fields);
 }
 
 /** Reads the checked-in public fixtures; importing this module writes nothing. */
@@ -40,7 +45,7 @@ export function deriveMeshLabFixtures({ root = projectRoot, now = Date.now() } =
     Buffer.from(alert.signature, 'base64'));
   for (const [name, alert] of [['DEMO_ALERT', demo], ['EXPIRED_ALERT', expired]]) {
     const payload = alert?.payload;
-    if (!payload || payload.version !== 1 || payload.drill !== true || payload.keyId !== keyId ||
+    if (!payload || ![1, 2].includes(payload.version) || payload.drill !== true || payload.keyId !== keyId ||
         !Number.isSafeInteger(payload.issuedAt) || !Number.isSafeInteger(payload.expiresAt) ||
         payload.expiresAt <= payload.issuedAt || !Number.isSafeInteger(payload.maxHops) || payload.maxHops < 1 ||
         typeof alert.signature !== 'string' || !authentic(alert)) {

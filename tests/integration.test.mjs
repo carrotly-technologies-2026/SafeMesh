@@ -151,21 +151,21 @@ process.on('exit', () => { Date.now = realNow; });
 test('a forged incoming packet preserves the authentic displayed title and badge', async () => {
   const alerts = createAlerts();
   assert.equal((await alerts.receive(fresh())).status, 'accepted');
-  const title = alerts.title, badge = alerts.verification;
+  const title = alerts.title, badge = alerts.verificationState;
   assert.equal((await alerts.receive(fixtures.createTamperedAlert())).status, 'invalid');
   assert.equal(alerts.title, title);
-  assert.equal(alerts.verification, badge);
+  assert.equal(alerts.verificationState, badge);
   assert.equal(alerts.received, true);
-  assert.match(alerts.lastReceiveStatus, /^invalid:/);
+  assert.equal(alerts.lastReceiveState, 'invalid');
 });
 
 test('an expired incoming packet cannot replace an active verified alert', async () => {
   const alerts = createAlerts();
   await alerts.receive(fresh());
-  const title = alerts.title, badge = alerts.verification;
+  const title = alerts.title, badge = alerts.verificationState;
   assert.equal((await alerts.receive(fixtures.createExpiredAlert())).status, 'expired');
   assert.equal(alerts.title, title);
-  assert.equal(alerts.verification, badge);
+  assert.equal(alerts.verificationState, badge);
 });
 
 test('persisted replay history restores and re-verifies before the first network packet', async () => {
@@ -175,7 +175,7 @@ test('persisted replay history restores and re-verifies before the first network
   const restored = createAlerts(store);
   assert.equal((await restored.receive(fresh())).status, 'duplicate');
   assert.equal(restored.received, true);
-  assert.match(restored.persistenceStatus, /re-verified/);
+  assert.equal(restored.persistenceState, 'reverified');
   const corruptedStore = new TestStore();
   corruptedStore.values.set('verified_alert', protocol.encodeEnvelope(fixtures.createTamperedAlert()));
   const rejected = createAlerts(corruptedStore);
@@ -189,7 +189,7 @@ test('disk failure leaves the authenticated in-memory alert intact and reports s
   const alerts = createAlerts(store);
   assert.equal((await alerts.receive(fresh())).status, 'accepted');
   assert.equal(alerts.received, true);
-  assert.match(alerts.persistenceStatus, /save failed/);
+  assert.equal(alerts.persistenceState, 'save_failed');
   assert.notEqual(alerts.nextPacket(), '');
 });
 
@@ -263,7 +263,7 @@ test('fire-and-forget receive/send failures are handled without losing verified 
   transport.callbacks.onPeer({ address: 'peer-C', name: 'C', connected: true });
   await nextTurn();
   assert.equal(relay.pendingCount, 2);
-  assert.match(alerts.verification, /Signature verified/);
+  assert.equal(alerts.verificationState, 'verified');
 });
 
 test('exact expiry clears the displayed alert and prevents any further relay', async () => {
@@ -272,6 +272,19 @@ test('exact expiry clears the displayed alert and prevents any further relay', a
   Date.now = () => fresh().payload.expiresAt;
   assert.equal(alerts.nextPacket(), '');
   assert.equal(alerts.received, false);
-  assert.match(alerts.verification, /Expired/);
+  assert.equal(alerts.verificationState, 'expired');
   assert.equal(alerts.expiry, '');
+});
+
+test('native-diagnostic workflow exposes stable localization keys and verdicts for all six checks', async () => {
+  const alerts = createAlerts(); const relay = createRelay(alerts);
+  await relay.simulate();
+  assert.equal(relay.testState, 'passed'); assert.equal(relay.testFailureState, 'none');
+  assert.deepEqual(relay.events.map(event => event.titleKey),
+    ['a', 'b', 'c', 'duplicate', 'tampered', 'expired'].map(key => `relay_event_${key}`));
+  assert.deepEqual(relay.events.map(event => event.detailKey),
+    ['a', 'b', 'c', 'duplicate', 'tampered', 'expired'].map(key => `relay_detail_${key}`));
+  assert.deepEqual(relay.events.map(event => event.status), ['accepted', 'accepted', 'accepted', 'duplicate', 'invalid', 'expired']);
+  assert.ok(relay.events.every(event => event.good));
+  assert.equal(alerts.received, true);
 });

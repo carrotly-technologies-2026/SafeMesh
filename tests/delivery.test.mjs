@@ -538,3 +538,108 @@ test('emulator delivery still rejects forged and expired content without success
   assert.equal(link.sent.length, 0);
   assert.equal(relay.pendingCount, 0);
 });
+
+test('foreground does not start an unused link, but resumes the active role and cached delivery after suspension', async () => {
+  const { relay, alerts } = views(); relay.setContext({});
+  await relay.foreground();
+  assert.equal(radios.length, 1); assert.equal(radios[0].startCount, 0);
+  await alerts.receive(signed('retained-on-suspend'));
+  await relay.startEmulator('C');
+  const previous = radios.at(-1);
+  await peer(previous, 'B'); assert.equal(previous.sent.length, 1);
+  await relay.suspend();
+  assert.equal(previous.stopped, true); assert.equal(relay.lifecycleState, 'paused');
+  assert.equal(relay.peerCount, 0); assert.equal(relay.pendingCount, 0);
+  assert.equal(relay.emulatorNode, 'C'); assert.equal(alerts.allAccepted().length, 1);
+  previous.callbacks.onPeer({ address: 'stale', name: 'stale', connected: true });
+  previous.callbacks.onMessage('stale', codec.encodeDataPacket(codec.createDeliveryId(), signed('stale')));
+  await nextTurn(); assert.equal(relay.peers.length, 0); assert.equal(alerts.allAccepted().length, 1);
+  await Promise.all([relay.foreground(), relay.foreground()]);
+  const resumed = radios.at(-1);
+  assert.notEqual(resumed, previous); assert.equal(resumed.node, 'C');
+  assert.equal(resumed.startCount, 1); assert.equal(relay.lifecycleState, 'active');
+  await peer(resumed, 'B');
+  assert.equal(resumed.sent.length, 1);
+  assert.equal(codec.decodeDataPacket(resumed.sent[0].packet).envelope.payload.alertId, 'retained-on-suspend');
+});
+
+test('explicit stop cancels auto-resume even when foreground is waiting on background cleanup', async () => {
+  const { relay } = views(); relay.setContext({});
+  await relay.startEmulator('B');
+  const previous = radios.at(-1);
+  let release; const gate = new Promise(resolve => { release = resolve; });
+  previous.stop = async () => { previous.stopped = true; await gate; };
+  const suspending = relay.suspend();
+  const foregrounding = relay.foreground();
+  const stopping = relay.stop();
+  release(); await Promise.all([suspending, foregrounding, stopping]);
+  assert.equal(radios.at(-1), previous);
+  assert.equal(relay.lifecycleState, 'idle'); assert.equal(relay.deliveryStatus, 'stopped');
+  await relay.foreground(); assert.equal(radios.at(-1), previous);
+});
+
+test('suspension during connection startup cancels it and does not manufacture a resume intent', async () => {
+  const { relay } = views(); relay.setContext({});
+  let release; Radio.nextStartGate = new Promise(resolve => { release = resolve; });
+  const starting = relay.startEmulator('A'); await nextTurn();
+  const previous = radios.at(-1);
+  await relay.suspend(); release(); await starting;
+  await relay.foreground();
+  assert.equal(radios.at(-1), previous); assert.equal(previous.stopped, true);
+  assert.equal(relay.lifecycleState, 'idle'); assert.equal(relay.peerCount, 0);
+});
+
+test('packet verdicts and acknowledgements expose localization states without diagnostic sentences', async () => {
+  const { relay, alerts, radio } = views();
+  await alerts.receive(signed('localized-state'));
+  assert.equal(relay.lastPacketState, 'none');
+  await peer(radio, 'B');
+  const data = codec.decodeDataPacket(radio.sent[0].packet);
+  await relay.receive('B', JSON.stringify(codec.makeAcknowledgement(data)));
+  assert.equal(relay.lastPacketState, 'ack_matched');
+  await relay.receive('C', JSON.stringify(codec.makeAcknowledgement(data)));
+  assert.equal(relay.lastPacketState, 'ack_unmatched');
+  await relay.receive('B', '{}'); assert.equal(relay.lastPacketState, 'malformed');
+  await relay.receive('B', protocol.encodeEnvelope(signed('new-localized-state')));
+  assert.equal(relay.lastPacketState, 'accepted');
+  await relay.receive('B', protocol.encodeEnvelope(signed('new-localized-state')));
+  assert.equal(relay.lastPacketState, 'duplicate');
+  const forged = signed('forged-localized'); forged.payload.body += ' changed';
+  await relay.receive('B', protocol.encodeEnvelope(forged)); assert.equal(relay.lastPacketState, 'invalid');
+});
+
+test('public connection state survives queued or rejected packets but clears on socket closure and hard failures', async () => {
+  const { relay, alerts } = views(); relay.setContext({});
+  await alerts.receive(signed('connection-state'));
+  await relay.startEmulator('B');
+  const link = radios.at(-1);
+  assert.equal(relay.isConnected, true);
+  await relay.share(); assert.equal(relay.hardwareState, 'waiting_peer'); assert.equal(relay.isConnected, true);
+  await peer(link, 'C'); await relay.share();
+  assert.equal(relay.hardwareState, 'queued'); assert.equal(relay.isConnected, true);
+  link.callbacks.onError('send', 401, 'Invalid individual packet');
+  assert.equal(relay.isConnected, true); assert.equal(relay.lifecycleState, 'active');
+  link.callbacks.onError('receive', 401, 'Unknown individual sender');
+  assert.equal(relay.isConnected, true);
+  link.callbacks.onStatus({ state: 'lab_disconnected', supported: true, connectedPeers: 0, message: 'closed' });
+  assert.equal(relay.isConnected, false); assert.equal(relay.lifecycleState, 'idle');
+  await relay.suspend(); await relay.foreground();
+  assert.equal(radios.at(-1), link, 'a socket closed before suspension has no automatic resume intent');
+  await relay.startEmulator('B');
+  radios.at(-1).callbacks.onError('socket', 200, 'Hard connection failure');
+  assert.equal(relay.isConnected, false); assert.equal(relay.lifecycleState, 'idle');
+  await relay.startEmulator('B');
+  const protocolFailure = radios.at(-1);
+  protocolFailure.callbacks.onStatus({ state: 'lab_error', supported: true, connectedPeers: 0, message: 'protocol failure' });
+  protocolFailure.callbacks.onError('receive', 401, 'Malformed hub protocol');
+  assert.equal(relay.isConnected, false);
+});
+
+test('NearLink operation errors preserve its active listener while radio-off status ends the session', async () => {
+  const { relay } = views(); relay.setContext({}); await relay.startHardware();
+  const link = radios.at(-1);
+  link.callbacks.onError('discover', 401, 'Invalid name'); assert.equal(relay.isConnected, true);
+  link.callbacks.onError('send', 1009700023, 'Busy'); assert.equal(relay.isConnected, true);
+  link.callbacks.onStatus({ state: 'off', supported: true, connectedPeers: 0, message: 'Radio disabled' });
+  assert.equal(relay.isConnected, false); assert.equal(relay.lifecycleState, 'idle');
+});

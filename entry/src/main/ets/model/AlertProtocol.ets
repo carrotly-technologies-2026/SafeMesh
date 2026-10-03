@@ -2,6 +2,13 @@ import { cryptoFramework } from '@kit.CryptoArchitectureKit';
 import { util } from '@kit.ArkTS';
 import { DEMO_KEY_ID, DEMO_PUBLIC_KEY_DER } from './DemoTrust';
 
+export interface AlertTranslation {
+  language: string;
+  area: string;
+  title: string;
+  body: string;
+}
+
 export interface AlertPayload {
   version: number;
   keyId: string;
@@ -16,6 +23,9 @@ export interface AlertPayload {
   shelterIds: string[];
   drill: boolean;
   maxHops: number;
+  /** Version 2 only: issuer-authored language and signed alternate content. */
+  language?: string;
+  translations?: AlertTranslation[];
 }
 
 export interface SignedAlertEnvelope {
@@ -42,11 +52,20 @@ const MAX_IN_FLIGHT: number = 8;
 /** A domain-separated, fixed-position array of strings. No JSON key-order dependency. */
 export function canonicalPayload(payload: AlertPayload): string {
   const fields: string[] = [
-    'SafeMesh.Alert.v1', payload.keyId, payload.alertId,
+    payload.version === 2 ? 'SafeMesh.Alert.v2' : 'SafeMesh.Alert.v1', payload.keyId, payload.alertId,
     String(payload.revision), String(payload.issuedAt), String(payload.expiresAt),
     payload.severity, payload.area, payload.title, payload.body,
     JSON.stringify(payload.shelterIds), payload.drill ? '1' : '0', String(payload.maxHops)
   ];
+  if (payload.version === 2) {
+    const translations: string[][] = [];
+    if (payload.translations !== undefined) {
+      for (const translation of payload.translations) {
+        translations.push([translation.language, translation.area, translation.title, translation.body]);
+      }
+    }
+    fields.push(payload.language === undefined ? '' : payload.language, JSON.stringify(translations));
+  }
   return JSON.stringify(fields);
 }
 
@@ -54,11 +73,35 @@ function textBounded(value: string, maximum: number): boolean {
   return typeof value === 'string' && value.length > 0 && value.length <= maximum;
 }
 
+function supportedLanguage(language: string | undefined): boolean {
+  return language === 'pl' || language === 'en';
+}
+
+function validTranslations(payload: AlertPayload): boolean {
+  // V1 never authenticated language metadata, so it must never influence display.
+  if (payload.version === 1) {
+    return payload.language === undefined && payload.translations === undefined;
+  }
+  if (!supportedLanguage(payload.language)) { return false; }
+  if (payload.translations === undefined) { return true; }
+  // The supported set has two languages: at most one distinct alternate is valid.
+  if (!Array.isArray(payload.translations) || payload.translations.length > 1) { return false; }
+  for (const translation of payload.translations) {
+    if (translation === null || typeof translation !== 'object' ||
+      !supportedLanguage(translation.language) || translation.language === payload.language ||
+      !textBounded(translation.area, 120) || !textBounded(translation.title, 160) ||
+      !textBounded(translation.body, 1200)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 function validPayload(payload: AlertPayload): boolean {
   if (payload === null || typeof payload !== 'object') {
     return false;
   }
-  if (payload.version !== 1 || !textBounded(payload.keyId, 64) ||
+  if ((payload.version !== 1 && payload.version !== 2) || !textBounded(payload.keyId, 64) ||
     !textBounded(payload.alertId, 96) || !Number.isSafeInteger(payload.revision) ||
     payload.revision < 1 || !Number.isSafeInteger(payload.issuedAt) ||
     !Number.isSafeInteger(payload.expiresAt) || payload.issuedAt <= 0 ||
@@ -67,7 +110,7 @@ function validPayload(payload: AlertPayload): boolean {
     !textBounded(payload.area, 120) || !textBounded(payload.title, 160) ||
     !textBounded(payload.body, 1200) || typeof payload.drill !== 'boolean' ||
     !Number.isSafeInteger(payload.maxHops) || payload.maxHops < 1 || payload.maxHops > 8 ||
-    !Array.isArray(payload.shelterIds) || payload.shelterIds.length > 12) {
+    !Array.isArray(payload.shelterIds) || payload.shelterIds.length > 12 || !validTranslations(payload)) {
     return false;
   }
   if (payload.severity !== 'critical' && payload.severity !== 'warning' && payload.severity !== 'info') {
@@ -97,6 +140,17 @@ export function copyEnvelope(source: SignedAlertEnvelope): SignedAlertEnvelope {
     drill: source.payload.drill,
     maxHops: source.payload.maxHops
   };
+  if (source.payload.language !== undefined) { payload.language = source.payload.language; }
+  if (source.payload.translations !== undefined) {
+    const translations: AlertTranslation[] = [];
+    for (const translation of source.payload.translations) {
+      translations.push({
+        language: translation.language, area: translation.area,
+        title: translation.title, body: translation.body
+      });
+    }
+    payload.translations = translations;
+  }
   return { payload: payload, signature: source.signature, hops: source.hops };
 }
 

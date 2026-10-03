@@ -1,5 +1,6 @@
 import { common, ConfigurationConstant } from '@kit.AbilityKit';
 import { accessibility } from '@kit.AccessibilityKit';
+import { intl } from '@kit.LocalizationKit';
 import { LocalStore } from '../model/LocalStore';
 import { AlertViewModel } from '../viewmodel/AlertViewModel';
 import { MapViewModel, SafePointViewModel } from '../viewmodel/MapViewModel';
@@ -16,6 +17,8 @@ const ACTION_BG: Resource = $r('app.color.action_bg');
 const ACTION_FG: Resource = $r('app.color.action_fg');
 const WARNING_BG: Resource = $r('app.color.warning_bg');
 const WARNING_FG: Resource = $r('app.color.warning_fg');
+const BORDER: Resource = $r('app.color.border');
+const SUCCESS: Resource = $r('app.color.success');
 
 @Entry
 @Component
@@ -26,8 +29,10 @@ struct Index {
   @State language: string = 'pl';
   @State themePreference: string = 'system';
   @State settingsBusy: boolean = true;
+  @State initialized: boolean = false;
   @State query: string = '';
-  @State labVisible: boolean = false;
+  @State mapMode: string = 'map';
+  @State guideExpanded: number = 0;
   @State labNode: string = 'A';
   @State labBusy: boolean = false;
   @State viewportWidth: number = 360;
@@ -40,29 +45,30 @@ struct Index {
   @State @Watch('onAlertChanged') alerts: AlertViewModel = new AlertViewModel(this.store);
   @State map: MapViewModel = new MapViewModel();
   @State @Watch('onRelayChanged') relay: RelayViewModel = new RelayViewModel(this.alerts);
-  private expiryTimer: number = -1;
   private pageScroll: Scroller = new Scroller();
   private lastAnnouncedAlert: string = '';
   private lastAnnouncedRelay: string = '';
   private previousTab: number = 0;
+  private pointParent: number = 1;
+  private diagnosticsParent: number = 4;
 
   aboutToAppear(): void {
     const context: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
     this.copy.initialize(context);
     this.initialize(context);
-    this.expiryTimer = setInterval(() => { this.alerts.refreshExpiry(); }, 10000);
   }
 
-  onPageHide(): void { this.relay.stop(); }
+  onPageHide(): void { this.alerts.dispose(); this.relay.suspend(); }
+
+  onPageShow(): void { this.alerts.resume(); this.relay.foreground(); }
 
   onBackPress(): boolean {
-    if (this.tab !== 4) { return false; }
-    this.closeSettings();
+    if (this.tab < 4) { return false; }
+    this.goBack();
     return true;
   }
 
   aboutToDisappear(): void {
-    if (this.expiryTimer !== -1) { clearInterval(this.expiryTimer); }
     this.alerts.dispose();
     this.relay.stop();
   }
@@ -70,23 +76,26 @@ struct Index {
   private t(key: string): string { return this.copy.text(key, this.language); }
 
   private async initialize(context: common.UIAbilityContext): Promise<void> {
+    this.relay.setContext(context);
     try {
       await this.store.init(context);
       const savedLanguage: string = await this.store.read('ui_language');
       this.language = savedLanguage === 'en' ? 'en' : 'pl';
       context.getApplicationContext().setLanguage(this.language);
+      this.alerts.setLanguage(this.language);
+      const savedNode: string = await this.store.read('lab_node');
+      this.labNode = savedNode === 'B' || savedNode === 'C' ? savedNode : 'A';
       const savedTheme: string = await this.store.read('ui_theme');
       this.themePreference = savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : 'system';
       this.applyTheme(this.themePreference);
       await this.map.restoreSaved(this.store);
-      this.relay.setContext(context);
       await this.alerts.restore();
       await this.relay.probe();
     } catch (error) {
       console.error('SAFEMESH_INIT_ERROR ' + String(error));
       this.notice = this.t('init_failed');
     }
-    finally { this.settingsBusy = false; }
+    finally { this.initialized = true; this.settingsBusy = false; }
   }
 
   private async chooseLanguage(language: string): Promise<void> {
@@ -98,6 +107,7 @@ struct Index {
       const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
       context.getApplicationContext().setLanguage(language);
       this.language = language;
+      this.alerts.setLanguage(language);
       applied = true;
       await this.store.write('ui_language', language);
       this.announce(this.t('language_saved'));
@@ -139,7 +149,7 @@ struct Index {
   }
 
   private onAlertChanged(): void {
-    const identity: string = this.alerts.received ? this.alerts.title + this.alerts.issueTime : '';
+    const identity: string = this.alerts.received ? this.alerts.currentIdentity : '';
     if (identity !== this.lastAnnouncedAlert) {
       const previous: string = this.lastAnnouncedAlert;
       this.lastAnnouncedAlert = identity;
@@ -156,15 +166,17 @@ struct Index {
   }
 
   private onRelayChanged(): void {
-    if (!this.relay.running && this.relay.events.length > 0 && this.relay.testStatus !== this.lastAnnouncedRelay) {
-      this.lastAnnouncedRelay = this.relay.testStatus;
-      this.announce(this.t('diagnostics') + ': ' + this.relay.testStatus);
+    if (!this.relay.running && this.relay.events.length > 0 && this.relay.testState !== this.lastAnnouncedRelay) {
+      this.lastAnnouncedRelay = this.relay.testState;
+      this.announce(this.t('test_' + this.relay.testState));
     }
   }
 
   private selectPoint(id: string): void {
-    this.map.select(id);
+    if (!this.map.select(id)) { return; }
     this.mapRevision++;
+    this.pointParent = this.tab === 0 ? 0 : 1;
+    this.selectTab(6);
     this.announce(this.t('selected_point') + ': ' + this.map.selected().address);
   }
 
@@ -180,8 +192,8 @@ struct Index {
     this.selectTab(4);
   }
 
-  private closeSettings(): void {
-    this.selectTab(this.previousTab);
+  private goBack(): void {
+    this.selectTab(this.tab === 5 ? this.diagnosticsParent : this.tab === 6 ? this.pointParent : this.previousTab);
   }
 
   private async savePoint(): Promise<void> {
@@ -200,7 +212,10 @@ struct Index {
   private async startLab(): Promise<void> {
     if (this.labBusy) { return; }
     this.labBusy = true;
-    try { await this.relay.startEmulator(this.labNode); }
+    try {
+      await this.relay.startEmulator(this.labNode);
+      if (this.relay.hardwareState === 'lab_ready') { await this.store.write('lab_node', this.labNode); }
+    }
     catch (error) { this.notice = this.t('hardware_lab_error'); }
     finally { this.labBusy = false; }
   }
@@ -221,430 +236,531 @@ struct Index {
   }
 
   private filteredPoints(): SafePointViewModel[] {
-    const query: string = this.query.trim().toLocaleLowerCase();
-    return this.map.points.filter((point: SafePointViewModel) =>
-      query.length === 0 || point.address.toLocaleLowerCase().includes(query));
+    return this.map.searchPoints(this.query);
   }
 
-  private availability(value: string): string {
-    if (value === 'Na żądanie') { return this.t('availability_request'); }
-    if (value === 'Całodobowa') { return this.t('availability_all_day'); }
-    if (value === 'Określone godziny') { return this.t('availability_hours'); }
-    return value;
+  private formatTime(value: number): string {
+    if (value <= 0) { return ''; }
+    try {
+      return new intl.DateTimeFormat(this.language === 'pl' ? 'pl-PL' : 'en-GB', {
+        day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC'
+      }).format(new Date(value)) + ' UTC';
+    } catch (error) { return new Date(value).toISOString().slice(0, 16).replace('T', ' ') + ' UTC'; }
+  }
+
+  private connected(): boolean {
+    return this.relay.isConnected;
+  }
+
+  private connectionTitle(): string {
+    if (this.relay.lifecycleState === 'paused') { return this.t('connection_paused'); }
+    if (this.connected()) { return this.t('connection_active'); }
+    if (this.labBusy) { return this.t('connection_connecting'); }
+    return this.t('connection_off');
+  }
+
+  private pageTitle(): string {
+    if (this.tab === 0) { return 'SafeMesh'; }
+    return this.t(this.tab === 1 ? 'map' : this.tab === 2 ? 'relay' : this.tab === 3 ? 'guide' :
+      this.tab === 4 ? 'settings_tab' : this.tab === 5 ? 'diagnostics_title' : 'point_type');
+  }
+
+  private visiblePoints(): SafePointViewModel[] {
+    const points: SafePointViewModel[] = this.filteredPoints();
+    return this.mapMode === 'map' && this.query.trim().length === 0 ? points.slice(0, 3) : points;
   }
 
   @Builder
-  private action(label: () => string, id: string, action: () => void, enabled: () => boolean = () => true, primary: boolean = true) {
+  private action(label: () => string, id: string, action: () => void,
+    enabled: () => boolean = () => true, primary: boolean = true) {
     Button({ type: ButtonType.Normal }) {
-      Text(label()).fontSize(16).fontWeight(FontWeight.Medium)
-        .fontColor(primary ? ACTION_FG : INK).textAlign(TextAlign.Center).width('100%')
-    }.id(id).width('100%').constraintSize({ minHeight: 48 }).padding(14)
-      .backgroundColor(primary ? ACTION_BG : SOFT).borderRadius(16)
-      .enabled(enabled()).opacity(enabled() ? 1 : 0.6).onClick(action)
-      .accessibilityText(label())
+      Text(label()).fontSize(15).fontWeight(FontWeight.Medium).fontColor(primary ? ACTION_FG : INK)
+        .textAlign(TextAlign.Center).width('100%')
+    }.id(id).width('100%').constraintSize({ minHeight: 48 }).padding(12).borderRadius(12)
+      .backgroundColor(primary ? ACTION_BG : SOFT).enabled(enabled()).opacity(enabled() ? 1 : 0.5)
+      .accessibilityText(label()).onClick(action)
   }
 
   @Builder
-  private heading(title: () => string, subtitle: () => string) {
-    Column({ space: 8 }) {
-      Text(title()).fontSize(28).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
-      Text(subtitle()).fontSize(16).fontColor(MUTED).width('100%')
-    }.width('100%').alignItems(HorizontalAlign.Start)
+  private iconButton(icon: Resource, label: () => string, id: string, action: () => void) {
+    Button({ type: ButtonType.Normal }) {
+      SymbolGlyph(icon).fontSize(22).maxFontScale(1).fontColor([INK]).accessibilityLevel('no')
+    }.id(id).width(48).height(48).borderRadius(12).backgroundColor(Color.Transparent)
+      .accessibilityText(label()).onClick(action)
+  }
+
+  @Builder
+  private divider() { Divider().color(BORDER).strokeWidth(0.5) }
+
+  @Builder
+  private section(key: string) {
+    Text(this.t(key)).fontSize(13).fontWeight(FontWeight.Medium).fontColor(MUTED).width('100%')
+      .margin({ top: 8, bottom: 4 })
+  }
+
+  @Builder
+  private rowLink(icon: Resource, title: () => string, detail: () => string, id: string, action: () => void) {
+    Button({ type: ButtonType.Normal }) {
+      Row({ space: 14 }) {
+        SymbolGlyph(icon).fontSize(23).maxFontScale(1).fontColor([INK]).accessibilityLevel('no')
+        Column({ space: 4 }) {
+          Text(title()).fontSize(16).fontWeight(FontWeight.Medium).fontColor(INK).width('100%')
+          if (detail().length > 0) { Text(detail()).fontSize(13).fontColor(MUTED).width('100%') }
+        }.layoutWeight(1).alignItems(HorizontalAlign.Start)
+        SymbolGlyph($r('sys.symbol.chevron_right')).fontSize(15).maxFontScale(1).fontColor([MUTED])
+          .accessibilityLevel('no')
+      }.width('100%').padding({ top: 16, bottom: 16 })
+    }.id(id).width('100%').constraintSize({ minHeight: 64 }).backgroundColor(Color.Transparent)
+      .borderRadius(8).accessibilityText(title() + '. ' + detail()).onClick(action)
   }
 
   @Builder
   private header() {
+    Row({ space: 4 }) {
+      if (this.tab >= 4) {
+        this.iconButton($r('sys.symbol.arrow_left'), () => this.t('back_settings'), 'backSettings', () => { this.goBack(); })
+      }
+      Text(this.pageTitle()).fontSize(this.tab === 0 ? 22 : 23).fontWeight(FontWeight.Bold)
+        .fontColor(INK).layoutWeight(1)
+      if (this.tab < 4) {
+        this.iconButton($r('sys.symbol.gearshape'), () => this.t('open_settings'), 'openSettings', () => { this.openSettings(); })
+      }
+    }.width('100%').constraintSize({ maxWidth: 720, minHeight: 56 })
+      .padding({ left: this.tab >= 4 ? 8 : 20, right: 8, top: 2, bottom: 2 })
+  }
+
+  @Builder
+  private contextLine() {
     Row({ space: 8 }) {
-      if (this.tab === 4) {
-        Button({ type: ButtonType.Normal }) {
-          SymbolGlyph($r('sys.symbol.arrow_left')).fontSize(24).maxFontScale(1).fontColor([INK])
-            .accessibilityLevel('no')
-        }.id('backSettings').width(48).height(48).backgroundColor(SOFT).borderRadius(24)
-          .accessibilityText(this.t('back_settings')).onClick(() => { this.closeSettings(); })
-        Text(this.t('settings_tab')).fontSize(23).fontWeight(FontWeight.Bold).fontColor(INK).layoutWeight(1)
-      } else {
-        Text('safemesh').fontSize(23).fontWeight(FontWeight.Bold).fontColor(INK).layoutWeight(1)
-        Button({ type: ButtonType.Normal }) {
-          SymbolGlyph($r('sys.symbol.gearshape')).fontSize(24).maxFontScale(1).fontColor([INK])
-            .accessibilityLevel('no')
-        }.id('openSettings').width(48).height(48).backgroundColor(SOFT).borderRadius(24)
-          .accessibilityText(this.t('open_settings')).onClick(() => { this.openSettings(); })
-      }
-    }.width('100%').constraintSize({ maxWidth: 720 }).padding({ left: 20, right: 20, top: 8, bottom: 8 })
+      Text(this.t('central_krakow')).fontSize(13).fontColor(MUTED).layoutWeight(1)
+      Text(this.t('exercise') + (this.relay.transportMode === 'emulator' ? ' · ' + this.relay.emulatorNode : ''))
+        .id('exerciseBadge').fontSize(12).fontWeight(FontWeight.Medium).fontColor(WARNING_FG)
+        .padding({ left: 9, right: 9, top: 5, bottom: 5 }).backgroundColor(WARNING_BG).borderRadius(6)
+    }.width('100%').margin({ bottom: 4 })
   }
 
   @Builder
-  private drillBanner() {
-    Text(this.t('exercise') + ' · ' + this.t('exercise_notice'))
-      .fontSize(13).fontColor(WARNING_FG).width('100%').padding(14)
-      .backgroundColor(WARNING_BG).borderRadius(14)
-  }
-
-  @Builder
-  private alertCard() {
+  private alertView() {
     Column({ space: 12 }) {
-      Text(this.t(this.alerts.received ? 'verified_exercise' : 'no_alert'))
-        .fontSize(14).fontWeight(FontWeight.Bold).fontColor(WARNING_FG)
-      Text(this.alerts.received ? this.alerts.title : this.t('ready_title'))
-        .fontSize(25).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
+      Row({ space: 8 }) {
+        SymbolGlyph(this.alerts.received ? $r('sys.symbol.checkmark_shield') : $r('sys.symbol.bell'))
+          .fontSize(20).maxFontScale(1).fontColor([this.alerts.received ? SUCCESS : MUTED]).accessibilityLevel('no')
+        Text(this.t(this.alerts.received ? 'signature_verified' :
+          this.alerts.verificationState === 'expired' ? 'alert_expired' : 'no_alert'))
+          .id('verificationBadge').fontSize(13).fontWeight(FontWeight.Medium)
+          .fontColor(this.alerts.received ? SUCCESS : MUTED).layoutWeight(1)
+      }.width('100%')
+      Text(this.alerts.received ? this.alerts.title : this.t('ready_title')).id('alertTitle')
+        .fontSize(24).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
+      Text(this.alerts.received ? this.alerts.body : this.t('ready_body')).id('alertBody')
+        .fontSize(16).fontColor(INK).width('100%')
       if (this.alerts.received) {
-        Text(this.t('signature_verified')).fontSize(14).fontWeight(FontWeight.Medium).fontColor($r('app.color.success'))
-        Text(this.t('signed_original')).fontSize(12).fontColor(MUTED)
+        if (this.alerts.languageFallback) {
+          Text(this.t('original_language_' + this.alerts.contentLanguage)).fontSize(12).fontColor(MUTED).width('100%')
+        }
+        this.divider()
+        Text(this.t('valid_until') + ' ' + this.formatTime(this.alerts.expiresAt))
+          .fontSize(12).fontColor(MUTED).width('100%')
+      } else {
+        this.action(() => this.t('connect_devices'), 'connectDevices', () => { this.selectTab(2); })
       }
-      Text(this.alerts.received ? this.alerts.body : this.t('ready_body')).fontSize(16).fontColor(INK).width('100%')
-      if (this.alerts.received) {
-        Text(this.t('valid_until') + ': ' + this.alerts.expiry).fontSize(14).fontColor(MUTED)
-        Text(this.t('persistence_' + this.alerts.persistenceState)).fontSize(13).fontColor(MUTED)
+      if (this.alerts.persistenceState === 'save_failed' || this.alerts.persistenceState === 'load_failed') {
+        Text(this.t('persistence_' + this.alerts.persistenceState)).fontSize(13).fontColor($r('app.color.danger')).width('100%')
       }
-      this.action(() => this.t(this.alerts.busy ? 'verifying' : this.alerts.received ? 'see_relay' : 'receive_drill'), 'receiveDrill', () => { if (this.alerts.received) { this.selectTab(2); } else { this.loadDrill(); } }, () => !this.alerts.busy)
-    }.width('100%').alignItems(HorizontalAlign.Start).padding(20).backgroundColor(WARNING_BG).borderRadius(24)
+    }.width('100%').alignItems(HorizontalAlign.Start).padding(18).backgroundColor(SURFACE)
+      .borderRadius(14).border({ width: 1, color: BORDER })
   }
 
   @Builder
   private homeView() {
-    Column({ space: 20 }) {
-      this.alertCard()
-      Column({ space: 14 }) {
-        Text(this.t('offline_area')).fontSize(14).fontWeight(FontWeight.Bold).fontColor(MUTED)
-        Text(this.t('central_krakow')).fontSize(24).fontWeight(FontWeight.Bold).fontColor(INK)
-        OfflineMap({ vm: this.map, revision: this.mapRevision + this.themeRevision, dark: this.dark, compact: true,
-          description: this.t('map_description'), onSelect: (id: string) => { this.selectPoint(id); this.selectTab(1); } })
-          .height(this.viewportHeight < 480 ? 140 : 180).borderRadius(16).clip(true)
-        Text(this.map.attribution).fontSize(12).fontColor(MUTED).width('100%')
-        Text(this.map.points.length + ' ' + this.t('point_count')).fontSize(18).fontWeight(FontWeight.Bold).fontColor(INK)
-        Text(this.t('bundled_points')).fontSize(14).fontColor(MUTED)
-        this.action(() => this.t('explore'), 'exploreMap', () => { this.selectTab(1); }, () => true, false)
-        if (this.map.savedId.length > 0) {
-          this.action(() => this.t('open_saved'), 'homeSavedPoint', () => {
-            if (this.map.openSaved()) { this.mapRevision++; this.selectTab(1); }
-          }, () => true, false)
-        }
-      }.width('100%').alignItems(HorizontalAlign.Start).padding(20).backgroundColor(SOFT).borderRadius(24)
-      Text(this.t('offline_ready')).fontSize(14).fontColor(MUTED).width('100%')
-      this.heading(() => this.t('community'), () => this.t('community_body'))
-      this.action(() => this.t('see_relay'), 'exploreRelay', () => { this.selectTab(2); }, () => true, false)
-    }.width('100%')
-  }
-
-  @Builder
-  private mapControls() {
-    Row({ space: 8 }) {
-      Button('+').id('zoomIn').constraintSize({ minWidth: 48, minHeight: 48 }).fontSize(24).padding(8)
-        .fontColor(INK).backgroundColor(SURFACE).accessibilityText(this.t('zoom_in'))
-        .onClick(() => { this.map.changeZoom(0.5); this.mapRevision++; })
-      Button('−').id('zoomOut').constraintSize({ minWidth: 48, minHeight: 48 }).fontSize(24).padding(8)
-        .fontColor(INK).backgroundColor(SURFACE).accessibilityText(this.t('zoom_out'))
-        .onClick(() => { this.map.changeZoom(-0.5); this.mapRevision++; })
-      Button({ type: ButtonType.Normal }) {
-        Text(this.t('recenter')).fontSize(14).fontColor(INK).textAlign(TextAlign.Center)
-      }.id('recenterMap').constraintSize({ minHeight: 48 }).layoutWeight(1).padding(12)
-        .backgroundColor(SURFACE).borderRadius(16).accessibilityText(this.t('recenter'))
-        .onClick(() => { this.map.recenter(); this.mapRevision++; })
-    }.width('100%')
-  }
-
-  @Builder
-  private selectedPoint() {
-    Column({ space: 10 }) {
-      Text(this.t('selected_point')).fontSize(14).fontWeight(FontWeight.Bold).fontColor(MUTED)
-      Text(this.map.selected().address).fontSize(23).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
-      Text(this.t('point_type') + ' · ' + this.availability(this.map.selected().availability))
-        .fontSize(16).fontColor(INK).width('100%')
-      Text(this.map.selected().distanceLabel).fontSize(16).fontWeight(FontWeight.Bold).fontColor(INK)
-      Text(this.t('access_notice')).fontSize(14).fontColor(MUTED).width('100%')
-      this.action(() => this.t(this.map.saveBusy ? 'saving' :
-        this.map.savedId === this.map.selectedId ? 'saved_point' : 'save_point'), 'savePoint', () => { this.savePoint(); }, () => !this.map.saveBusy)
-      if (this.map.saveError.length > 0) {
-        Text(this.t(this.map.saveError === 'load_failed' ? 'saved_load_failed' : 'save_failed'))
-          .fontSize(14).fontColor($r('app.color.danger')).width('100%')
+    Column({ space: 16 }) {
+      this.contextLine()
+      Text(this.t('home_alerts')).fontSize(29).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
+      this.alertView()
+      this.section('your_place')
+      if (this.map.saveError === 'load_failed') {
+        Text(this.t('saved_load_failed')).fontSize(13).fontColor($r('app.color.danger')).width('100%')
       }
-    }.alignItems(HorizontalAlign.Start).padding(20).width('100%').backgroundColor(SURFACE).borderRadius(24)
+      if (this.map.saved() !== undefined) {
+        this.rowLink($r('sys.symbol.bookmark'), () => this.map.saved()?.address ?? '',
+          () => this.t('saved_on_phone'), 'homeSavedPoint', () => { this.selectPoint(this.map.savedId); })
+      } else {
+        this.rowLink($r('sys.symbol.bookmark'), () => this.t('choose_place'),
+          () => this.t('choose_place_hint'), 'exploreMap', () => { this.selectTab(1); })
+      }
+      this.divider()
+      this.rowLink($r('sys.symbol.phone_transmission_phone'), () => this.connectionTitle(),
+        () => this.connected() ? this.relay.peerCount + ' ' + this.t('nearby_devices') : this.t('connection_home_hint'),
+        'exploreRelay', () => { this.selectTab(2); })
+      Text(this.t('exercise_notice')).id('exerciseNotice').fontSize(12).fontColor(MUTED).width('100%')
+    }.width('100%').alignItems(HorizontalAlign.Start)
+  }
+
+  @Builder
+  private modeChoice(mode: string, key: string) {
+    Button({ type: ButtonType.Normal }) {
+      Text(this.t(key)).fontSize(14).fontWeight(FontWeight.Medium).fontColor(this.mapMode === mode ? ACTION_FG : INK)
+    }.id('mapMode' + mode).layoutWeight(1).constraintSize({ minHeight: 48 }).borderRadius(10)
+      .backgroundColor(this.mapMode === mode ? ACTION_BG : SOFT).accessibilitySelected(this.mapMode === mode)
+      .onClick(() => { this.mapMode = mode; if (mode === 'map') { this.query = ''; } })
+  }
+
+  @Builder
+  private pointRow(point: SafePointViewModel) {
+    Button({ type: ButtonType.Normal }) {
+      Row({ space: 12 }) {
+        Column({ space: 5 }) {
+          Text(point.address).fontSize(16).fontWeight(FontWeight.Medium).fontColor(INK).width('100%')
+          Text(this.t(point.availabilityKey) + (this.map.savedId === point.id ? ' · ' + this.t('saved_short') : ''))
+            .fontSize(12).fontColor(MUTED).width('100%')
+        }.layoutWeight(1).alignItems(HorizontalAlign.Start)
+        Text(this.map.distanceText(point, this.language)).fontSize(13).fontWeight(FontWeight.Medium).fontColor(INK)
+        SymbolGlyph($r('sys.symbol.chevron_right')).fontSize(13).maxFontScale(1).fontColor([MUTED]).accessibilityLevel('no')
+      }.width('100%').padding({ top: 16, bottom: 16 })
+    }.id('point_' + point.id).width('100%').constraintSize({ minHeight: 68 }).backgroundColor(Color.Transparent)
+      .borderRadius(6).accessibilityText(point.address + '. ' + this.map.distanceText(point, this.language) + '. ' +
+        this.t(point.availabilityKey)).onClick(() => { this.selectPoint(point.id); })
+    this.divider()
+  }
+
+  @Builder
+  private mapTools() {
+    Row({ space: 8 }) {
+      this.iconButton($r('sys.symbol.plus'), () => this.t('zoom_in'), 'zoomIn',
+        () => { this.map.changeZoom(0.5); this.mapRevision++; })
+      this.iconButton($r('sys.symbol.minus'), () => this.t('zoom_out'), 'zoomOut',
+        () => { this.map.changeZoom(-0.5); this.mapRevision++; })
+      Button({ type: ButtonType.Normal }) {
+        Text(this.t('recenter')).fontSize(14).fontColor(INK)
+      }.id('recenterMap').layoutWeight(1).constraintSize({ minHeight: 48 }).backgroundColor(Color.Transparent)
+        .onClick(() => { this.map.recenter(); this.mapRevision++; })
+    }.width('100%').backgroundColor(SURFACE).borderRadius(10)
   }
 
   @Builder
   private mapView() {
-    Column({ space: 18 }) {
-      this.heading(() => this.t('find_point'), () => this.t('central_krakow'))
-      Text(this.t('map_description')).fontSize(14).fontColor(MUTED).width('100%')
-      Text(this.t(this.map.originIsDevice ? 'device_origin' : 'demo_origin')).fontSize(14).fontColor(MUTED).width('100%')
-      OfflineMap({ vm: this.map, revision: this.mapRevision + this.themeRevision, dark: this.dark, description: this.t('map_description'),
-        onSelect: (id: string) => { this.selectPoint(id); } })
-        .height(this.viewportHeight < 480 ? 200 : 280).width('100%').borderRadius(20).clip(true)
-      this.mapControls()
-      Text(this.map.attribution).fontSize(12).fontColor(MUTED).width('100%')
-      this.action(() => this.t(this.map.locationBusy ? 'locating' : 'use_location'), 'useLocation', () => { this.useLocation(); }, () => !this.map.locationBusy, false)
-      if (this.map.locationStatus !== 'demo') {
-        Text(this.locationMessage()).fontSize(14).fontColor(MUTED).width('100%')
-      }
-      if (this.map.originIsDevice) {
-        Text(this.t('accuracy') + ': ' + Math.round(this.map.locationAccuracy) + ' m').fontSize(14).fontColor(MUTED)
-        this.action(() => this.t('reset_origin'), 'resetOrigin', () => { this.map.resetOrigin(); this.mapRevision++; }, () => true, false)
-      }
-      this.selectedPoint()
-      if (this.map.savedId.length > 0 && this.map.savedId !== this.map.selectedId) {
-        this.action(() => this.t('open_saved'), 'openSavedPoint', () => {
-          if (this.map.openSaved()) { this.mapRevision++; }
-        }, () => true, false)
-      }
-      Text(this.t('distance_notice')).fontSize(14).fontColor(MUTED).width('100%')
-      Text(this.t('all_points')).fontSize(23).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
+    Column({ space: 12 }) {
+      Row({ space: 8 }) {
+        Text(this.t('central_krakow')).fontSize(17).fontWeight(FontWeight.Medium).fontColor(INK).layoutWeight(1)
+        Text(this.t('offline_short')).fontSize(12).fontColor(SUCCESS)
+      }.width('100%')
       TextInput({ placeholder: this.t('search_points'), text: this.query }).id('searchPoints')
-        .fontSize(16).constraintSize({ minHeight: 52 }).backgroundColor(SURFACE).fontColor(INK)
-        .placeholderColor(MUTED).accessibilityText(this.t('search_points'))
-        .onChange((value: string) => { this.query = value; })
-      Text(this.t('results') + ': ' + this.filteredPoints().length + ' / ' + this.map.points.length)
-        .fontSize(14).fontColor(MUTED).width('100%')
-      ForEach(this.filteredPoints(), (point: SafePointViewModel) => {
-        Button({ type: ButtonType.Normal }) {
-          Column({ space: 6 }) {
-            Text(point.address).fontSize(16).fontWeight(FontWeight.Medium).fontColor(INK).width('100%')
-            Text(this.availability(point.availability) + ' · ' + point.distanceLabel).fontSize(14).fontColor(MUTED).width('100%')
-          }.width('100%').alignItems(HorizontalAlign.Start)
-        }.id('point_' + point.id).width('100%').constraintSize({ minHeight: 64 }).padding(16)
-          .backgroundColor(point.id === this.map.selectedId ? SOFT : SURFACE).borderRadius(16)
-          .accessibilityText(point.address + ', ' + this.availability(point.availability) + ', ' + point.distanceLabel)
-          .accessibilitySelected(point.id === this.map.selectedId)
-          .onClick(() => { this.selectPoint(point.id); this.pageScroll.scrollTo({ xOffset: 0, yOffset: 0 }); })
-      }, (point: SafePointViewModel) => point.id)
-      if (this.filteredPoints().length === 0) {
-        Text(this.t('no_results')).fontSize(16).fontColor(INK).width('100%')
+        .fontSize(16).constraintSize({ minHeight: 48 }).backgroundColor(SURFACE).fontColor(INK)
+        .placeholderColor(MUTED).borderRadius(12).maxLength(100).accessibilityText(this.t('search_points'))
+        .onChange((value: string) => { this.query = value; if (value.trim().length > 0) { this.mapMode = 'list'; } })
+      Row({ space: 4 }) { this.modeChoice('map', 'map'); this.modeChoice('list', 'point_list') }.width('100%')
+      if (this.mapMode === 'map' && this.query.trim().length === 0) {
+        OfflineMap({ vm: this.map, revision: this.mapRevision + this.themeRevision, dark: this.dark,
+          description: this.t('map_description'), onSelect: (id: string) => { this.selectPoint(id); } })
+          .id('offlineMap').height(this.viewportHeight < 540 ? 190 : 270).width('100%').borderRadius(12).clip(true)
+        this.mapTools()
+        Text(this.t('map_attribution')).fontSize(10).fontColor(MUTED).width('100%')
       }
-      Text(this.t('pack_date') + ': ' + this.map.sourceDate + ' · ' + this.map.packSize)
-        .fontSize(13).fontColor(MUTED).width('100%')
-    }.width('100%')
+      Text(this.t(this.map.originIsDevice ? 'device_origin' : 'demo_origin')).id('mapOrigin')
+        .fontSize(12).fontColor(MUTED).width('100%')
+      if (this.mapMode === 'map') {
+        this.action(() => this.t(this.map.locationBusy ? 'locating' : 'use_location'), 'useLocation',
+          () => { this.useLocation(); }, () => !this.map.locationBusy, false)
+        if (this.map.locationStatus !== 'demo' && this.map.locationStatus !== 'ready') {
+          Text(this.locationMessage()).fontSize(13).fontColor(MUTED).width('100%')
+        }
+        if (this.map.originIsDevice) {
+          this.action(() => this.t('reset_origin'), 'resetOrigin',
+            () => { this.map.resetOrigin(); this.mapRevision++; }, () => true, false)
+        }
+      }
+      Row() {
+        Text(this.t(this.mapMode === 'map' ? 'nearest_points' : 'results')).fontSize(15)
+          .fontWeight(FontWeight.Medium).fontColor(INK).layoutWeight(1)
+        Text(this.filteredPoints().length + ' / ' + this.map.points.length).id('resultCount').fontSize(13).fontColor(MUTED)
+      }.width('100%').margin({ top: 8 })
+      Column() {
+        ForEach(this.visiblePoints(), (point: SafePointViewModel) => { this.pointRow(point) },
+          (point: SafePointViewModel) => point.id + this.language + String(point.distance))
+      }.width('100%')
+      if (this.filteredPoints().length === 0) {
+        Text(this.t('no_results')).fontSize(16).fontColor(INK).width('100%').padding({ top: 16, bottom: 16 })
+      }
+      if (this.mapMode === 'map') {
+        this.action(() => this.t('all_points'), 'allPoints', () => { this.mapMode = 'list'; this.pageScroll.scrollTo({ xOffset: 0, yOffset: 0 }); }, () => true, false)
+      }
+      Text(this.t('distance_notice')).fontSize(12).fontColor(MUTED).width('100%')
+    }.width('100%').alignItems(HorizontalAlign.Start)
   }
 
   @Builder
-  private nodeBadge(letter: string, label: () => string, level: number) {
-    Column({ space: 8 }) {
-      Text(letter).fontSize(26).fontWeight(FontWeight.Bold).fontColor(INK)
-      Text(label()).fontSize(14).fontColor(INK).textAlign(TextAlign.Center).width('100%')
-    }.layoutWeight(1).padding(12).constraintSize({ minHeight: 84 })
-      .backgroundColor(this.relay.stage >= level ? SOFT : SURFACE).borderRadius(16)
-      .accessibilityGroup(true)
+  private pointDetail() {
+    Column({ space: 20 }) {
+      Text(this.map.selected().address).id('pointAddress').fontSize(28).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
+      Text(this.map.distanceText(this.map.selected(), this.language) + ' · ' + this.t('straight_line'))
+        .fontSize(15).fontColor(MUTED).width('100%')
+      this.divider()
+      Column({ space: 8 }) {
+        this.section('access_label')
+        Text(this.t(this.map.selected().availabilityKey)).id('pointAccess').fontSize(20).fontWeight(FontWeight.Medium).fontColor(INK).width('100%')
+        Text(this.t('access_notice')).fontSize(14).fontColor(MUTED).width('100%')
+      }.alignItems(HorizontalAlign.Start).width('100%')
+      this.action(() => this.t(this.map.saveBusy ? 'saving' : this.map.savedId === this.map.selectedId ? 'saved_point' : 'save_point'),
+        'savePoint', () => { this.savePoint(); }, () => this.initialized && !this.map.saveBusy && this.map.savedId !== this.map.selectedId)
+      this.action(() => this.t('show_on_map'), 'showOnMap', () => {
+        this.query = ''; this.mapMode = 'map'; this.selectTab(1);
+      }, () => true, false)
+      if (this.map.saveError.length > 0) {
+        Text(this.t(this.map.saveError === 'load_failed' ? 'saved_load_failed' : 'save_failed'))
+          .fontSize(14).fontColor($r('app.color.danger')).width('100%')
+      }
+      this.divider()
+      Column({ space: 6 }) {
+        Text(this.t('source_psp')).fontSize(14).fontColor(INK).width('100%')
+        Text(this.t('pack_date') + ': ' + this.map.selected().sourceDate).fontSize(12).fontColor(MUTED).width('100%')
+        Text(this.t('point_scope')).fontSize(12).fontColor(MUTED).width('100%')
+      }.width('100%')
+    }.width('100%').alignItems(HorizontalAlign.Start)
   }
 
   @Builder
   private labNodeChoice(node: string) {
     Button({ type: ButtonType.Normal }) {
-      Text(node).fontSize(20).fontWeight(FontWeight.Bold).fontColor(this.labNode === node ? ACTION_FG : INK)
-    }.id('labNode' + node).layoutWeight(1).constraintSize({ minHeight: 48 })
-      .backgroundColor(this.labNode === node ? ACTION_BG : SOFT).borderRadius(16)
-      .accessibilityText(this.t('lab_node') + ' ' + node).accessibilitySelected(this.labNode === node)
-      .enabled(!this.labBusy).onClick(() => { this.labNode = node; })
+      Text(node).fontSize(18).fontWeight(FontWeight.Medium).fontColor(this.labNode === node ? ACTION_FG : INK)
+    }.id('labNode' + node).layoutWeight(1).constraintSize({ minHeight: 48 }).borderRadius(10)
+      .backgroundColor(this.labNode === node ? ACTION_BG : SOFT).accessibilityText(this.t('node_label') + ' ' + node)
+      .accessibilitySelected(this.labNode === node).enabled(!this.labBusy).onClick(() => { this.labNode = node; })
   }
 
   @Builder
-  private meshLabView() {
-    Column({ space: 14 }) {
-      Text(this.t('lab_title')).fontSize(23).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
-      Text(this.t('lab_explanation')).fontSize(14).fontColor(MUTED).width('100%')
-      Text(this.t('lab_node')).fontSize(16).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
-      Row({ space: 8 }) {
-        this.labNodeChoice('A')
-        this.labNodeChoice('B')
-        this.labNodeChoice('C')
-      }.width('100%')
-      this.action(() => this.t(this.labBusy ? 'lab_connecting' : 'lab_connect') + ' ' + this.labNode,
-        'labStart', () => { this.startLab(); }, () => !this.labBusy)
-      if (this.relay.transportMode === 'emulator') {
-        Text(this.t('lab_active') + ' ' + this.relay.emulatorNode).id('labActiveNode')
-          .fontSize(18).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
-        Text(this.t('hardware_' + this.relay.hardwareState)).id('labStatus')
-          .fontSize(16).fontColor(INK).width('100%')
-        if (this.relay.hardwareState === 'lab_error' || this.relay.hardwareState === 'restore_failed') {
-          Text(this.t('diagnostics') + ': ' + this.relay.hardwareStatus).id('labConnectionDetail')
-            .fontSize(13).fontColor(MUTED).width('100%')
-        }
-        Text(this.t('lab_peers') + ': ' + this.relay.peerCount).id('labPeerCount')
-          .fontSize(16).fontColor(INK).width('100%')
-        ForEach(this.relay.peers, (peer: PeerViewModel) => {
-          Text(peer.name + ' · ' + this.t(peer.connected ? 'connected_short' : 'lab_disconnected_peer'))
-            .fontSize(14).fontColor(MUTED).width('100%')
-        }, (peer: PeerViewModel) => peer.address)
-        this.action(() => this.t('lab_send_drill'), 'labSendDrill', () => { this.sendLabDrill(); },
-          () => !this.labBusy && !this.alerts.busy)
-        this.action(() => this.t('share_alert'), 'labShare', () => { this.relay.share(); },
-          () => !this.labBusy && this.alerts.received, false)
-        this.action(() => this.t('lab_disconnect'), 'labStop', () => { this.relay.stop(); },
-          () => !this.labBusy, false)
-        Text(this.t('lab_received') + ': ' + this.relay.acceptedCount + '\n' +
-          this.t('lab_rejected') + ': ' + this.relay.rejectedCount + '\n' +
-          this.t('queue_pending') + ': ' + this.relay.pendingCount + '\n' +
-          this.t('queue_acked') + ': ' + this.relay.acknowledgedCount + '\n' +
-          this.t('queue_retry') + ': ' + this.relay.retryCount + '\n' +
-          this.t('queue_failed') + ': ' + this.relay.failedCount)
-          .id('labMetrics').fontSize(14).fontColor(INK).width('100%')
-        Text(this.t('diagnostics') + ': ' + this.relay.lastPacketStatus)
-          .id('labPacketStatus').fontSize(13).fontColor(MUTED).width('100%')
-        this.action(() => this.t('lab_return_radio'), 'labReturnRadio', () => { this.relay.probe(); },
-          () => !this.labBusy, false)
-      }
-      Text(this.t('lab_topology')).fontSize(14).fontColor(MUTED).width('100%')
-    }.padding(20).width('100%').alignItems(HorizontalAlign.Start).backgroundColor(SURFACE).borderRadius(24)
+  private metric(value: () => number, key: string) {
+    Column({ space: 5 }) {
+      Text(String(value())).fontSize(26).fontWeight(FontWeight.Medium).fontColor(INK)
+      Text(this.t(key)).fontSize(12).fontColor(MUTED).textAlign(TextAlign.Center).width('100%')
+    }.layoutWeight(1).padding({ top: 16, bottom: 16 })
   }
 
   @Builder
   private relayView() {
     Column({ space: 18 }) {
-      this.heading(() => this.t('relay_title'), () => this.t('relay_intro'))
-      this.action(() => this.t(this.labVisible ? 'lab_hide' : 'lab_open'), 'openMeshLab',
-        () => { this.labVisible = !this.labVisible; }, () => true, false)
-      if (this.labVisible) { this.meshLabView() }
-      Column({ space: 16 }) {
-        Text(this.t('simulation')).fontSize(20).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
-        Text(this.t('no_radio')).fontSize(14).fontColor(MUTED).width('100%')
-        Row({ space: 8 }) {
-          this.nodeBadge('A', () => this.t('node_a'), 1)
-          this.nodeBadge('B', () => this.t('node_b'), 2)
-          this.nodeBadge('C', () => this.t('node_c'), 3)
-        }.width('100%')
-        this.action(() => this.t(this.relay.running ? 'drill_running' : 'run_drill'), 'runRelay', () => { this.relay.simulate(); }, () => !this.relay.running)
-        Text(this.t('diagnostics')).fontSize(14).fontWeight(FontWeight.Bold).fontColor(MUTED)
-        Text(this.relay.testStatus).id('relayTestStatus').fontSize(16).fontColor(INK).width('100%')
-      }.alignItems(HorizontalAlign.Start).padding(20).width('100%').backgroundColor(SOFT).borderRadius(24)
-      ForEach(this.relay.events, (event: RelayEvent) => {
-        Column({ space: 8 }) {
-          Text((event.good ? '✓ ' : '! ') + event.title).fontSize(16).fontWeight(FontWeight.Medium).fontColor(INK).width('100%')
-          Text(event.detail).fontSize(14).fontColor(MUTED).width('100%')
-        }.padding(16).width('100%').backgroundColor(SURFACE).borderRadius(16).accessibilityGroup(true)
-      }, (event: RelayEvent) => event.id)
-      if (this.relay.transportMode !== 'emulator') {
-      Column({ space: 14 }) {
-        Text('NearLink').fontSize(24).fontWeight(FontWeight.Bold).fontColor(INK)
-        Text(this.relay.peerCount + ' ' + this.t('connected')).fontSize(14).fontColor(MUTED)
-        Text(this.t('hardware_' + this.relay.hardwareState)).fontSize(16).fontColor(INK).width('100%').id('nearlinkStatus')
-        if (this.relay.hardwareState === 'error' || this.relay.hardwareState === 'queue_error' ||
-          this.relay.hardwareState === 'restore_failed' || this.relay.hardwareState === 'cleanup_failed') {
-          Text(this.t('diagnostics') + ': ' + this.relay.hardwareStatus).fontSize(13).fontColor(MUTED).width('100%')
-        }
-        Text(this.t('nearlink_notice')).fontSize(14).fontColor(MUTED).width('100%')
-        Text(this.t('queue_metrics')).fontSize(16).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
-        Text(this.t('queue_pending') + ': ' + this.relay.pendingCount + '\n' +
-          this.t('queue_acked') + ': ' + this.relay.acknowledgedCount + '\n' +
-          this.t('queue_retry') + ': ' + this.relay.retryCount + '\n' +
-          this.t('queue_failed') + ': ' + this.relay.failedCount).fontSize(14).fontColor(INK).width('100%')
-        Text(this.t('queue_note')).fontSize(13).fontColor(MUTED).width('100%')
-        this.action(() => this.t('check_hardware'), 'checkNearLink', () => { this.relay.probe(); }, () => true, false)
-        if (this.relay.hardwareSupported) {
-          TextInput({ placeholder: this.t('peer_name'), text: this.relay.peerName }).id('peerName')
-            .fontSize(16).constraintSize({ minHeight: 52 }).backgroundColor(SOFT).fontColor(INK).placeholderColor(MUTED)
-            .accessibilityText(this.t('peer_name')).onChange((value: string) => { this.relay.peerName = value; })
-          this.action(() => this.t('start_relay'), 'startHardware', () => { this.relay.startHardware(); })
-          ForEach(this.relay.peers, (peer: PeerViewModel) => {
-            this.action(() => peer.name + ' · ' + this.t(peer.connected ? 'connected_short' : 'connect'), 'peer_' + peer.address, () => { this.relay.connect(peer.address); }, () => !peer.connected, false)
-          }, (peer: PeerViewModel) => peer.address)
-          this.action(() => this.t('share_alert'), 'shareAlert', () => { this.relay.share(); }, () => this.alerts.received)
-          this.action(() => this.t('stop_relay'), 'stopRelay', () => { this.relay.stop(); }, () => true, false)
-        }
-      }.padding(20).width('100%').alignItems(HorizontalAlign.Start).backgroundColor(SURFACE).borderRadius(24)
+      Text(this.t('relay_intro')).fontSize(16).fontColor(MUTED).width('100%')
+      Row({ space: 12 }) {
+        SymbolGlyph($r('sys.symbol.phone_transmission_phone')).fontSize(32).maxFontScale(1)
+          .fontColor([this.connected() ? SUCCESS : MUTED]).accessibilityLevel('no')
+        Column({ space: 4 }) {
+          Text(this.connectionTitle()).id('labStatus').fontSize(23).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
+          Text(this.t('emulator_transport')).id('labBanner').fontSize(13).fontColor(MUTED).width('100%')
+        }.layoutWeight(1).alignItems(HorizontalAlign.Start)
+      }.width('100%').padding({ top: 8, bottom: 8 })
+      Text(this.t('lab_node')).fontSize(13).fontColor(MUTED).width('100%')
+      Row({ space: 8 }) { this.labNodeChoice('A'); this.labNodeChoice('B'); this.labNodeChoice('C') }.width('100%')
+      if (this.connected() && this.relay.emulatorNode === this.labNode && this.relay.transportMode === 'emulator') {
+        this.action(() => this.t('lab_disconnect') + ' ' + this.relay.emulatorNode, 'labStop',
+          () => { this.relay.stop(); }, () => !this.labBusy, false)
+      } else {
+        this.action(() => this.t(this.labBusy ? 'lab_connecting' : 'lab_connect') + ' ' + this.labNode,
+          'labStart', () => { this.startLab(); }, () => this.initialized && !this.labBusy)
       }
-      Text(this.t('technical_note')).fontSize(13).fontColor(MUTED).width('100%')
-    }.width('100%')
+      if (this.relay.hardwareState === 'lab_error' || this.relay.hardwareState === 'restore_failed') {
+        Text(this.t('hardware_' + this.relay.hardwareState)).id('labConnectionDetail')
+          .fontSize(14).fontColor($r('app.color.danger')).width('100%')
+      }
+      if (this.relay.transportMode === 'emulator' && this.connected()) {
+        this.divider()
+        Row() {
+          Text(this.t('neighbors')).fontSize(15).fontWeight(FontWeight.Medium).fontColor(INK).layoutWeight(1)
+          Text(String(this.relay.peerCount)).id('labPeerCount').fontSize(15).fontColor(MUTED)
+        }.width('100%')
+        if (this.relay.peerCount === 0) {
+          Text(this.t('waiting_neighbors')).fontSize(14).fontColor(MUTED).width('100%')
+        }
+        ForEach(this.relay.peers.filter((peer: PeerViewModel) => peer.connected), (peer: PeerViewModel) => {
+          Row({ space: 10 }) {
+            Text(peer.address).fontSize(17).fontWeight(FontWeight.Medium).fontColor(INK).width(36)
+            Text(this.t('neighbor_connected')).fontSize(14).fontColor(MUTED).layoutWeight(1)
+            SymbolGlyph($r('sys.symbol.checkmark_circle')).fontSize(20).maxFontScale(1).fontColor([SUCCESS]).accessibilityLevel('no')
+          }.width('100%').constraintSize({ minHeight: 48 })
+        }, (peer: PeerViewModel) => peer.address)
+        this.divider()
+        Row({ space: 8 }) {
+          this.metric(() => this.relay.pendingCount, 'queue_pending')
+          this.metric(() => this.relay.acknowledgedCount, 'queue_acked')
+          this.metric(() => this.relay.retryCount, 'queue_retry')
+        }.id('labMetrics').width('100%').alignItems(VerticalAlign.Top)
+        this.action(() => this.t('share_alert'), 'labShare', () => { this.relay.share(); },
+          () => !this.labBusy && this.alerts.received)
+        Text(this.t('packet_' + this.relay.lastPacketState)).id('labPacketStatus').fontSize(13).fontColor(MUTED).width('100%')
+      }
+      Text(this.t('foreground_notice')).fontSize(13).fontColor(MUTED).width('100%')
+      this.divider()
+      this.rowLink($r('sys.symbol.checkmark_shield'), () => this.t('diagnostics_title'),
+        () => this.t('diagnostics_hint'), 'openDiagnostics', () => { this.diagnosticsParent = 2; this.selectTab(5); })
+    }.width('100%').alignItems(HorizontalAlign.Start)
   }
 
   @Builder
-  private guideItem(number: string, title: () => string, detail: () => string) {
-    Column({ space: 10 }) {
-      Text(number + ' · ' + title()).fontSize(19).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
-      Text(detail()).fontSize(16).fontColor(INK).width('100%')
-    }.width('100%').alignItems(HorizontalAlign.Start).padding(20).backgroundColor(SURFACE).borderRadius(20)
+  private guideItem(index: number, title: string, body: string) {
+    Column({ space: 0 }) {
+      Button({ type: ButtonType.Normal }) {
+        Row({ space: 12 }) {
+          Text('0' + (index + 1)).fontSize(13).fontColor(MUTED).width(26)
+          Text(this.t(title)).fontSize(17).fontWeight(FontWeight.Medium).fontColor(INK).layoutWeight(1)
+          SymbolGlyph(this.guideExpanded === index ? $r('sys.symbol.minus') : $r('sys.symbol.plus'))
+            .fontSize(18).maxFontScale(1).fontColor([MUTED]).accessibilityLevel('no')
+        }.padding({ top: 18, bottom: 18 }).width('100%')
+      }.id('guideItem' + index).width('100%').constraintSize({ minHeight: 60 }).backgroundColor(Color.Transparent)
+        .borderRadius(6).accessibilityText(this.t(title)).accessibilityDescription(this.t(this.guideExpanded === index ? 'collapse' : 'expand'))
+        .onClick(() => { this.guideExpanded = this.guideExpanded === index ? -1 : index; })
+      if (this.guideExpanded === index) {
+        Text(this.t(body)).fontSize(15).fontColor(INK).width('100%').padding({ left: 38, bottom: 20 })
+      }
+      this.divider()
+    }.width('100%')
   }
 
   @Builder
   private sourceLink(url: string, label: () => string) {
-    Hyperlink(url, label()).color(INK).width('100%')
-      .constraintSize({ minHeight: 48 }).padding({ top: 12, bottom: 12 })
+    Hyperlink(url, label()).color(INK).width('100%').constraintSize({ minHeight: 48 })
+      .padding({ top: 12, bottom: 12 })
   }
 
   @Builder
   private guideView() {
-    Column({ space: 20 }) {
-      this.heading(() => this.t('guide_title'), () => this.t('guide_intro'))
-      this.guideItem('01', () => this.t('guide1_title'), () => this.t('guide1_body'))
-      this.guideItem('02', () => this.t('guide2_title'), () => this.t('guide2_body'))
-      this.guideItem('03', () => this.t('guide3_title'), () => this.t('guide3_body'))
-      this.guideItem('04', () => this.t('guide4_title'), () => this.t('guide4_body'))
-      Column({ space: 12 }) {
-        Text(this.t('trust_title')).fontSize(23).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
-        Text(this.t('trust_body')).fontSize(16).fontColor(INK).width('100%')
-        Text(this.t('trust_limits')).fontSize(14).fontColor(MUTED).width('100%')
-      }.padding(20).width('100%').alignItems(HorizontalAlign.Start).backgroundColor(SOFT).borderRadius(24)
-      Text(this.t('sources')).fontSize(23).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
-      this.sourceLink('https://www.openstreetmap.org/copyright', () => 'OpenStreetMap contributors · ODbL')
-      this.sourceLink('https://dane.gov.pl/pl/dataset/28058,punkty-schronienia-w-polsce', () => this.t('source_psp'))
-      this.sourceLink('https://creativecommons.org/licenses/by/4.0/', () => 'CC BY 4.0')
+    Column({ space: 16 }) {
+      Text(this.t('guide_intro')).fontSize(15).fontColor(MUTED).width('100%')
+      Column() {
+        this.guideItem(0, 'guide1_title', 'guide1_body')
+        this.guideItem(1, 'guide2_title', 'guide2_body')
+        this.guideItem(2, 'guide3_title', 'guide3_body')
+        this.guideItem(3, 'guide4_title', 'guide4_body')
+      }.width('100%')
+      Text(this.t('guide_offline')).fontSize(12).fontColor(MUTED).width('100%')
       this.sourceLink('https://www.gov.pl/web/poradnikbezpieczenstwa', () => this.t('source_safety'))
-      Text(this.t('external_links')).fontSize(14).fontColor(MUTED).width('100%')
-    }.width('100%')
+      Text(this.t('external_links')).fontSize(12).fontColor(MUTED).width('100%')
+    }.width('100%').alignItems(HorizontalAlign.Start)
   }
 
   @Builder
   private settingsChoice(label: () => string, id: string, selected: () => boolean, action: () => void) {
     Button({ type: ButtonType.Normal }) {
-      Text((selected() ? '✓  ' : '') + label()).fontSize(16).fontWeight(FontWeight.Medium)
-        .fontColor(INK).width('100%')
-    }.id(id).width('100%').constraintSize({ minHeight: 52 }).padding(16)
-      .backgroundColor(selected() ? SOFT : SURFACE).borderRadius(16)
-      .accessibilityText(label()).accessibilitySelected(selected())
-      .enabled(!this.settingsBusy).onClick(action)
+      Row({ space: 16 }) {
+        Text(label()).fontSize(16).fontColor(INK).layoutWeight(1)
+        SymbolGlyph(selected() ? $r('sys.symbol.checkmark_circle_fill_1') : $r('sys.symbol.circle'))
+          .fontSize(22).maxFontScale(1).fontColor([selected() ? SUCCESS : MUTED]).accessibilityLevel('no')
+      }.width('100%').padding(16)
+    }.id(id).width('100%').constraintSize({ minHeight: 54 }).backgroundColor(SURFACE).borderRadius(0)
+      .accessibilityText(label()).accessibilitySelected(selected()).enabled(!this.settingsBusy).onClick(action)
   }
 
   @Builder
   private settingsView() {
-    Column({ space: 18 }) {
-      Text(this.t('settings_intro')).fontSize(16).fontColor(MUTED).width('100%')
-      Text(this.t('theme_label')).fontSize(23).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
-      this.settingsChoice(() => this.t('theme_auto'), 'themeSystem', () => this.themePreference === 'system',
-        () => { this.chooseTheme('system'); })
-      this.settingsChoice(() => this.t('theme_light'), 'themeLight', () => this.themePreference === 'light',
-        () => { this.chooseTheme('light'); })
-      this.settingsChoice(() => this.t('theme_dark'), 'themeDark', () => this.themePreference === 'dark',
-        () => { this.chooseTheme('dark'); })
-      Text(this.t('theme_auto_hint')).fontSize(14).fontColor(MUTED).width('100%')
-      Text(this.t('language_label')).fontSize(23).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
-      this.settingsChoice(() => 'Polski', 'languagePl', () => this.language === 'pl', () => { this.chooseLanguage('pl'); })
-      this.settingsChoice(() => 'English', 'languageEn', () => this.language === 'en', () => { this.chooseLanguage('en'); })
-      Text(this.t('text_size_hint')).fontSize(14).fontColor(MUTED).width('100%')
-    }.width('100%')
+    Column({ space: 12 }) {
+      this.section('theme_label')
+      Column() {
+        this.settingsChoice(() => this.t('theme_auto'), 'themeSystem', () => this.themePreference === 'system', () => { this.chooseTheme('system'); })
+        this.divider()
+        this.settingsChoice(() => this.t('theme_light'), 'themeLight', () => this.themePreference === 'light', () => { this.chooseTheme('light'); })
+        this.divider()
+        this.settingsChoice(() => this.t('theme_dark'), 'themeDark', () => this.themePreference === 'dark', () => { this.chooseTheme('dark'); })
+      }.width('100%').borderRadius(12).clip(true)
+      Text(this.t('theme_auto_hint')).fontSize(12).fontColor(MUTED).width('100%')
+      this.section('language_label')
+      Column() {
+        this.settingsChoice(() => 'Polski', 'languagePl', () => this.language === 'pl', () => { this.chooseLanguage('pl'); })
+        this.divider()
+        this.settingsChoice(() => 'English', 'languageEn', () => this.language === 'en', () => { this.chooseLanguage('en'); })
+      }.width('100%').borderRadius(12).clip(true)
+      Text(this.t('text_size_hint')).fontSize(12).fontColor(MUTED).width('100%')
+      this.divider()
+      this.rowLink($r('sys.symbol.checkmark_shield'), () => this.t('diagnostics_title'), () => this.t('diagnostics_hint'),
+        'settingsDiagnostics', () => { this.diagnosticsParent = 4; this.selectTab(5); })
+      this.section('about_app')
+      Text(this.t('about_body')).fontSize(14).fontColor(MUTED).width('100%')
+      Text(this.t('pack_date') + ': ' + this.map.sourceDate + ' · ' + this.map.packSize).fontSize(12).fontColor(MUTED).width('100%')
+      this.sourceLink('https://dane.gov.pl/pl/dataset/28058,punkty-schronienia-w-polsce', () => this.t('source_psp'))
+      this.sourceLink('https://www.openstreetmap.org/copyright', () => this.t('source_osm'))
+      Text('SafeMesh 1.3.0').fontSize(12).fontColor(MUTED).width('100%')
+    }.width('100%').alignItems(HorizontalAlign.Start)
   }
 
   @Builder
-  private navItem(index: number, label: () => string, icon: Resource) {
+  private diagnosticsView() {
+    Column({ space: 16 }) {
+      Text(this.t('diagnostics_intro')).fontSize(15).fontColor(MUTED).width('100%')
+      this.section('exercise_actions')
+      this.action(() => this.t(this.alerts.busy ? 'verifying' : 'receive_drill'), 'diagnosticDrill',
+        () => { this.loadDrill(); }, () => this.initialized && !this.alerts.busy)
+      if (this.relay.transportMode === 'emulator' && this.connected()) {
+        this.action(() => this.t('lab_send_drill'), 'labSendDrill', () => { this.sendLabDrill(); }, () => !this.labBusy, false)
+      }
+      this.divider()
+      this.section('simulation')
+      Text(this.t('no_radio')).fontSize(13).fontColor(MUTED).width('100%')
+      this.action(() => this.t(this.relay.running ? 'drill_running' : 'run_drill'), 'runRelay',
+        () => { this.relay.simulate(); }, () => this.initialized && !this.relay.running, false)
+      Text(this.t('test_' + this.relay.testState)).id('relayTestStatus').fontSize(16).fontWeight(FontWeight.Medium).fontColor(INK).width('100%')
+      ForEach(this.relay.events, (event: RelayEvent) => {
+        Column({ space: 6 }) {
+          Text(this.t(event.titleKey)).fontSize(15).fontWeight(FontWeight.Medium).fontColor(event.good ? SUCCESS : $r('app.color.danger')).width('100%')
+          Text(this.t(event.detailKey)).fontSize(13).fontColor(MUTED).width('100%')
+          if (!event.good) { Text(this.t('packet_' + event.status)).fontSize(13).fontColor(MUTED).width('100%') }
+          this.divider()
+        }.width('100%').padding({ top: 8, bottom: 8 })
+      }, (event: RelayEvent) => event.id + this.language)
+      this.section('delivery_details')
+      Text(this.t('lab_received') + ': ' + this.relay.acceptedCount + '\n' + this.t('lab_rejected') + ': ' + this.relay.rejectedCount +
+        '\n' + this.t('queue_failed') + ': ' + this.relay.failedCount).fontSize(14).fontColor(INK).width('100%')
+      Text(this.t('queue_note')).fontSize(12).fontColor(MUTED).width('100%')
+      this.divider()
+      this.section('physical_radio')
+      Text(this.t('nearlink_notice')).fontSize(14).fontColor(MUTED).width('100%')
+      this.action(() => this.t('check_hardware'), 'checkNearLink', () => { this.relay.probe(); }, () => this.initialized && !this.labBusy, false)
+      if (this.relay.transportMode === 'nearlink') {
+        Text(this.t('hardware_' + this.relay.hardwareState)).id('nearlinkStatus').fontSize(14).fontColor(MUTED).width('100%')
+        if (this.relay.hardwareSupported) {
+          TextInput({ placeholder: this.t('peer_name'), text: this.relay.peerName }).id('peerName')
+            .fontSize(16).constraintSize({ minHeight: 48 }).fontColor(INK).backgroundColor(SURFACE)
+            .onChange((value: string) => { this.relay.peerName = value; })
+          this.action(() => this.t('start_relay'), 'startHardware', () => { this.relay.startHardware(); })
+          ForEach(this.relay.peers, (peer: PeerViewModel) => {
+            this.action(() => peer.name + ' · ' + this.t(peer.connected ? 'connected_short' : 'connect'),
+              'peer_' + peer.address, () => { this.relay.connect(peer.address); }, () => !peer.connected, false)
+          }, (peer: PeerViewModel) => peer.address)
+          this.action(() => this.t('share_alert'), 'shareAlert', () => { this.relay.share(); }, () => this.alerts.received)
+          this.action(() => this.t('stop_relay'), 'stopRelay', () => { this.relay.stop(); }, () => true, false)
+        }
+      }
+      Text(this.t('trust_body')).fontSize(13).fontColor(MUTED).width('100%')
+    }.width('100%').alignItems(HorizontalAlign.Start)
+  }
+
+  @Builder
+  private navItem(index: number, key: string, icon: Resource) {
     Button({ type: ButtonType.Normal }) {
-      Column({ space: 4 }) {
-        SymbolGlyph(icon).fontSize(24).maxFontScale(1).fontColor([INK])
+      Column({ space: 5 }) {
+        SymbolGlyph(icon).fontSize(23).maxFontScale(1).fontColor([this.tab === index ? SUCCESS : MUTED])
           .fontWeight(this.tab === index ? FontWeight.Bold : FontWeight.Normal).accessibilityLevel('no')
-        Text(label()).fontSize(this.fontScale >= 1.6 ? 13 : 12).fontWeight(this.tab === index ? FontWeight.Bold : FontWeight.Medium)
-          .fontColor(INK).textAlign(TextAlign.Center).width('100%')
+        Text(this.t(key)).fontSize(12).fontWeight(this.tab === index ? FontWeight.Bold : FontWeight.Normal)
+          .fontColor(this.tab === index ? INK : MUTED).textAlign(TextAlign.Center).width('100%')
       }.width('100%')
-    }.layoutWeight(1).constraintSize({ minHeight: 48 }).padding({ left: 2, right: 2, top: 8, bottom: 8 })
-      .borderRadius(16).backgroundColor(this.tab === index ? SOFT : SURFACE)
-      .id('tab' + index).accessibilityText(label()).accessibilitySelected(this.tab === index)
-      .onClick(() => { this.selectTab(index); })
+    }.layoutWeight(1).constraintSize({ minHeight: 56 }).padding({ left: 2, right: 2, top: 8, bottom: 8 })
+      .backgroundColor(Color.Transparent).borderRadius(8).id('tab' + index)
+      .accessibilityText(this.t(key)).accessibilitySelected(this.tab === index).onClick(() => { this.selectTab(index); })
   }
 
   @Builder
   private navigation() {
-    if (this.fontScale >= 1.6 || this.viewportWidth < 340) {
-      Column({ space: 4 }) {
+    Column() {
+      this.divider()
+      if (this.fontScale >= 1.6 || this.viewportWidth < 340) {
+        Column({ space: 2 }) {
+          Row({ space: 4 }) { this.navItem(0, 'home', $r('sys.symbol.house')); this.navItem(1, 'map', $r('sys.symbol.map')) }.width('100%')
+          Row({ space: 4 }) { this.navItem(2, 'relay', $r('sys.symbol.phone_transmission_phone')); this.navItem(3, 'guide', $r('sys.symbol.book')) }.width('100%')
+        }.padding(6).width('100%')
+      } else {
         Row({ space: 4 }) {
-          this.navItem(0, () => this.t('home'), $r('sys.symbol.house'))
-          this.navItem(1, () => this.t('map'), $r('sys.symbol.map'))
-        }.width('100%')
-        Row({ space: 4 }) {
-          this.navItem(2, () => this.t('relay'), $r('sys.symbol.phone_transmission_phone'))
-          this.navItem(3, () => this.t('guide'), $r('sys.symbol.book'))
-        }.width('100%')
-      }.padding(8).width('100%').backgroundColor(SURFACE)
-    } else {
-      Row({ space: 4 }) {
-        this.navItem(0, () => this.t('home'), $r('sys.symbol.house'))
-        this.navItem(1, () => this.t('map'), $r('sys.symbol.map'))
-        this.navItem(2, () => this.t('relay'), $r('sys.symbol.phone_transmission_phone'))
-        this.navItem(3, () => this.t('guide'), $r('sys.symbol.book'))
-      }.width('100%').padding(8).backgroundColor(SURFACE)
-    }
+          this.navItem(0, 'home', $r('sys.symbol.house'))
+          this.navItem(1, 'map', $r('sys.symbol.map'))
+          this.navItem(2, 'relay', $r('sys.symbol.phone_transmission_phone'))
+          this.navItem(3, 'guide', $r('sys.symbol.book'))
+        }.width('100%').padding({ left: 8, right: 8, top: 4, bottom: 4 })
+      }
+    }.width('100%').backgroundColor(SURFACE)
   }
 
   build() {
@@ -652,30 +768,23 @@ struct Index {
       this.header()
       Scroll(this.pageScroll) {
         Column({ space: 16 }) {
-          this.drillBanner()
-          if (this.relay.transportMode === 'emulator') {
-            Text(this.t('lab_banner') + ' ' + this.relay.emulatorNode).id('labBanner')
-              .fontSize(14).fontWeight(FontWeight.Bold).fontColor(WARNING_FG).width('100%')
-              .padding(12).backgroundColor(WARNING_BG).borderRadius(14)
-          }
           if (this.notice.length > 0) {
-            Column({ space: 8 }) {
-              Text(this.notice).fontSize(16).fontColor(INK).width('100%')
-              this.action(() => this.t('dismiss'), 'dismissNotice', () => { this.notice = ''; }, () => true, false)
-            }.padding(16).width('100%').backgroundColor(SOFT).borderRadius(16)
+            Row({ space: 8 }) {
+              Text(this.notice).fontSize(14).fontColor(INK).layoutWeight(1)
+              this.iconButton($r('sys.symbol.xmark'), () => this.t('dismiss'), 'dismissNotice', () => { this.notice = ''; })
+            }.padding({ left: 12 }).width('100%').backgroundColor(SOFT).borderRadius(10)
           }
           if (this.tab === 0) { this.homeView() }
           else if (this.tab === 1) { this.mapView() }
           else if (this.tab === 2) { this.relayView() }
           else if (this.tab === 3) { this.guideView() }
-          else { this.settingsView() }
-        }.padding(this.viewportWidth < 340 ? 12 : 20).width('100%').constraintSize({ maxWidth: 720 })
+          else if (this.tab === 4) { this.settingsView() }
+          else if (this.tab === 5) { this.diagnosticsView() }
+          else { this.pointDetail() }
+        }.width('100%').constraintSize({ maxWidth: 680 }).padding({ left: 20, right: 20, top: 12, bottom: 24 })
       }.layoutWeight(1).width('100%').scrollBar(BarState.Auto).align(Alignment.Top)
-      if (this.tab !== 4) { this.navigation() }
+      if (this.tab < 4) { this.navigation() }
     }.width('100%').height('100%').backgroundColor(PAPER)
-      .onAreaChange((_old: Area, area: Area) => {
-        this.viewportWidth = Number(area.width);
-        this.viewportHeight = Number(area.height);
-      })
+      .onAreaChange((_old: Area, area: Area) => { this.viewportWidth = Number(area.width); this.viewportHeight = Number(area.height); })
   }
 }

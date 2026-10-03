@@ -30,7 +30,11 @@ const { MapViewModel, MapShape, MapVertex } = new Function(...dataNames, 'Device
 
 class CanvasMock {
   calls = { stroke: 0, lineTo: 0, moveTo: 0, fill: 0, fillRect: 0, clip: 0 };
-  beginPath() {}
+  globalAlpha = 1;
+  currentArc;
+  markerFills = [];
+  colors = [];
+  beginPath() { this.currentArc = undefined; }
   closePath() {}
   moveTo(x, y) { assert(Number.isFinite(x) && Number.isFinite(y)); this.calls.moveTo++; }
   lineTo(x, y) { assert(Number.isFinite(x) && Number.isFinite(y)); this.calls.lineTo++; }
@@ -43,11 +47,14 @@ class CanvasMock {
   clip() { this.calls.clip++; }
   save() {}
   restore() {}
-  fill() { this.calls.fill++; }
+  fill() {
+    this.calls.fill++; this.colors.push(this.fillStyle);
+    if (this.currentArc) this.markerFills.push({ ...this.currentArc, color: this.fillStyle, alpha: this.globalAlpha });
+  }
   stroke() { this.calls.stroke++; }
   fillText() {}
   measureText(text) { return { width: text.length * 6.5 }; }
-  arc() {}
+  arc(x, y, radius) { this.currentArc = { x, y, radius }; }
 }
 class SettingsMock {}
 let viewSource = read('entry/src/main/ets/views/OfflineMap.ets').replace(/import[\s\S]*?;\s*/g, '');
@@ -131,16 +138,16 @@ test('unknown selected IDs cannot mutate any model state or move the map to 0,0'
   model.savedId = model.points[3].id;
   model.changeZoom(2);
   const before = JSON.stringify(model);
-  model.select('unknown-id');
+  assert.equal(model.select('unknown-id'), false);
   assert.equal(JSON.stringify(model), before);
-  model.select('');
+  assert.equal(model.select(''), false);
   assert.equal(JSON.stringify(model), before);
 });
 
 test('valid selection centers an existing source point; recenter retains origin and sensible zoom', () => {
   const model = new MapViewModel();
   const point = model.points[10];
-  model.select(point.id);
+  assert.equal(model.select(point.id), true);
   assert.equal(model.selected(), point);
   assert.equal(model.centerLat, point.lat);
   assert.equal(model.centerLon, point.lon);
@@ -283,4 +290,103 @@ test('a late location response cannot replace a user-selected reset to the demo 
   assert.equal(model.locationStatus, 'demo');
   assert.equal(model.originIsDevice, false);
   assert.equal(model.locationBusy, false);
+});
+
+test('address search accepts an accent-free Polish keyboard, token order and whitespace without changing map selection', () => {
+  const model = new MapViewModel();
+  const before = JSON.stringify(model);
+  assert.equal(model.searchPoints('  ').length, model.points.length);
+  assert(model.searchPoints('GLOWNY').some(point => point.address === 'Rynek Główny 1, Kraków'));
+  assert.deepEqual(model.searchPoints('  krakow   25 glowny  ').map(point => point.address), ['Rynek Główny 25, Kraków']);
+  assert.deepEqual(model.searchPoints('GŁÓWNY').map(point => point.id), model.searchPoints('glowny').map(point => point.id));
+  assert.equal(model.searchPoints('nonexistent-street-abcxyz').length, 0);
+  assert.equal(JSON.stringify(model), before, 'Filtering must preserve selection, source addresses and distance order');
+});
+
+test('access categories expose only stable localization keys and retain point provenance after origin changes', async () => {
+  const model = new MapViewModel();
+  const knownKeys = new Set(['availability_request', 'availability_all_day', 'availability_hours']);
+  assert.deepEqual(new Set(model.points.map(point => point.availabilityKey)), knownKeys);
+  const original = new Map(model.points.map(point => [point.id,
+    { key: point.availabilityKey, source: point.source, sourceDate: point.sourceDate }]));
+  const point = model.points[10];
+  LocationMock.next = Promise.resolve({ status: 'ready', latitude: point.lat, longitude: point.lon, accuracy: 12 });
+  assert.equal(await model.locate({}), true);
+  model.resetOrigin();
+  for (const item of model.points) {
+    assert.deepEqual({ key: item.availabilityKey, source: item.source, sourceDate: item.sourceDate }, original.get(item.id));
+    assert.match(item.source, /Państwowej Straży Pożarnej/);
+    assert.equal(item.sourceDate, model.sourceDate);
+  }
+  const sourcePoint = data.SAFE_POINTS[0];
+  const oldCategory = sourcePoint.availability;
+  try {
+    sourcePoint.availability = 'Unrecognized English access category';
+    const unknown = new MapViewModel().points.find(item => item.id === sourcePoint.id);
+    assert.equal(unknown.availabilityKey, 'availability_unknown');
+  } finally { sourcePoint.availability = oldCategory; }
+});
+
+test('distance presentation follows the selected language and guards unavailable values', () => {
+  const model = new MapViewModel();
+  const point = model.points[0];
+  point.distance = 1400;
+  assert.equal(model.distanceText(point, 'pl'), '1,4 km');
+  assert.equal(model.distanceText(point, 'en'), '1.4 km');
+  point.distance = 153.4;
+  assert.equal(model.distanceText(point, 'pl'), '153 m');
+  assert.equal(model.distanceText(point, 'en'), '153 m');
+  for (const invalid of [NaN, Infinity, -1]) {
+    point.distance = invalid;
+    assert.equal(model.distanceText(point, 'pl'), '—');
+  }
+});
+
+test('saved-point entry is absent for missing IDs and returns the durable point independently of current selection', () => {
+  const model = new MapViewModel();
+  assert.equal(model.saved(), undefined);
+  model.savedId = 'missing';
+  assert.equal(model.saved(), undefined);
+  const point = model.points[4];
+  model.savedId = point.id;
+  model.select(model.points[8].id);
+  assert.equal(model.saved(), point);
+  assert.equal(model.openSaved(), true);
+  assert.equal(model.selected(), point);
+});
+
+test('selected marker paints above coincident points and origin, and hit testing agrees with the visible marker', () => {
+  const view = createView();
+  const selected = view.vm.points[1];
+  const underneath = view.vm.points[0];
+  // A real map can contain several source points at the same entrance.
+  underneath.lat = selected.lat; underneath.lon = selected.lon;
+  view.vm.originLat = selected.lat; view.vm.originLon = selected.lon;
+  view.vm.select(selected.id);
+  view.canvasReady = true;
+  view.draw();
+  const top = view.canvas.markerFills.at(-1);
+  assert.deepEqual(top, { x: view.widthValue / 2, y: view.heightValue / 2,
+    radius: 11, color: '#164D40', alpha: 1 });
+  assert(view.canvas.markerFills.some(mark => mark.alpha === 0.18));
+  assert.equal(view.canvas.globalAlpha, 1, 'Origin transparency must not leak into point markers');
+  let chosen;
+  view.onSelect = id => { chosen = id; };
+  view.pick(view.widthValue / 2, view.heightValue / 2);
+  assert.equal(chosen, selected.id);
+});
+
+test('theme revision re-reads Canvas resources for the selected marker', () => {
+  const view = createView();
+  let selectedColor = 0xff164d40;
+  view.getUIContext = () => ({ getHostContext: () => ({ resourceManager: {
+    getColorByNameSync: name => name === 'map_selected' ? selectedColor : 0xffdddddd
+  } }) });
+  view.canvasReady = true;
+  view.draw();
+  assert.equal(view.canvas.markerFills.at(-1).color, '#164d40');
+  selectedColor = 0xffd8f58a;
+  view.dark = true;
+  view.onRevisionChanged();
+  assert.equal(view.canvas.markerFills.at(-1).color, '#d8f58a');
 });

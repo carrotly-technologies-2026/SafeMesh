@@ -1,7 +1,8 @@
 import { abilityAccessCtrl, common, Permissions } from '@kit.AbilityKit';
 import { util } from '@kit.ArkTS';
 import { BusinessError } from '@kit.BasicServicesKit';
-import type { dataTransfer, scan } from '@kit.NearLinkKit';
+// Kit bindings resolve lazily (API 18+); capability is checked before first use.
+import lazy { manager, advertising, dataTransfer, scan } from '@kit.NearLinkKit';
 
 export interface NearLinkStatus {
   state: string;
@@ -51,6 +52,9 @@ export class NearLinkTransport {
   private peers: Map<string, NearLinkPeer> = new Map();
   private partials: Map<string, PartialPacket> = new Map();
   private pendingConnections: Set<string> = new Set();
+  private connectionTimers: Map<string, number> = new Map();
+  private generation: number = 0;
+  private starting: Promise<boolean> | undefined = undefined;
   private encoder: util.TextEncoder = new util.TextEncoder();
   private decoder: util.TextDecoder = util.TextDecoder.create('utf-8', { fatal: true });
 
@@ -75,17 +79,16 @@ export class NearLinkTransport {
   async probe(): Promise<NearLinkStatus> {
     if (!canIUse('SystemCapability.Communication.NearLink.Core')) {
       this.supported = false;
-      return this.notify('unsupported', 'NearLink radio is unavailable on this device. Emulator relay uses simulation.');
+      return this.notify('unsupported', 'NearLink radio is unavailable here. Local emulator transport can test packets.');
     }
     try {
       // Loading an unsupported Huawei Kit statically can crash an emulator at startup.
-      const kit = await import('@kit.NearLinkKit');
       this.loaded = true;
-      this.supported = kit.manager.isNearLinkSupported();
+      this.supported = manager.isNearLinkSupported();
       if (!this.supported) {
         return this.notify('unsupported', 'NearLink needs supported physical hardware; this emulator has no NearLink radio.');
       }
-      if (kit.manager.getState() !== kit.manager.NearlinkState.STATE_ON) {
+      if (manager.getState() !== manager.NearlinkState.STATE_ON) {
         return this.notify('off', 'Enable NearLink in the device settings, then start the relay.');
       }
       return this.notify(this.started ? 'ready' : 'available', 'NearLink hardware detected. Radio delivery still requires another device.');
@@ -97,37 +100,52 @@ export class NearLinkTransport {
   }
 
   async start(context: common.UIAbilityContext): Promise<boolean> {
+    if (this.starting !== undefined) { return this.starting; }
     if (this.started) {
       return true;
     }
+    const pending: Promise<boolean> = this.startSession(context, this.generation);
+    this.starting = pending;
+    try { return await pending; } finally {
+      if (this.starting === pending) { this.starting = undefined; }
+    }
+  }
+
+  private async startSession(context: common.UIAbilityContext, generation: number): Promise<boolean> {
     const status: NearLinkStatus = await this.probe();
-    if (!status.supported || status.state === 'off') {
+    if (generation !== this.generation || !status.supported || status.state === 'off') {
       return false;
     }
     try {
       const permissions: Permissions[] = ['ohos.permission.ACCESS_NEARLINK'];
       const result = await abilityAccessCtrl.createAtManager().requestPermissionsFromUser(context, permissions);
+      if (generation !== this.generation) { return false; }
       if (result.authResults.length !== 1 || result.authResults[0] !== 0) {
         this.notify('permission-denied', 'Allow nearby NearLink access to exchange alerts.');
         return false;
       }
-      const kit = await import('@kit.NearLinkKit');
-      kit.dataTransfer.createPort(this.uuid);
+      dataTransfer.createPort(this.uuid);
       this.portCreated = true;
-      kit.dataTransfer.on('connectionStateChanged', this.onConnection);
+      dataTransfer.on('connectionStateChanged', this.onConnection);
       this.connectionSubscribed = true;
-      kit.dataTransfer.on('readData', this.onRead);
+      dataTransfer.on('readData', this.onRead);
       this.readSubscribed = true;
-      kit.scan.on('deviceFound', this.onDiscovered);
+      scan.on('deviceFound', this.onDiscovered);
       this.scanSubscribed = true;
-      this.advertisingId = await kit.advertising.startAdvertising({
+      const advertisingId: number = await advertising.startAdvertising({
         advertisingSettings: { interval: 5000, isConnectable: true },
         advertisingData: { serviceUuids: [this.uuid], includeDeviceName: true }
       });
+      if (generation !== this.generation) {
+        await advertising.stopAdvertising(advertisingId);
+        return false;
+      }
+      this.advertisingId = advertisingId;
       this.started = true;
       this.notify('ready', 'Radio listening. Find another phone by its NearLink device name.');
       return true;
     } catch (error) {
+      if (generation !== this.generation) { return false; }
       this.report('start', error as BusinessError);
       await this.stop();
       this.notify('error', 'NearLink could not start. Check permission, radio settings and hardware support.');
@@ -136,6 +154,7 @@ export class NearLinkTransport {
   }
 
   async discover(peerDeviceName: string): Promise<boolean> {
+    const generation: number = this.generation;
     if (!this.started) {
       this.callbacks.onError('discover', 0, 'Start NearLink before discovering peers.');
       return false;
@@ -146,21 +165,27 @@ export class NearLinkTransport {
       return false;
     }
     try {
-      const kit = await import('@kit.NearLinkKit');
       if (this.scanning) {
-        await kit.scan.stopScan();
+        await scan.stopScan();
       }
-      await kit.scan.startScan([{ deviceName: name }], { scanMode: kit.scan.ScanMode.SCAN_MODE_LOW_POWER });
+      if (generation !== this.generation || !this.started) { return false; }
+      await scan.startScan([{ deviceName: name }], { scanMode: scan.ScanMode.SCAN_MODE_LOW_POWER });
+      if (generation !== this.generation || !this.started) {
+        await scan.stopScan();
+        return false;
+      }
       this.scanning = true;
       this.notify('discovering', `Looking for ${name}. Select a discovered peer to connect.`);
       return true;
     } catch (error) {
+      if (generation !== this.generation) { return false; }
       this.report('discover', error as BusinessError);
       return false;
     }
   }
 
   async connect(address: string): Promise<boolean> {
+    const generation: number = this.generation;
     const peer: NearLinkPeer | undefined = this.peers.get(address);
     if (!this.started || !peer || !peer.connectable || this.pendingConnections.has(address)) {
       this.callbacks.onError('connect', 0, 'Select a connectable device returned by discovery.');
@@ -175,21 +200,29 @@ export class NearLinkTransport {
     }
     this.pendingConnections.add(address);
     try {
-      const kit = await import('@kit.NearLinkKit');
-      await kit.dataTransfer.connect({
+      await dataTransfer.connect({
         address: address,
         uuid: this.uuid,
         mtu: 1024,
-        transferMode: kit.dataTransfer.TransferMode.RELIABLE
+        transferMode: dataTransfer.TransferMode.RELIABLE
       });
+      if (generation !== this.generation || !this.started) {
+        await dataTransfer.disconnect({ address: address, uuid: this.uuid });
+        return false;
+      }
+      if (!this.pendingConnections.has(address)) { return true; }
       // Only the actual connection callback counts the peer as connected.
-      setTimeout(() => {
+      const timer: number = setTimeout(() => {
+        this.connectionTimers.delete(address);
+        if (generation !== this.generation || !this.started) { return; }
         if (this.pendingConnections.delete(address)) {
           this.callbacks.onError('connect', 0, 'No channel confirmation within 30 seconds. Try connecting again.');
         }
       }, 30000);
+      this.connectionTimers.set(address, timer);
       return true;
     } catch (error) {
+      if (generation !== this.generation) { return false; }
       this.pendingConnections.delete(address);
       this.report('connect', error as BusinessError);
       return false;
@@ -197,6 +230,7 @@ export class NearLinkTransport {
   }
 
   async send(address: string, packet: string): Promise<boolean> {
+    const generation: number = this.generation;
     const peer: NearLinkPeer | undefined = this.peers.get(address);
     if (!this.started || !peer || !peer.connected || peer.mtu < 8) {
       this.callbacks.onError('send', 0, 'No confirmed NearLink channel with a usable MTU.');
@@ -204,6 +238,11 @@ export class NearLinkTransport {
     }
     if (this.sending) {
       this.callbacks.onError('send', 1009700023, 'Send in progress. Keep the alert queued for the next relay attempt.');
+      return false;
+    }
+    // API 24 may return undefined from encodeInto('') despite its SDK annotation.
+    if (typeof packet !== 'string' || packet.length === 0 || packet.length > this.maxPacketBytes) {
+      this.callbacks.onError('send', 401, 'Alert packet must contain 1-16384 UTF-8 bytes.');
       return false;
     }
     const payload: Uint8Array = this.encoder.encodeInto(packet);
@@ -218,20 +257,20 @@ export class NearLinkTransport {
     frame.set(payload, 8);
     this.sending = true;
     try {
-      const kit = await import('@kit.NearLinkKit');
       const chunkSize: number = Math.min(peer.mtu, 1024);
       for (let offset: number = 0; offset < frame.length; offset += chunkSize) {
-        if (!this.started || !this.peers.get(address)?.connected) {
+        if (generation !== this.generation || !this.started || !this.peers.get(address)?.connected) {
           this.callbacks.onError('send', 0, 'Channel closed during send; alert remains queued.');
           return false;
         }
         const chunk: Uint8Array = frame.slice(offset, Math.min(frame.length, offset + chunkSize));
-        await kit.dataTransfer.writeData({ address: address, uuid: this.uuid, data: chunk.buffer });
+        await dataTransfer.writeData({ address: address, uuid: this.uuid, data: chunk.buffer });
         // Huawei FAQ recommends pacing writes to avoid queue congestion.
         await new Promise<void>((resolve: () => void) => { setTimeout(resolve, 10); });
       }
-      return true; // Local write success, not a signed application-level delivery acknowledgement.
+      return generation === this.generation && this.started; // Local write only; not an app ACK.
     } catch (error) {
+      if (generation !== this.generation) { return false; }
       this.report('send', error as BusinessError);
       return false;
     } finally {
@@ -256,37 +295,39 @@ export class NearLinkTransport {
   }
 
   async stop(): Promise<void> {
+    this.generation++;
     this.started = false;
+    this.connectionTimers.forEach((timer: number): void => { clearTimeout(timer); });
+    this.connectionTimers.clear();
     if (this.loaded) {
       try {
-        const kit = await import('@kit.NearLinkKit');
         if (this.scanning) {
-          await this.cleanup('stopScan', async (): Promise<void> => { await kit.scan.stopScan(); });
+          await this.cleanup('stopScan', async (): Promise<void> => { await scan.stopScan(); });
         }
         if (this.advertisingId >= 0) {
           await this.cleanup('stopAdvertising', async (): Promise<void> => {
-            await kit.advertising.stopAdvertising(this.advertisingId);
+            await advertising.stopAdvertising(this.advertisingId);
           });
         }
         if (this.scanSubscribed) {
-          await this.cleanup('unsubscribeScan', async (): Promise<void> => { kit.scan.off('deviceFound', this.onDiscovered); });
+          await this.cleanup('unsubscribeScan', async (): Promise<void> => { scan.off('deviceFound', this.onDiscovered); });
         }
         if (this.connectionSubscribed) {
           await this.cleanup('unsubscribeConnection', async (): Promise<void> => {
-            kit.dataTransfer.off('connectionStateChanged', this.onConnection);
+            dataTransfer.off('connectionStateChanged', this.onConnection);
           });
         }
         if (this.readSubscribed) {
-          await this.cleanup('unsubscribeRead', async (): Promise<void> => { kit.dataTransfer.off('readData', this.onRead); });
+          await this.cleanup('unsubscribeRead', async (): Promise<void> => { dataTransfer.off('readData', this.onRead); });
         }
         const addresses: string[] = Array.from(this.peers.keys());
         for (const address of addresses) {
           await this.cleanup('disconnect', async (): Promise<void> => {
-            await kit.dataTransfer.disconnect({ address: address, uuid: this.uuid });
+            await dataTransfer.disconnect({ address: address, uuid: this.uuid });
           });
         }
         if (this.portCreated) {
-          await this.cleanup('destroyPort', async (): Promise<void> => { kit.dataTransfer.destroyPort(this.uuid); });
+          await this.cleanup('destroyPort', async (): Promise<void> => { dataTransfer.destroyPort(this.uuid); });
         }
       } catch (error) {
         this.report('stop', error as BusinessError);
@@ -327,18 +368,20 @@ export class NearLinkTransport {
     if (result.uuid.toUpperCase() !== this.uuid || !this.started) {
       return;
     }
-    this.pendingConnections.delete(result.address);
     // API 24 constant.ConnectionState: 1=connected, 3=disconnected.
     if (result.state !== 1 && result.state !== 3) {
       return;
     }
+    this.pendingConnections.delete(result.address);
+    const timer: number | undefined = this.connectionTimers.get(result.address);
+    if (timer !== undefined) { clearTimeout(timer); this.connectionTimers.delete(result.address); }
     const previous: NearLinkPeer | undefined = this.peers.get(result.address);
     if (!previous && this.peers.size >= this.maxPeers) {
       this.callbacks.onError('connect', 0, 'Incoming peer exceeds the bounded peer table.');
       return;
     }
     const peer: NearLinkPeer = {
-      address: result.address, name: previous?.name ?? 'Nearby relay', rssi: previous?.rssi ?? 127,
+      address: result.address, name: previous?.name ?? '', rssi: previous?.rssi ?? 127,
       connectable: true, connected: result.state === 1, mtu: result.mtu
     };
     this.peers.set(peer.address, peer);

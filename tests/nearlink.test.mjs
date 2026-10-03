@@ -6,6 +6,7 @@ import vm from 'node:vm';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
+import { setImmediate as nextTurn } from 'node:timers/promises';
 
 // Run against the actual application source. Only platform radio/permission APIs are mocked.
 const require = createRequire(import.meta.url);
@@ -42,7 +43,9 @@ function makeHarness({ capable = true, permissionGranted = true } = {}) {
   const state = {
     capable, permissionGranted, importCount: 0, permissionRequests: 0,
     writes: [], messages: [], errors: [], statuses: [], peers: [], scanFilters: [],
-    listeners: new Map(), deferredTimers: []
+    listeners: new Map(), deferredTimers: [], touchedBindings: new Set(),
+    portsCreated: 0, advertisements: 0, stoppedAdvertisements: [], disconnects: [],
+    permissionGate: undefined, advertisingGate: undefined, connectGate: undefined, writeGate: undefined
   };
   const on = (name, callback) => state.listeners.set(name, callback);
   const off = name => state.listeners.delete(name);
@@ -53,8 +56,8 @@ function makeHarness({ capable = true, permissionGranted = true } = {}) {
       NearlinkState: { STATE_ON: 1 }
     },
     advertising: {
-      startAdvertising: async () => 7,
-      stopAdvertising: async () => {}
+      startAdvertising: async () => { state.advertisements++; if (state.advertisingGate) await state.advertisingGate; return 7; },
+      stopAdvertising: async id => { state.stoppedAdvertisements.push(id); }
     },
     scan: {
       on, off,
@@ -63,14 +66,15 @@ function makeHarness({ capable = true, permissionGranted = true } = {}) {
       ScanMode: { SCAN_MODE_LOW_POWER: 0 }
     },
     dataTransfer: {
-      createPort: () => {}, destroyPort: () => {}, on, off,
-      connect: async () => {}, disconnect: async () => {},
+      createPort: () => { state.portsCreated++; }, destroyPort: () => {}, on, off,
+      connect: async () => { if (state.connectGate) await state.connectGate; },
+      disconnect: async params => { state.disconnects.push(params.address); },
       TransferMode: { RELIABLE: 1 },
-      writeData: async params => { state.writes.push(new Uint8Array(params.data).slice()); }
+      writeData: async params => { state.writes.push(new Uint8Array(params.data).slice()); if (state.writeGate) await state.writeGate; }
     }
   };
   class Encoder {
-    encodeInto(value) { return new TextEncoder().encode(value); }
+    encodeInto(value) { return value === '' ? undefined : new TextEncoder().encode(value); }
   }
   const util = {
     TextEncoder: Encoder,
@@ -89,6 +93,7 @@ function makeHarness({ capable = true, permissionGranted = true } = {}) {
             createAtManager: () => ({
               requestPermissionsFromUser: async () => {
                 state.permissionRequests++;
+                if (state.permissionGate) await state.permissionGate;
                 return { authResults: [state.permissionGranted ? 0 : -1] };
               }
             })
@@ -96,8 +101,12 @@ function makeHarness({ capable = true, permissionGranted = true } = {}) {
         };
       }
       if (name === '@kit.NearLinkKit') {
-        state.importCount++;
-        return kit;
+        // CommonJS erases ArkTS lazy-import syntax. This proxy models binding
+        // access only; the real ArkTS compiler/runtime validates native loading.
+        return new Proxy(kit, { get(target, key) {
+          if (!state.touchedBindings.has(key)) { state.touchedBindings.add(key); state.importCount++; }
+          return target[key];
+        } });
       }
       throw new Error(`Unexpected platform module: ${name}`);
     },
@@ -107,6 +116,7 @@ function makeHarness({ capable = true, permissionGranted = true } = {}) {
       else state.deferredTimers.push(callback);
       return state.deferredTimers.length;
     },
+    clearTimeout(id) { state.deferredTimers[id - 1] = undefined; },
     console, Uint8Array, DataView, Map, Set, Promise, Date
   };
   vm.runInNewContext(compiled, sandbox, { filename: sourcePath });
@@ -246,4 +256,69 @@ test('stop releases listeners, clears channel count and rejects further writes',
   assert.equal(await harness.radio.send(ADDRESS, MESSAGE), false);
   assert.equal(harness.state.writes.length, 0);
   assert.equal(harness.state.statuses.at(-1).state, 'stopped');
+});
+
+test('stopping during a permission request prevents port creation and advertising after consent arrives', async () => {
+  const { radio, state } = makeHarness();
+  let release; state.permissionGate = new Promise(resolve => { release = resolve; });
+  const starting = radio.start({}); await nextTurn();
+  assert.equal(state.permissionRequests, 1);
+  await radio.stop(); release();
+  assert.equal(await starting, false);
+  assert.equal(state.portsCreated, 0); assert.equal(state.advertisements, 0);
+  assert.equal(state.listeners.size, 0);
+  assert.equal(state.statuses.at(-1).state, 'stopped');
+});
+
+test('concurrent starts share one request and a late advertisement is stopped after cancellation', async () => {
+  const { radio, state } = makeHarness();
+  let release; state.advertisingGate = new Promise(resolve => { release = resolve; });
+  const one = radio.start({}), two = radio.start({}); await nextTurn();
+  assert.equal(state.permissionRequests, 1); assert.equal(state.portsCreated, 1);
+  assert.equal(state.advertisements, 1);
+  await radio.stop(); release();
+  assert.deepEqual(await Promise.all([one, two]), [false, false]);
+  assert.deepEqual(state.stoppedAdvertisements, [7]);
+  assert.equal(state.listeners.size, 0);
+  state.advertisingGate = undefined;
+  assert.equal(await radio.start({}), true, 'a later explicit start can recover');
+  await radio.stop();
+});
+
+test('confirmed connections clear deadlines and a late connect cannot survive stop', async () => {
+  const harness = await connectedHarness();
+  assert.equal(harness.state.deferredTimers.filter(Boolean).length, 0);
+  await harness.radio.stop();
+  const { radio, state, discoverPeer } = makeHarness();
+  await radio.start({}); discoverPeer();
+  let release; state.connectGate = new Promise(resolve => { release = resolve; });
+  const connecting = radio.connect(ADDRESS); await nextTurn();
+  await radio.stop(); release();
+  assert.equal(await connecting, false);
+  assert.ok(state.disconnects.includes(ADDRESS));
+  assert.equal(state.deferredTimers.filter(Boolean).length, 0);
+  assert.equal(radio.connectedCount(), 0);
+});
+
+test('stop interrupts a multi-chunk send without claiming a completed local write', async () => {
+  const { radio, state } = await connectedHarness();
+  let release; state.writeGate = new Promise(resolve => { release = resolve; });
+  const sending = radio.send(ADDRESS, MESSAGE); await nextTurn();
+  assert.equal(state.writes.length, 1);
+  await radio.stop(); release();
+  assert.equal(await sending, false);
+  assert.equal(state.writes.length, 1);
+});
+
+test('intermediate connection states retain the pending request until confirmation or timeout', async () => {
+  const { radio, state, discoverPeer, confirmConnection } = makeHarness();
+  await radio.start({}); discoverPeer(); await radio.connect(ADDRESS);
+  state.listeners.get('connectionStateChanged')({ address: ADDRESS, uuid: UUID, mtu: 0, state: 0 });
+  assert.equal(await radio.connect(ADDRESS), false, 'connecting state must not permit a duplicate request');
+  assert.equal(state.deferredTimers.filter(Boolean).length, 1);
+  assert.equal(radio.connectedCount(), 0);
+  confirmConnection();
+  assert.equal(state.deferredTimers.filter(Boolean).length, 0);
+  assert.equal(radio.connectedCount(), 1);
+  await radio.stop();
 });
