@@ -49,6 +49,7 @@ export class AlertViewModel {
       this.persistenceStatus = this.received ? 'Saved signatures re-verified' : 'No current saved alert';
       this.persistenceState = this.received ? 'reverified' : 'none';
     } catch (error) {
+      console.error('SAFEMESH_RESTORE_ERROR ' + String(error));
       this.persistenceStatus = 'Saved alerts could not be loaded';
       this.persistenceState = 'load_failed';
       this.restored = false;

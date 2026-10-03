@@ -96,6 +96,10 @@ function loadEts(filename) {
   const localRequire = specifier => {
     if (specifier === '@kit.CryptoArchitectureKit') return cryptoKit;
     if (specifier === '@kit.ArkTS') return utilKit;
+    // This suite uses the fake radio. Loading the public Kit must not open a lab socket.
+    if (specifier === '@kit.NetworkKit') return { webSocket: {
+      createWebSocket() { throw new Error('Unexpected native WebSocket in the radio integration suite'); }
+    } };
     if (specifier.endsWith('/NearLinkTransport')) return { NearLinkTransport: TestTransport };
     if (specifier.startsWith('.')) return loadEts(resolve(dirname(absolute), `${specifier}.ets`));
     throw new Error(`Unexpected integration dependency: ${specifier}`);

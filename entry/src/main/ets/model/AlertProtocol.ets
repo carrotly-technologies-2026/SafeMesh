@@ -108,7 +108,7 @@ function validEnvelope(envelope: SignedAlertEnvelope): boolean {
 
 /** Bounded parsing only; decoding never implies authentication or permission to forward. */
 export function decodeEnvelope(packet: string): SignedAlertEnvelope | undefined {
-  if (typeof packet !== 'string' || packet.length > 8192 ||
+  if (typeof packet !== 'string' || packet.length === 0 || packet.length > 8192 ||
     new util.TextEncoder().encodeInto(packet).length > 8192) {
     return undefined;
   }

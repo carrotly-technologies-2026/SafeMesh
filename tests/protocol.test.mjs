@@ -45,7 +45,9 @@ const kit = {
   }
 };
 const utilKit = { util: {
-  TextEncoder: class { encodeInto(text) { return new TextEncoder().encode(text); } },
+  // The API 24 emulator can return undefined for an empty input, despite the
+  // SDK's Uint8Array return annotation. Preserve that native edge in host tests.
+  TextEncoder: class { encodeInto(text) { return text === '' ? undefined : new TextEncoder().encode(text); } },
   Base64Helper: class { decodeSync(text) { return new Uint8Array(Buffer.from(text, 'base64')); } }
 } };
 const moduleCache = new Map();
@@ -68,9 +70,18 @@ function loadEts(filename) {
   return module.exports;
 }
 const protocol = loadEts(resolve(root, 'entry/src/main/ets/model/AlertProtocol.ets'));
+const delivery = loadEts(resolve(root, 'entry/src/main/ets/model/DeliveryProtocol.ets'));
 const fixtures = loadEts(resolve(root, 'entry/src/main/ets/model/DemoAlerts.ets'));
 const fresh = () => fixtures.createDemoAlert();
 const testNow = fresh().payload.issuedAt + 60_000;
+
+test('empty persisted alerts and empty wire frames are rejected with the native empty-encoder behavior', () => {
+  assert.equal(new utilKit.util.TextEncoder().encodeInto(''), undefined);
+  assert.equal(protocol.decodeEnvelope(''), undefined);
+  assert.equal(delivery.decodeDataPacket(''), undefined);
+  assert.equal(delivery.decodeAcknowledgement(''), undefined);
+  assert.deepEqual(protocol.decodeEnvelope(protocol.encodeEnvelope(fresh())), fresh());
+});
 
 test('real P-256 signed fixture verifies; every security-relevant field is signed', async () => {
   assert.equal((await new protocol.RelayEngine().ingest(fresh(), testNow)).status, 'accepted');
