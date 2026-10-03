@@ -26,6 +26,12 @@ const trust = {
   DEMO_KEY_ID: 'safemesh-demo-authority-v1',
   DEMO_PUBLIC_KEY_DER: keys.publicKey.export({ format: 'der', type: 'spki' }).toString('base64')
 };
+// Bundled fixtures carry the exercise issuer's signature; stand-ins use the test root.
+const demoAlerts = {
+  createDemoAlert: () => signed('bundled-drill'),
+  createTamperedAlert: () => { const forged = signed('bundled-drill'); forged.payload.body += ' changed'; return forged; },
+  createExpiredAlert: () => signed('expired-drill', { issuedAt: epoch - 120_000, expiresAt: epoch - 60_000 })
+};
 const nativeCrypto = { cryptoFramework: {
   createRandom() { return { generateRandomSync(length) { return { data: new Uint8Array(randomBytes(length)) }; } }; },
   createAsyKeyGenerator(algorithm) {
@@ -123,6 +129,7 @@ function load(filename) {
     if (name === '@kit.CryptoArchitectureKit') return nativeCrypto;
     if (name === '@kit.ArkTS') return utilKit;
     if (name.endsWith('/DemoTrust')) return trust;
+    if (name.endsWith('/DemoAlerts')) return demoAlerts;
     if (name.endsWith('/NearLinkTransport')) return { NearLinkTransport: Radio };
     if (name.endsWith('/EmulatorTransport')) return { EmulatorTransport: EmulatorRadio };
     if (name.startsWith('.')) return load(resolve(dirname(filename), `${name}.ets`));
@@ -642,4 +649,22 @@ test('NearLink operation errors preserve its active listener while radio-off sta
   link.callbacks.onError('send', 1009700023, 'Busy'); assert.equal(relay.isConnected, true);
   link.callbacks.onStatus({ state: 'off', supported: true, connectedPeers: 0, message: 'Radio disabled' });
   assert.equal(relay.isConnected, false); assert.equal(relay.lifecycleState, 'idle');
+});
+
+test('loading the bundled exercise on an active link queues it for already-connected peers', async () => {
+  const { relay, alerts } = views(); relay.setContext({}); await relay.startHardware();
+  const link = radios.at(-1);
+  await peer(link, 'B');
+  assert.equal(link.sent.length, 0, 'nothing to synchronize before an exercise exists');
+  await relay.loadDrill();
+  assert.equal(alerts.received, true);
+  const frames = link.sent.map(item => codec.decodeDataPacket(item.packet)).filter(Boolean);
+  assert.equal(frames.length, 1);
+  assert.equal(link.sent[0].address, 'B');
+  assert.equal(frames[0].envelope.payload.alertId, 'bundled-drill');
+  assert.equal(frames[0].envelope.hops, 1);
+  assert.equal(relay.pendingCount, 1, 'delivery still waits for the peer application ACK');
+  await relay.stop();
+  const idle = views(); await idle.relay.loadDrill();
+  assert.equal(idle.alerts.received, true, 'without a link the exercise is only stored locally');
 });

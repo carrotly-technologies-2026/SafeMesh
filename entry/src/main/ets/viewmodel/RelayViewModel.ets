@@ -78,6 +78,8 @@ export class RelayViewModel {
     const callbacks: NearLinkCallbacks = {
       onStatus: (status: NearLinkStatus): void => {
         if (transportGeneration !== this.transportGeneration || this.stopped) { return; }
+        console.info('SAFEMESH_TRANSPORT_STATUS mode=' + mode + ' state=' + status.state +
+          ' peers=' + status.connectedPeers);
         this.hardwareStatus = status.message;
         this.hardwareState = status.state.replace('-', '_');
         this.hardwareSupported = status.supported;
@@ -91,6 +93,11 @@ export class RelayViewModel {
       onPeer: (peer: NearLinkPeer): void => {
         if (transportGeneration !== this.transportGeneration || this.stopped) { return; }
         const previous: PeerViewModel | undefined = this.peers.find((old: PeerViewModel) => old.address === peer.address);
+        if (previous === undefined || previous.connected !== peer.connected) {
+          // Repeated scan results are not logged; only first discovery and link changes.
+          console.info('SAFEMESH_TRANSPORT_PEER mode=' + mode + ' connected=' + peer.connected +
+            ' name=' + peer.name.replace(/[^A-Za-z0-9 _.-]/g, '_').slice(0, 32));
+        }
         const item: PeerViewModel = new PeerViewModel();
         item.address = peer.address; item.name = peer.name; item.connected = peer.connected;
         this.peers = this.peers.filter((old: PeerViewModel) => old.address !== item.address).concat([item]).slice(-8);
@@ -117,6 +124,9 @@ export class RelayViewModel {
       },
       onError: (operation: string, code: number, message: string): void => {
         if (transportGeneration !== this.transportGeneration || this.stopped) { return; }
+        // Platform error codes are diagnostic metadata; packets and alert text are never logged.
+        console.error('SAFEMESH_TRANSPORT_ERROR mode=' + mode + ' op=' + operation + ' code=' + code +
+          ' message=' + message.replace(/[\r\n]/g, ' ').slice(0, 200));
         this.hardwareStatus = operation + ': ' + message + ' (' + code + ')';
         this.hardwareState = mode === 'emulator' ? 'lab_error' : 'error';
         // Invalid individual packets do not close a ready lab socket. The
@@ -317,6 +327,12 @@ export class RelayViewModel {
       !this.peers.some((peer: PeerViewModel) => peer.address === address && peer.connected)) { return; }
     this.delivery.synchronize(address, this.alertVM.allAccepted());
     await this.pumpDelivery();
+  }
+
+  /** Loads the bundled signed exercise; an active link offers it to connected peers at once. */
+  async loadDrill(): Promise<void> {
+    await this.alertVM.loadDrill();
+    if (this.isConnected) { await this.share(); }
   }
 
   async share(): Promise<void> {
