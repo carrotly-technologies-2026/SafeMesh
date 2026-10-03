@@ -35,7 +35,7 @@ export function createDeliveryId(): string {
 }
 
 export function decodeDataPacket(packet: string): DeliveryData | undefined {
-  if (typeof packet !== 'string' || packet.length > 9216 ||
+  if (typeof packet !== 'string' || packet.length === 0 || packet.length > 9216 ||
     new util.TextEncoder().encodeInto(packet).length > 9216) { return undefined; }
   try {
     const candidate: DeliveryData = JSON.parse(packet) as DeliveryData;

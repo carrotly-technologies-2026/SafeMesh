@@ -607,6 +607,90 @@
     {
       "name": "back_settings",
       "value": "Wróć do poprzedniej zakładki"
+    },
+    {
+      "name": "lab_title",
+      "value": "Laboratorium 3 emulatorów"
+    },
+    {
+      "name": "lab_explanation",
+      "value": "Trzy osobne aplikacje wymieniają pakiety przez lokalny mock transportu. Podpisy, zapis i przekazywanie sprawdza każdy emulator. To nie jest transmisja radiowa NearLink."
+    },
+    {
+      "name": "lab_node",
+      "value": "Tożsamość testowego węzła"
+    },
+    {
+      "name": "lab_connect",
+      "value": "Połącz węzeł"
+    },
+    {
+      "name": "lab_connecting",
+      "value": "Łączenie węzła"
+    },
+    {
+      "name": "lab_active",
+      "value": "Aktywny węzeł testowy:"
+    },
+    {
+      "name": "lab_peers",
+      "value": "Połączeni sąsiedzi testowi"
+    },
+    {
+      "name": "lab_send_drill",
+      "value": "Wczytaj i wyślij podpisane ćwiczenie"
+    },
+    {
+      "name": "lab_disconnect",
+      "value": "Odłącz węzeł testowy"
+    },
+    {
+      "name": "lab_received",
+      "value": "Przyjęte alerty z innych emulatorów"
+    },
+    {
+      "name": "lab_rejected",
+      "value": "Odrzucone pakiety"
+    },
+    {
+      "name": "lab_return_radio",
+      "value": "Zakończ test i sprawdź NearLink"
+    },
+    {
+      "name": "lab_topology",
+      "value": "Domyślnie A ↔ B ↔ C. Brak połączenia A ↔ C. Serwer tylko przenosi pakiety: nie podpisuje, nie potwierdza i nie przechowuje alertów. Pozostaw aplikację na ekranie."
+    },
+    {
+      "name": "lab_open",
+      "value": "Otwórz test między emulatorami"
+    },
+    {
+      "name": "lab_hide",
+      "value": "Zwiń panel testowy"
+    },
+    {
+      "name": "lab_banner",
+      "value": "MOCK TRANSPORTU · Węzeł"
+    },
+    {
+      "name": "lab_disconnected_peer",
+      "value": "odłączony"
+    },
+    {
+      "name": "hardware_lab_connecting",
+      "value": "Łączenie z lokalnym serwerem testowym…"
+    },
+    {
+      "name": "hardware_lab_ready",
+      "value": "Lokalny transport testowy połączony. To nie jest radio NearLink."
+    },
+    {
+      "name": "hardware_lab_disconnected",
+      "value": "Transport testowy rozłączony. Podpisane alerty pozostają na urządzeniu."
+    },
+    {
+      "name": "hardware_lab_error",
+      "value": "Nie udało się połączyć z testem. Sprawdź lokalny serwer i przekierowanie portu HDC."
     }
   ]
 }

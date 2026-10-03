@@ -607,6 +607,90 @@
     {
       "name": "back_settings",
       "value": "Back to the previous tab"
+    },
+    {
+      "name": "lab_title",
+      "value": "Three-emulator lab"
+    },
+    {
+      "name": "lab_explanation",
+      "value": "Three separate apps exchange packets through a local mock transport. Each emulator verifies signatures, stores alerts and forwards messages. This is not NearLink radio transmission."
+    },
+    {
+      "name": "lab_node",
+      "value": "Test node identity"
+    },
+    {
+      "name": "lab_connect",
+      "value": "Connect node"
+    },
+    {
+      "name": "lab_connecting",
+      "value": "Connecting node"
+    },
+    {
+      "name": "lab_active",
+      "value": "Active test node:"
+    },
+    {
+      "name": "lab_peers",
+      "value": "Connected test neighbours"
+    },
+    {
+      "name": "lab_send_drill",
+      "value": "Load and send signed exercise"
+    },
+    {
+      "name": "lab_disconnect",
+      "value": "Disconnect test node"
+    },
+    {
+      "name": "lab_received",
+      "value": "Alerts accepted from other emulators"
+    },
+    {
+      "name": "lab_rejected",
+      "value": "Rejected packets"
+    },
+    {
+      "name": "lab_return_radio",
+      "value": "End lab and check NearLink"
+    },
+    {
+      "name": "lab_topology",
+      "value": "Default: A ↔ B ↔ C, with no A ↔ C link. The server only carries packets: it never signs, acknowledges or stores alerts. Keep the app in the foreground."
+    },
+    {
+      "name": "lab_open",
+      "value": "Open multi-emulator test"
+    },
+    {
+      "name": "lab_hide",
+      "value": "Collapse lab panel"
+    },
+    {
+      "name": "lab_banner",
+      "value": "MOCK TRANSPORT · Node"
+    },
+    {
+      "name": "lab_disconnected_peer",
+      "value": "disconnected"
+    },
+    {
+      "name": "hardware_lab_connecting",
+      "value": "Connecting to the local test server…"
+    },
+    {
+      "name": "hardware_lab_ready",
+      "value": "Local test transport connected. This is not NearLink radio."
+    },
+    {
+      "name": "hardware_lab_disconnected",
+      "value": "Test transport disconnected. Signed alerts remain on this device."
+    },
+    {
+      "name": "hardware_lab_error",
+      "value": "Could not connect to the lab. Check the local server and HDC port mapping."
     }
   ]
 }

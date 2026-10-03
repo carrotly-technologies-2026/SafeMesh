@@ -27,6 +27,9 @@ struct Index {
   @State themePreference: string = 'system';
   @State settingsBusy: boolean = true;
   @State query: string = '';
+  @State labVisible: boolean = false;
+  @State labNode: string = 'A';
+  @State labBusy: boolean = false;
   @State viewportWidth: number = 360;
   @State viewportHeight: number = 760;
   @StorageLink('safeMeshDark') dark: boolean = false;
@@ -79,7 +82,10 @@ struct Index {
       this.relay.setContext(context);
       await this.alerts.restore();
       await this.relay.probe();
-    } catch (error) { this.notice = this.t('init_failed'); }
+    } catch (error) {
+      console.error('SAFEMESH_INIT_ERROR ' + String(error));
+      this.notice = this.t('init_failed');
+    }
     finally { this.settingsBusy = false; }
   }
 
@@ -189,6 +195,25 @@ struct Index {
     await this.map.locate(context);
     this.mapRevision++;
     this.announce(this.locationMessage());
+  }
+
+  private async startLab(): Promise<void> {
+    if (this.labBusy) { return; }
+    this.labBusy = true;
+    try { await this.relay.startEmulator(this.labNode); }
+    catch (error) { this.notice = this.t('hardware_lab_error'); }
+    finally { this.labBusy = false; }
+  }
+
+  private async sendLabDrill(): Promise<void> {
+    if (this.labBusy || this.alerts.busy) { return; }
+    this.labBusy = true;
+    try {
+      await this.alerts.loadDrill();
+      if (this.alerts.received) { await this.relay.share(); }
+      else { this.notice = this.t('verify_failed'); }
+    } catch (error) { this.notice = this.t('verify_failed'); }
+    finally { this.labBusy = false; }
   }
 
   private locationMessage(): string {
@@ -400,9 +425,72 @@ struct Index {
   }
 
   @Builder
+  private labNodeChoice(node: string) {
+    Button({ type: ButtonType.Normal }) {
+      Text(node).fontSize(20).fontWeight(FontWeight.Bold).fontColor(this.labNode === node ? ACTION_FG : INK)
+    }.id('labNode' + node).layoutWeight(1).constraintSize({ minHeight: 48 })
+      .backgroundColor(this.labNode === node ? ACTION_BG : SOFT).borderRadius(16)
+      .accessibilityText(this.t('lab_node') + ' ' + node).accessibilitySelected(this.labNode === node)
+      .enabled(!this.labBusy).onClick(() => { this.labNode = node; })
+  }
+
+  @Builder
+  private meshLabView() {
+    Column({ space: 14 }) {
+      Text(this.t('lab_title')).fontSize(23).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
+      Text(this.t('lab_explanation')).fontSize(14).fontColor(MUTED).width('100%')
+      Text(this.t('lab_node')).fontSize(16).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
+      Row({ space: 8 }) {
+        this.labNodeChoice('A')
+        this.labNodeChoice('B')
+        this.labNodeChoice('C')
+      }.width('100%')
+      this.action(() => this.t(this.labBusy ? 'lab_connecting' : 'lab_connect') + ' ' + this.labNode,
+        'labStart', () => { this.startLab(); }, () => !this.labBusy)
+      if (this.relay.transportMode === 'emulator') {
+        Text(this.t('lab_active') + ' ' + this.relay.emulatorNode).id('labActiveNode')
+          .fontSize(18).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
+        Text(this.t('hardware_' + this.relay.hardwareState)).id('labStatus')
+          .fontSize(16).fontColor(INK).width('100%')
+        if (this.relay.hardwareState === 'lab_error' || this.relay.hardwareState === 'restore_failed') {
+          Text(this.t('diagnostics') + ': ' + this.relay.hardwareStatus).id('labConnectionDetail')
+            .fontSize(13).fontColor(MUTED).width('100%')
+        }
+        Text(this.t('lab_peers') + ': ' + this.relay.peerCount).id('labPeerCount')
+          .fontSize(16).fontColor(INK).width('100%')
+        ForEach(this.relay.peers, (peer: PeerViewModel) => {
+          Text(peer.name + ' · ' + this.t(peer.connected ? 'connected_short' : 'lab_disconnected_peer'))
+            .fontSize(14).fontColor(MUTED).width('100%')
+        }, (peer: PeerViewModel) => peer.address)
+        this.action(() => this.t('lab_send_drill'), 'labSendDrill', () => { this.sendLabDrill(); },
+          () => !this.labBusy && !this.alerts.busy)
+        this.action(() => this.t('share_alert'), 'labShare', () => { this.relay.share(); },
+          () => !this.labBusy && this.alerts.received, false)
+        this.action(() => this.t('lab_disconnect'), 'labStop', () => { this.relay.stop(); },
+          () => !this.labBusy, false)
+        Text(this.t('lab_received') + ': ' + this.relay.acceptedCount + '\n' +
+          this.t('lab_rejected') + ': ' + this.relay.rejectedCount + '\n' +
+          this.t('queue_pending') + ': ' + this.relay.pendingCount + '\n' +
+          this.t('queue_acked') + ': ' + this.relay.acknowledgedCount + '\n' +
+          this.t('queue_retry') + ': ' + this.relay.retryCount + '\n' +
+          this.t('queue_failed') + ': ' + this.relay.failedCount)
+          .id('labMetrics').fontSize(14).fontColor(INK).width('100%')
+        Text(this.t('diagnostics') + ': ' + this.relay.lastPacketStatus)
+          .id('labPacketStatus').fontSize(13).fontColor(MUTED).width('100%')
+        this.action(() => this.t('lab_return_radio'), 'labReturnRadio', () => { this.relay.probe(); },
+          () => !this.labBusy, false)
+      }
+      Text(this.t('lab_topology')).fontSize(14).fontColor(MUTED).width('100%')
+    }.padding(20).width('100%').alignItems(HorizontalAlign.Start).backgroundColor(SURFACE).borderRadius(24)
+  }
+
+  @Builder
   private relayView() {
     Column({ space: 18 }) {
       this.heading(() => this.t('relay_title'), () => this.t('relay_intro'))
+      this.action(() => this.t(this.labVisible ? 'lab_hide' : 'lab_open'), 'openMeshLab',
+        () => { this.labVisible = !this.labVisible; }, () => true, false)
+      if (this.labVisible) { this.meshLabView() }
       Column({ space: 16 }) {
         Text(this.t('simulation')).fontSize(20).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
         Text(this.t('no_radio')).fontSize(14).fontColor(MUTED).width('100%')
@@ -421,6 +509,7 @@ struct Index {
           Text(event.detail).fontSize(14).fontColor(MUTED).width('100%')
         }.padding(16).width('100%').backgroundColor(SURFACE).borderRadius(16).accessibilityGroup(true)
       }, (event: RelayEvent) => event.id)
+      if (this.relay.transportMode !== 'emulator') {
       Column({ space: 14 }) {
         Text('NearLink').fontSize(24).fontWeight(FontWeight.Bold).fontColor(INK)
         Text(this.relay.peerCount + ' ' + this.t('connected')).fontSize(14).fontColor(MUTED)
@@ -449,6 +538,7 @@ struct Index {
           this.action(() => this.t('stop_relay'), 'stopRelay', () => { this.relay.stop(); }, () => true, false)
         }
       }.padding(20).width('100%').alignItems(HorizontalAlign.Start).backgroundColor(SURFACE).borderRadius(24)
+      }
       Text(this.t('technical_note')).fontSize(13).fontColor(MUTED).width('100%')
     }.width('100%')
   }
@@ -563,6 +653,11 @@ struct Index {
       Scroll(this.pageScroll) {
         Column({ space: 16 }) {
           this.drillBanner()
+          if (this.relay.transportMode === 'emulator') {
+            Text(this.t('lab_banner') + ' ' + this.relay.emulatorNode).id('labBanner')
+              .fontSize(14).fontWeight(FontWeight.Bold).fontColor(WARNING_FG).width('100%')
+              .padding(12).backgroundColor(WARNING_BG).borderRadius(14)
+          }
           if (this.notice.length > 0) {
             Column({ space: 8 }) {
               Text(this.notice).fontSize(16).fontColor(INK).width('100%')

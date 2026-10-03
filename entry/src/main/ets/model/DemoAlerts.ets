@@ -8,8 +8,8 @@ const DEMO_ALERT: SignedAlertEnvelope = {
     "keyId": "safemesh-demo-authority-v1",
     "alertId": "krakow-hackyeah-exercise-001",
     "revision": 1,
-    "issuedAt": 1791040772456,
-    "expiresAt": 1791299972456,
+    "issuedAt": 1791049551662,
+    "expiresAt": 1791308751662,
     "severity": "warning",
     "area": "Kraków · centrum",
     "title": "Network outage exercise",
@@ -18,7 +18,7 @@ const DEMO_ALERT: SignedAlertEnvelope = {
     "drill": true,
     "maxHops": 8
   },
-  "signature": "MEYCIQDr0OHgxwwrXhMPeFVxdWBXnPAIVmDDQzq5uKpjcSuAVgIhAIGJoaa1ABg/dxiXfitMyfUeg3ChmF5HvO9n07+GB2Ah",
+  "signature": "MEUCIQCgD6+afT1eZHwtRQi+fCBqk9u2lvPjUoSpb78DKdhVJAIgC5KDZYFod1iNIqe8RwOEKilt7h5rcjwi9FbnKwVqdqM=",
   "hops": 0
 };
 
@@ -28,8 +28,8 @@ const EXPIRED_ALERT: SignedAlertEnvelope = {
     "keyId": "safemesh-demo-authority-v1",
     "alertId": "krakow-expired-exercise-001",
     "revision": 1,
-    "issuedAt": 1790778032456,
-    "expiresAt": 1791037232456,
+    "issuedAt": 1790786811662,
+    "expiresAt": 1791046011662,
     "severity": "warning",
     "area": "Kraków · centrum",
     "title": "Network outage exercise",
@@ -38,7 +38,7 @@ const EXPIRED_ALERT: SignedAlertEnvelope = {
     "drill": true,
     "maxHops": 8
   },
-  "signature": "MEYCIQDQFjh22qSOKVQ1f5EsmQFOYJn6nEHtP9uUsQDKx2hP/wIhAJvQxzGhtvcRZq0HMIlaveS3AQxCp9W9tkpJaBazPbmd",
+  "signature": "MEUCIQD1aabPebQxv/zV7kPxu7bp1rxyUZJw8dzn33ooHodr4wIgQm0uUfeRmG0nVmpwntl2vYhaYTysLUA8upMJ7ATAORw=",
   "hops": 0
 };
 

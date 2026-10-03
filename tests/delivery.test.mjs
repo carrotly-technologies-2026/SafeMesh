@@ -49,16 +49,61 @@ const utilKit = { util: {
 } };
 const radios = [];
 class Radio {
+  static nextStartGate;
+  static nextDiscoverGate;
   constructor(callbacks) {
     this.callbacks = callbacks; this.sent = []; this.stopped = false;
     this.startCount = 0; this.stopCount = 0; this.discoverCount = 0;
-    this.startGate = undefined; this.discoverGate = undefined;
+    this.startGate = Radio.nextStartGate; this.discoverGate = Radio.nextDiscoverGate;
+    Radio.nextStartGate = undefined; Radio.nextDiscoverGate = undefined;
     radios.push(this);
+  }
+  async probe() {
+    const status = { state: 'available', message: 'Test radio', supported: true, connectedPeers: 0 };
+    this.callbacks.onStatus(status); return status;
   }
   async send(address, packet) { this.sent.push({ address, packet }); return !this.stopped; }
   async start() { this.startCount++; if (this.startGate) await this.startGate; this.stopped = false; return true; }
   async discover() { this.discoverCount++; if (this.discoverGate) await this.discoverGate; return true; }
   async stop() { this.stopCount++; this.stopped = true; }
+}
+
+// This link fake tests the actual ViewModels' transport selection and forwarding.
+// Native WebSocket framing is tested separately against EmulatorTransport source.
+let labRouting = false;
+const labNodes = new Map();
+const labEdges = new Set(['AB', 'BA', 'BC', 'CB']);
+function updateLabPeers() {
+  for (const node of labNodes.values()) {
+    const neighbors = [...labNodes.keys()].filter(id => labEdges.has(node.node + id));
+    for (const id of new Set([...node.neighbors, ...neighbors])) {
+      node.callbacks.onPeer({ address: id, name: `Emulator ${id}`, connected: neighbors.includes(id) });
+    }
+    node.neighbors = neighbors;
+    node.callbacks.onStatus({ state: 'lab_ready', message: 'Local test link', supported: true,
+      connectedPeers: neighbors.length });
+  }
+}
+class EmulatorRadio extends Radio {
+  constructor(callbacks, node) { super(callbacks); this.node = node; this.neighbors = []; }
+  async start() {
+    await super.start();
+    if (labRouting) { labNodes.set(this.node, this); updateLabPeers(); }
+    else this.callbacks.onStatus({ state: 'lab_ready', message: 'Local test link', supported: true, connectedPeers: 0 });
+    return true;
+  }
+  async send(address, packet) {
+    if (!labRouting) return super.send(address, packet);
+    this.sent.push({ address, packet });
+    const destination = labNodes.get(address);
+    if (this.stopped || destination === undefined || !labEdges.has(this.node + address)) return false;
+    destination.callbacks.onMessage(this.node, packet);
+    return true;
+  }
+  async stop() {
+    await super.stop();
+    if (labNodes.get(this.node) === this) { labNodes.delete(this.node); updateLabPeers(); }
+  }
 }
 class Store {
   constructor() { this.values = new Map(); this.unavailable = false; }
@@ -79,6 +124,7 @@ function load(filename) {
     if (name === '@kit.ArkTS') return utilKit;
     if (name.endsWith('/DemoTrust')) return trust;
     if (name.endsWith('/NearLinkTransport')) return { NearLinkTransport: Radio };
+    if (name.endsWith('/EmulatorTransport')) return { EmulatorTransport: EmulatorRadio };
     if (name.startsWith('.')) return load(resolve(dirname(filename), `${name}.ets`));
     throw new Error(`Unexpected dependency ${name}`);
   };
@@ -101,6 +147,8 @@ afterEach(async () => {
   for (const relay of relayViews) await relay.stop();
   for (const alerts of alertViews) alerts.dispose();
   alertViews.length = 0; relayViews.length = 0; radios.length = 0;
+  labNodes.clear(); labRouting = false;
+  Radio.nextStartGate = undefined; Radio.nextDiscoverGate = undefined;
   now = epoch;
 });
 process.on('exit', () => { Date.now = realNow; });
@@ -368,13 +416,14 @@ test('stop during restore, native startup or discovery cannot revive foreground 
     const gate = new Promise(resolve => { release = resolve; });
     const store = new Store();
     if (phase === 'restore') store.read = async () => { await gate; return ''; };
-    const { relay, radio } = views(store);
+    const { relay } = views(store);
     relay.setContext({});
     relay.peerName = 'B';
-    if (phase === 'start') radio.startGate = gate;
-    if (phase === 'discover') radio.discoverGate = gate;
+    if (phase === 'start') Radio.nextStartGate = gate;
+    if (phase === 'discover') Radio.nextDiscoverGate = gate;
     const starting = relay.startHardware();
     await nextTurn();
+    const radio = radios.at(-1);
     await relay.stop();
     release();
     await starting;
@@ -385,4 +434,107 @@ test('stop during restore, native startup or discovery cannot revive foreground 
     if (phase === 'restore') assert.equal(radio.startCount, 0);
     else assert.ok(radio.stopCount >= 2, 'late native completion is cleaned up again');
   }
+});
+
+test('switching emulator roles and back to hardware ignores all callbacks from the retired transport', async () => {
+  const { relay, alerts, radio: original } = views();
+  relay.setContext({});
+  await alerts.receive(signed('retained-cache'));
+  await relay.startEmulator('A');
+  const first = radios.at(-1);
+  assert.ok(first instanceof EmulatorRadio);
+  assert.equal(relay.transportMode, 'emulator');
+  assert.equal(relay.emulatorNode, 'A');
+  await peer(first, 'B');
+  assert.equal(first.sent.length, 1);
+  await relay.startEmulator('C');
+  const current = radios.at(-1);
+  assert.notEqual(current, first);
+  assert.equal(relay.pendingCount, 0);
+  assert.equal(relay.emulatorNode, 'C');
+  for (const old of [original, first]) {
+    old.callbacks.onStatus({ state: 'error', message: 'old status', supported: false, connectedPeers: 99 });
+    old.callbacks.onPeer({ address: 'old', name: 'old', connected: true });
+    old.callbacks.onMessage('old', protocol.encodeEnvelope(signed('old-session-message')));
+    old.callbacks.onError('old-error', 1, 'old error');
+  }
+  await nextTurn();
+  assert.equal(relay.hardwareState, 'lab_ready');
+  assert.equal(relay.peerCount, 0);
+  assert.equal(relay.peers.length, 0);
+  assert.equal(alerts.allAccepted().length, 1);
+  assert.equal(current.sent.length, 0);
+  await relay.probe();
+  assert.equal(relay.transportMode, 'nearlink');
+  assert.ok(!(radios.at(-1) instanceof EmulatorRadio));
+  assert.equal(current.stopped, true);
+  assert.equal(relay.hardwareState, 'available');
+  assert.equal(alerts.allAccepted().length, 1);
+  assert.equal(relay.pendingCount, 0);
+});
+
+test('a stopped or superseded emulator startup cannot overwrite or close the replacement link', async () => {
+  const { relay } = views(); relay.setContext({});
+  let release;
+  Radio.nextStartGate = new Promise(resolve => { release = resolve; });
+  const starting = relay.startEmulator('A');
+  await nextTurn();
+  const retired = radios.at(-1);
+  assert.equal(retired.startCount, 1);
+  await relay.startEmulator('B');
+  const replacement = radios.at(-1);
+  assert.equal(relay.emulatorNode, 'B');
+  release(); await starting;
+  assert.equal(retired.stopped, true);
+  assert.equal(replacement.stopped, false);
+  assert.equal(relay.hardwareState, 'lab_ready');
+  assert.equal(relay.emulatorNode, 'B');
+  await relay.stop();
+  replacement.callbacks.onStatus({ state: 'lab_ready', supported: true, connectedPeers: 2, message: 'late' });
+  assert.equal(relay.hardwareState, 'stopped');
+  assert.equal(relay.peerCount, 0);
+});
+
+test('three independent app ViewModels relay A to B then to delayed C after A disconnects', async () => {
+  labRouting = true;
+  const a = views(), b = views(), c = views();
+  for (const app of [a, b, c]) app.relay.setContext({});
+  const signedPacket = signed('three-app-hop');
+  await a.alerts.receive(signedPacket);
+  await a.relay.startEmulator('A');
+  const aLink = radios.at(-1);
+  await b.relay.startEmulator('B');
+  const bLink = radios.at(-1);
+  for (let step = 0; step < 12; step++) await nextTurn();
+  assert.equal(b.alerts.received, true);
+  assert.equal(b.alerts.allAccepted()[0].hops, 1);
+  assert.equal(c.alerts.received, false);
+  assert.equal(a.relay.acknowledgedCount, 1);
+  await a.relay.stop();
+  await c.relay.startEmulator('C');
+  const cLink = radios.at(-1);
+  for (let step = 0; step < 12; step++) await nextTurn();
+  assert.equal(c.alerts.received, true);
+  assert.equal(c.alerts.allAccepted()[0].hops, 2);
+  assert.equal(c.alerts.allAccepted()[0].signature, signedPacket.signature);
+  assert.equal(b.relay.acknowledgedCount, 1);
+  assert.ok(aLink.sent.every(item => item.address === 'B'));
+  assert.ok(bLink.sent.some(item => item.address === 'C' && codec.decodeDataPacket(item.packet)));
+  assert.ok(cLink.sent.some(item => item.address === 'B' && codec.decodeAcknowledgement(item.packet)));
+});
+
+test('emulator delivery still rejects forged and expired content without success acknowledgements', async () => {
+  const { relay, alerts } = views(); relay.setContext({});
+  await relay.startEmulator('B');
+  const link = radios.at(-1);
+  await peer(link, 'A');
+  const forged = signed('forged'); forged.payload.body = 'Modified after signing';
+  for (const packet of [forged, signed('expired', { issuedAt: epoch - 120_000, expiresAt: epoch })]) {
+    link.callbacks.onMessage('A', codec.encodeDataPacket(codec.createDeliveryId(), packet));
+  }
+  for (let step = 0; step < 6; step++) await nextTurn();
+  assert.equal(alerts.received, false);
+  assert.equal(relay.rejectedCount, 2);
+  assert.equal(link.sent.length, 0);
+  assert.equal(relay.pendingCount, 0);
 });
