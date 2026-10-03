@@ -1,0 +1,24 @@
+{
+  "app": "1.5.0",
+  "loadAfterConnect_B_received": true,
+  "B_route": "Received from device A · Relay hops: 1",
+  "A_nearlink_status": "NearLink is unavailable on this device.",
+  "hub_A_to_B": {
+    "attempted": 1,
+    "forwarded": 1,
+    "dropped": 0,
+    "blocked": 0,
+    "offline": 0,
+    "backpressure": 0,
+    "injected": 0
+  },
+  "hub_B_to_A_acks": {
+    "attempted": 1,
+    "forwarded": 1,
+    "dropped": 0,
+    "blocked": 0,
+    "offline": 0,
+    "backpressure": 0,
+    "injected": 0
+  }
+}
