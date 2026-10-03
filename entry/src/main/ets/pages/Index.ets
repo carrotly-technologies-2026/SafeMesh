@@ -2,7 +2,8 @@ import { common, ConfigurationConstant } from '@kit.AbilityKit';
 import { accessibility } from '@kit.AccessibilityKit';
 import { intl } from '@kit.LocalizationKit';
 import { LocalStore } from '../model/LocalStore';
-import { AlertViewModel } from '../viewmodel/AlertViewModel';
+import { AlertViewModel, AlertInboxItem } from '../viewmodel/AlertViewModel';
+import { AuthorityViewModel } from '../viewmodel/AuthorityViewModel';
 import { MapViewModel, SafePointViewModel } from '../viewmodel/MapViewModel';
 import { RelayViewModel, RelayEvent, PeerViewModel } from '../viewmodel/RelayViewModel';
 import { OfflineMap } from '../views/OfflineMap';
@@ -45,12 +46,15 @@ struct Index {
   @State @Watch('onAlertChanged') alerts: AlertViewModel = new AlertViewModel(this.store);
   @State map: MapViewModel = new MapViewModel();
   @State @Watch('onRelayChanged') relay: RelayViewModel = new RelayViewModel(this.alerts);
+  @State authority: AuthorityViewModel = new AuthorityViewModel(this.alerts, this.relay);
   private pageScroll: Scroller = new Scroller();
   private lastAnnouncedAlert: string = '';
   private lastAnnouncedRelay: string = '';
   private previousTab: number = 0;
   private pointParent: number = 1;
   private diagnosticsParent: number = 4;
+  private messageParent: number = 0;
+  private lastArrivalSequence: number = 0;
 
   aboutToAppear(): void {
     const context: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
@@ -71,6 +75,7 @@ struct Index {
   aboutToDisappear(): void {
     this.alerts.dispose();
     this.relay.stop();
+    this.authority.dispose();
   }
 
   private t(key: string): string { return this.copy.text(key, this.language); }
@@ -81,6 +86,7 @@ struct Index {
       await this.store.init(context);
       const savedLanguage: string = await this.store.read('ui_language');
       this.language = savedLanguage === 'en' ? 'en' : 'pl';
+      this.authority.draftLanguage = this.language;
       context.getApplicationContext().setLanguage(this.language);
       this.alerts.setLanguage(this.language);
       const savedNode: string = await this.store.read('lab_node');
@@ -149,12 +155,16 @@ struct Index {
   }
 
   private onAlertChanged(): void {
+    if (this.alerts.arrivalSequence !== this.lastArrivalSequence) {
+      this.lastArrivalSequence = this.alerts.arrivalSequence;
+      const message: AlertInboxItem | undefined = this.alerts.getMessage(this.alerts.arrivalIdentity);
+      if (message !== undefined) { this.announce(this.t('new_alert') + '. ' + message.title); }
+    }
     const identity: string = this.alerts.received ? this.alerts.currentIdentity : '';
     if (identity !== this.lastAnnouncedAlert) {
       const previous: string = this.lastAnnouncedAlert;
       this.lastAnnouncedAlert = identity;
-      if (identity.length > 0) { this.announce(this.t('new_alert') + ' ' + this.alerts.title); }
-      else if (previous.length > 0) { this.announce(this.t('alert_expired')); }
+      if (identity.length === 0 && previous.length > 0) { this.announce(this.t('alert_expired')); }
     }
   }
 
@@ -193,7 +203,41 @@ struct Index {
   }
 
   private goBack(): void {
-    this.selectTab(this.tab === 5 ? this.diagnosticsParent : this.tab === 6 ? this.pointParent : this.previousTab);
+    this.selectTab(this.tab === 8 ? 5 : this.tab === 7 ? this.messageParent :
+      this.tab === 5 ? this.diagnosticsParent : this.tab === 6 ? this.pointParent : this.previousTab);
+  }
+
+  private async openMessage(identity: string): Promise<void> {
+    this.messageParent = this.tab === 7 ? this.messageParent : this.tab;
+    try {
+      const opened: boolean = await this.alerts.openMessage(identity);
+      if (opened && this.alerts.selectedMessage()?.identity === identity) {
+        this.selectTab(7);
+        if (this.alerts.persistenceState === 'save_failed') { this.notice = this.t('read_save_failed'); }
+      } else { this.notice = this.t('message_unavailable'); }
+    } catch (error) { this.notice = this.t('persistence_load_failed'); }
+  }
+
+  private issuerLabel(message: AlertInboxItem): string {
+    return this.t('issuer_authority');
+  }
+
+  private receiptOrigin(message: AlertInboxItem): string {
+    if (message.sourcePeer === 'authority') { return this.t('receipt_authority_source'); }
+    if (message.sourcePeer === 'local_test') { return this.t('receipt_local_source'); }
+    if (message.sourcePeer.length === 0) { return this.t('receipt_unknown_source'); }
+    return this.t('receipt_peer') + ' ' + message.sourcePeer;
+  }
+
+  private async signInAuthority(): Promise<void> {
+    await this.authority.login();
+    this.announce(this.t('authority_state_' + this.authority.state));
+  }
+
+  private async publishAlert(): Promise<void> {
+    const published: boolean = await this.authority.publish();
+    this.announce(this.t('authority_state_' + this.authority.state));
+    if (published) { this.pageScroll.scrollTo({ xOffset: 0, yOffset: 0 }); }
   }
 
   private async savePoint(): Promise<void> {
@@ -217,17 +261,6 @@ struct Index {
       if (this.relay.hardwareState === 'lab_ready') { await this.store.write('lab_node', this.labNode); }
     }
     catch (error) { this.notice = this.t('hardware_lab_error'); }
-    finally { this.labBusy = false; }
-  }
-
-  private async sendLabDrill(): Promise<void> {
-    if (this.labBusy || this.alerts.busy) { return; }
-    this.labBusy = true;
-    try {
-      await this.alerts.loadDrill();
-      if (this.alerts.received) { await this.relay.share(); }
-      else { this.notice = this.t('verify_failed'); }
-    } catch (error) { this.notice = this.t('verify_failed'); }
     finally { this.labBusy = false; }
   }
 
@@ -262,7 +295,8 @@ struct Index {
   private pageTitle(): string {
     if (this.tab === 0) { return 'SafeMesh'; }
     return this.t(this.tab === 1 ? 'map' : this.tab === 2 ? 'relay' : this.tab === 3 ? 'guide' :
-      this.tab === 4 ? 'settings_tab' : this.tab === 5 ? 'diagnostics_title' : 'point_type');
+      this.tab === 4 ? 'settings_tab' : this.tab === 5 ? 'diagnostics_title' : this.tab === 6 ? 'point_type' :
+      this.tab === 7 ? 'message_detail' : 'authority_console');
   }
 
   private visiblePoints(): SafePointViewModel[] {
@@ -347,12 +381,12 @@ struct Index {
           .fontSize(20).maxFontScale(1).fontColor([this.alerts.received ? SUCCESS : MUTED]).accessibilityLevel('no')
         Text(this.t(this.alerts.received ? 'signature_verified' :
           this.alerts.verificationState === 'expired' ? 'alert_expired' : 'no_alert'))
-          .id('verificationBadge').fontSize(13).fontWeight(FontWeight.Medium)
+          .id('emptyVerificationBadge').fontSize(13).fontWeight(FontWeight.Medium)
           .fontColor(this.alerts.received ? SUCCESS : MUTED).layoutWeight(1)
       }.width('100%')
-      Text(this.alerts.received ? this.alerts.title : this.t('ready_title')).id('alertTitle')
+      Text(this.alerts.received ? this.alerts.title : this.t('ready_title')).id('readyTitle')
         .fontSize(24).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
-      Text(this.alerts.received ? this.alerts.body : this.t('ready_body')).id('alertBody')
+      Text(this.alerts.received ? this.alerts.body : this.t('ready_body')).id('readyBody')
         .fontSize(16).fontColor(INK).width('100%')
       if (this.alerts.received) {
         if (this.alerts.languageFallback) {
@@ -372,11 +406,119 @@ struct Index {
   }
 
   @Builder
+  private inboxRow(message: AlertInboxItem) {
+    Button({ type: ButtonType.Normal }) {
+      Column({ space: 8 }) {
+        Row({ space: 8 }) {
+          Text(this.issuerLabel(message)).fontSize(12).fontColor(MUTED).layoutWeight(1)
+          if (message.unread) {
+            Text(this.t('unread_short')).fontSize(11).fontWeight(FontWeight.Medium).fontColor(SUCCESS)
+          }
+        }.width('100%')
+        Row({ space: 12 }) {
+          Text(message.title).fontSize(20).fontWeight(message.unread ? FontWeight.Bold : FontWeight.Medium)
+            .fontColor(INK).layoutWeight(1).maxLines(3).textOverflow({ overflow: TextOverflow.Ellipsis })
+          SymbolGlyph($r('sys.symbol.chevron_right')).fontSize(15).maxFontScale(1).fontColor([MUTED])
+            .accessibilityLevel('no')
+        }.width('100%')
+        Text(message.area).fontSize(14).fontColor(INK).width('100%')
+        Text(this.t('issued_at') + ' ' + this.formatTime(message.issuedAt)).fontSize(12).fontColor(MUTED).width('100%')
+      }.alignItems(HorizontalAlign.Start).width('100%').padding({ top: 18, bottom: 18 })
+    }.id('message_' + message.alertId + '_' + message.revision).width('100%').constraintSize({ minHeight: 64 })
+      .backgroundColor(Color.Transparent).borderRadius(8)
+      .accessibilityText((message.unread ? this.t('unread_short') + '. ' : '') + message.title + '. ' + message.area)
+      .onClick(() => { this.openMessage(message.identity); })
+    this.divider()
+  }
+
+  @Builder
+  private incomingBanner() {
+    if (this.alerts.getMessage(this.alerts.arrivalIdentity) !== undefined) {
+      Row({ space: 4 }) {
+        Button({ type: ButtonType.Normal }) {
+          Column({ space: 4 }) {
+            Text(this.t('new_alert')).fontSize(12).fontWeight(FontWeight.Medium).fontColor(SUCCESS).width('100%')
+            Text(this.alerts.getMessage(this.alerts.arrivalIdentity)?.title ?? '').fontSize(15)
+              .fontWeight(FontWeight.Medium).fontColor(INK).maxLines(this.viewportHeight < 540 ? 1 : 2)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
+              .width('100%')
+            Text(this.t('read_message')).fontSize(13).fontWeight(FontWeight.Medium).fontColor(SUCCESS).width('100%')
+          }.width('100%').alignItems(HorizontalAlign.Start).padding(12)
+        }.id('readIncoming').layoutWeight(1).constraintSize({ minHeight: 48 }).backgroundColor(Color.Transparent)
+          .borderRadius(10).accessibilityText(this.t('read_message') + '. ' +
+            (this.alerts.getMessage(this.alerts.arrivalIdentity)?.title ?? ''))
+          .onClick(() => { this.openMessage(this.alerts.arrivalIdentity); })
+        this.iconButton($r('sys.symbol.xmark'), () => this.t('dismiss'), 'dismissIncoming', () => { this.alerts.dismissArrival(); })
+      }.width('100%').constraintSize({ maxWidth: 720 }).backgroundColor(SOFT)
+        .border({ width: { bottom: 1 }, color: BORDER }).padding({ left: 8, right: 8 })
+    }
+  }
+
+  @Builder
+  private messageContent(message: AlertInboxItem) {
+    Column({ space: 18 }) {
+      Row({ space: 8 }) {
+        SymbolGlyph($r('sys.symbol.checkmark_shield')).fontSize(22).maxFontScale(1).fontColor([SUCCESS]).accessibilityLevel('no')
+        Text(this.t('signature_verified')).id('verificationBadge').fontSize(13).fontColor(SUCCESS).layoutWeight(1)
+      }.width('100%')
+      Text(message.title).id('alertTitle').fontSize(28).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
+      Text(this.issuerLabel(message) + ' · ' + this.t('exercise')).id('messageIssuer')
+        .fontSize(13).fontWeight(FontWeight.Medium).fontColor(WARNING_FG).width('100%')
+      Text(message.area).id('messageArea').fontSize(17).fontWeight(FontWeight.Medium).fontColor(INK).width('100%')
+      Text(message.body).id('alertBody').fontSize(17).fontColor(INK).width('100%')
+      if (message.languageFallback) {
+        Text(this.t('original_language_' + message.contentLanguage)).fontSize(12).fontColor(MUTED).width('100%')
+      }
+      this.divider()
+      Text(this.t('severity_' + message.severity)).fontSize(14).fontWeight(FontWeight.Medium).fontColor(INK).width('100%')
+      Text(this.t('issued_at') + ' ' + this.formatTime(message.issuedAt) + '\n' +
+        this.t('valid_until') + ' ' + this.formatTime(message.expiresAt)).fontSize(13).fontColor(MUTED).width('100%')
+      this.section('receipt_local')
+      if (message.receivedAt > 0) {
+        Text(this.t('received_at') + ' ' + this.formatTime(message.receivedAt)).fontSize(13).fontColor(INK).width('100%')
+      }
+      Text(this.receiptOrigin(message) +
+        ' · ' + this.t('receipt_hops') + ': ' + message.hops).id('messageRoute').fontSize(13).fontColor(INK).width('100%')
+      Text(this.t('receipt_notice')).fontSize(12).fontColor(MUTED).width('100%')
+      Text(this.t('exercise_notice')).fontSize(12).fontColor(MUTED).width('100%')
+    }.width('100%').alignItems(HorizontalAlign.Start)
+  }
+
+  @Builder
+  private messageDetail() {
+    if (this.alerts.selectedMessage() !== undefined) {
+      ForEach([this.alerts.selectedMessage()!], (message: AlertInboxItem) => { this.messageContent(message) },
+        (message: AlertInboxItem) => message.identity + this.language + String(message.unread))
+    } else {
+      Column({ space: 16 }) {
+        Text(this.t('message_unavailable')).fontSize(17).fontColor(INK).width('100%')
+        this.action(() => this.t('back_to_inbox'), 'backToInbox', () => { this.selectTab(0); }, () => true, false)
+      }.width('100%')
+    }
+  }
+
+  @Builder
   private homeView() {
     Column({ space: 16 }) {
       this.contextLine()
-      Text(this.t('home_alerts')).fontSize(29).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
-      this.alertView()
+      Row({ space: 8 }) {
+        Text(this.t('home_alerts')).fontSize(29).fontWeight(FontWeight.Bold).fontColor(INK).layoutWeight(1)
+        if (this.alerts.unreadCount > 0) {
+          Text(String(this.alerts.unreadCount)).id('unreadCount').fontSize(16).fontWeight(FontWeight.Bold)
+            .fontColor(ACTION_FG).padding({ left: 12, right: 12, top: 7, bottom: 7 }).backgroundColor(ACTION_BG).borderRadius(20)
+            .accessibilityText(this.t('unread_count') + ': ' + this.alerts.unreadCount)
+        }
+      }.width('100%')
+      if (this.alerts.inbox.length === 0) { this.alertView() }
+      else {
+        Column() {
+          ForEach(this.alerts.inbox, (message: AlertInboxItem) => { this.inboxRow(message) },
+            (message: AlertInboxItem) => message.identity + this.language + String(message.unread))
+        }.id('messageInbox').width('100%')
+        if (this.alerts.persistenceState === 'save_failed' || this.alerts.persistenceState === 'load_failed') {
+          Text(this.t('persistence_' + this.alerts.persistenceState)).fontSize(13).fontColor($r('app.color.danger')).width('100%')
+        }
+      }
       this.section('your_place')
       if (this.map.saveError === 'load_failed') {
         Text(this.t('saved_load_failed')).fontSize(13).fontColor($r('app.color.danger')).width('100%')
@@ -582,8 +724,7 @@ struct Index {
           this.metric(() => this.relay.acknowledgedCount, 'queue_acked')
           this.metric(() => this.relay.retryCount, 'queue_retry')
         }.id('labMetrics').width('100%').alignItems(VerticalAlign.Top)
-        this.action(() => this.t('share_alert'), 'labShare', () => { this.relay.share(); },
-          () => !this.labBusy && this.alerts.received)
+        Text(this.t('relay_automatic')).id('relayAutomatic').fontSize(14).fontColor(SUCCESS).width('100%')
         Text(this.t('packet_' + this.relay.lastPacketState)).id('labPacketStatus').fontSize(13).fontColor(MUTED).width('100%')
       }
       Text(this.t('foreground_notice')).fontSize(13).fontColor(MUTED).width('100%')
@@ -674,7 +815,7 @@ struct Index {
       Text(this.t('pack_date') + ': ' + this.map.sourceDate + ' · ' + this.map.packSize).fontSize(12).fontColor(MUTED).width('100%')
       this.sourceLink('https://dane.gov.pl/pl/dataset/28058,punkty-schronienia-w-polsce', () => this.t('source_psp'))
       this.sourceLink('https://www.openstreetmap.org/copyright', () => this.t('source_osm'))
-      Text('SafeMesh 1.3.0').fontSize(12).fontColor(MUTED).width('100%')
+      Text('SafeMesh 1.4.0').fontSize(12).fontColor(MUTED).width('100%')
     }.width('100%').alignItems(HorizontalAlign.Start)
   }
 
@@ -682,12 +823,12 @@ struct Index {
   private diagnosticsView() {
     Column({ space: 16 }) {
       Text(this.t('diagnostics_intro')).fontSize(15).fontColor(MUTED).width('100%')
+      this.rowLink($r('sys.symbol.checkmark_shield'), () => this.t('authority_console'),
+        () => this.t('authority_console_hint'), 'openAuthority', () => { this.selectTab(8); })
+      this.divider()
       this.section('exercise_actions')
       this.action(() => this.t(this.alerts.busy ? 'verifying' : 'receive_drill'), 'diagnosticDrill',
         () => { this.loadDrill(); }, () => this.initialized && !this.alerts.busy)
-      if (this.relay.transportMode === 'emulator' && this.connected()) {
-        this.action(() => this.t('lab_send_drill'), 'labSendDrill', () => { this.sendLabDrill(); }, () => !this.labBusy, false)
-      }
       this.divider()
       this.section('simulation')
       Text(this.t('no_radio')).fontSize(13).fontColor(MUTED).width('100%')
@@ -721,7 +862,6 @@ struct Index {
             this.action(() => peer.name + ' · ' + this.t(peer.connected ? 'connected_short' : 'connect'),
               'peer_' + peer.address, () => { this.relay.connect(peer.address); }, () => !peer.connected, false)
           }, (peer: PeerViewModel) => peer.address)
-          this.action(() => this.t('share_alert'), 'shareAlert', () => { this.relay.share(); }, () => this.alerts.received)
           this.action(() => this.t('stop_relay'), 'stopRelay', () => { this.relay.stop(); }, () => true, false)
         }
       }
@@ -730,17 +870,130 @@ struct Index {
   }
 
   @Builder
+  private authorityChoice(label: () => string, id: string, selected: () => boolean, action: () => void) {
+    Button({ type: ButtonType.Normal }) {
+      Text(label()).fontSize(14).fontWeight(FontWeight.Medium).textAlign(TextAlign.Center).width('100%')
+        .fontColor(selected() ? ACTION_FG : INK)
+    }.id(id).layoutWeight(1).constraintSize({ minHeight: 48 }).padding(10).borderRadius(10)
+      .backgroundColor(selected() ? ACTION_BG : SOFT).accessibilityText(label()).accessibilitySelected(selected())
+      .enabled(!this.authority.busy).onClick(action)
+  }
+
+  @Builder
+  private authorityForm() {
+    Column({ space: 12 }) {
+      this.section('message_language')
+      Row({ space: 8 }) {
+        this.authorityChoice(() => 'Polski', 'draftLanguagePl', () => this.authority.draftLanguage === 'pl',
+          () => { this.authority.draftLanguage = 'pl'; })
+        this.authorityChoice(() => 'English', 'draftLanguageEn', () => this.authority.draftLanguage === 'en',
+          () => { this.authority.draftLanguage = 'en'; })
+      }.width('100%')
+      Text(this.t('message_language_hint')).fontSize(12).fontColor(MUTED).width('100%')
+      this.section('draft_title')
+      TextInput({ text: this.authority.draftTitle, placeholder: this.t('draft_title_hint') }).id('draftTitle')
+        .fontSize(16).fontColor(INK).placeholderColor(MUTED).backgroundColor(SURFACE).borderRadius(10)
+        .constraintSize({ minHeight: 52 }).maxLength(160).enabled(!this.authority.busy)
+        .accessibilityText(this.t('draft_title')).onChange((value: string) => { this.authority.draftTitle = value; })
+      this.section('draft_body')
+      TextArea({ text: this.authority.draftBody, placeholder: this.t('draft_body_hint') }).id('draftBody')
+        .fontSize(16).fontColor(INK).placeholderColor(MUTED).backgroundColor(SURFACE).borderRadius(10)
+        .height(this.viewportHeight < 540 ? 130 : 180).maxLength(1200).enabled(!this.authority.busy)
+        .accessibilityText(this.t('draft_body')).onChange((value: string) => { this.authority.draftBody = value; })
+      Text(this.authority.draftBody.length + ' / 1200').fontSize(12).fontColor(MUTED).width('100%').textAlign(TextAlign.End)
+      this.section('draft_area')
+      TextInput({ text: this.authority.draftArea, placeholder: this.t('draft_area_hint') }).id('draftArea')
+        .fontSize(16).fontColor(INK).placeholderColor(MUTED).backgroundColor(SURFACE).borderRadius(10)
+        .constraintSize({ minHeight: 52 }).maxLength(120).enabled(!this.authority.busy)
+        .accessibilityText(this.t('draft_area')).onChange((value: string) => { this.authority.draftArea = value; })
+      this.section('draft_severity')
+      Column({ space: 8 }) {
+        Row({ space: 8 }) {
+          this.authorityChoice(() => this.t('severity_info'), 'severityInfo', () => this.authority.severity === 'info',
+            () => { this.authority.severity = 'info'; })
+          this.authorityChoice(() => this.t('severity_warning'), 'severityWarning', () => this.authority.severity === 'warning',
+            () => { this.authority.severity = 'warning'; })
+        }.width('100%')
+        Row() {
+          this.authorityChoice(() => this.t('severity_critical'), 'severityCritical', () => this.authority.severity === 'critical',
+            () => { this.authority.severity = 'critical'; })
+        }.width('100%')
+      }.width('100%')
+      this.section('draft_validity')
+      Row({ space: 6 }) {
+        this.authorityChoice(() => this.t('validity_15'), 'validity15', () => this.authority.validForMinutes === 15,
+          () => { this.authority.validForMinutes = 15; })
+        this.authorityChoice(() => this.t('validity_60'), 'validity60', () => this.authority.validForMinutes === 60,
+          () => { this.authority.validForMinutes = 60; })
+      }.width('100%')
+      Row({ space: 6 }) {
+        this.authorityChoice(() => this.t('validity_240'), 'validity240', () => this.authority.validForMinutes === 240,
+          () => { this.authority.validForMinutes = 240; })
+        this.authorityChoice(() => this.t('validity_1440'), 'validity1440', () => this.authority.validForMinutes === 1440,
+          () => { this.authority.validForMinutes = 1440; })
+      }.width('100%')
+      Text(this.t('authority_publish_hint')).fontSize(13).fontColor(MUTED).width('100%')
+      this.action(() => this.t(this.authority.busy ? 'authority_publishing' : 'authority_publish'), 'publishAlert',
+        () => { this.publishAlert(); }, () => !this.authority.busy && this.authority.authenticated &&
+          this.authority.draftTitle.trim().length > 0 && this.authority.draftBody.trim().length > 0 &&
+          this.authority.draftArea.trim().length > 0)
+    }.width('100%').alignItems(HorizontalAlign.Start)
+  }
+
+  @Builder
+  private authorityView() {
+    Column({ space: 16 }) {
+      Text(this.t('authority_intro')).fontSize(15).fontColor(MUTED).width('100%')
+      Row({ space: 8 }) {
+        SymbolGlyph($r('sys.symbol.checkmark_shield')).fontSize(22).maxFontScale(1)
+          .fontColor([this.authority.authenticated ? SUCCESS : MUTED]).accessibilityLevel('no')
+        Text(this.t(this.authority.authenticated ? 'authority_authenticated' : 'authority_login_title'))
+          .fontSize(19).fontWeight(FontWeight.Bold).fontColor(INK).layoutWeight(1)
+      }.width('100%')
+      Text(this.t('authority_state_' + this.authority.state)).id('authorityStatus').fontSize(14).fontColor(MUTED).width('100%')
+      if (!this.authority.authenticated) {
+        this.section('authority_token')
+        TextInput({ text: this.authority.tokenInput, placeholder: this.t('authority_token_hint') }).id('authorityToken')
+          .type(InputType.Password).enableAutoFill(false).showPasswordIcon(false).copyOption(CopyOptions.None)
+          .fontSize(16).fontColor(INK).placeholderColor(MUTED).backgroundColor(SURFACE).borderRadius(10)
+          .constraintSize({ minHeight: 52 }).maxLength(64).enabled(!this.authority.busy)
+          .accessibilityText(this.t('authority_token')).onChange((value: string) => { this.authority.tokenInput = value; })
+        Text(this.t('authority_token_notice')).fontSize(12).fontColor(MUTED).width('100%')
+        this.action(() => this.t(this.authority.busy ? 'authority_signing_in' : 'authority_login'), 'authorityLogin',
+          () => { this.signInAuthority(); }, () => !this.authority.busy && this.authority.tokenInput.trim().length > 0)
+      } else {
+        this.action(() => this.t('authority_logout'), 'authorityLogout', () => { this.authority.logout(); },
+          () => !this.authority.busy, false)
+        if (this.authority.lastPublishedIdentity.length > 0) {
+          this.rowLink($r('sys.symbol.bell'), () => this.t('view_published'), () => this.authority.lastPublishedTitle,
+            'viewPublished', () => { this.openMessage(this.authority.lastPublishedIdentity); })
+        }
+        this.divider()
+        this.authorityForm()
+      }
+    }.width('100%').alignItems(HorizontalAlign.Start)
+  }
+
+  @Builder
   private navItem(index: number, key: string, icon: Resource) {
     Button({ type: ButtonType.Normal }) {
       Column({ space: 5 }) {
-        SymbolGlyph(icon).fontSize(23).maxFontScale(1).fontColor([this.tab === index ? SUCCESS : MUTED])
-          .fontWeight(this.tab === index ? FontWeight.Bold : FontWeight.Normal).accessibilityLevel('no')
+        Row({ space: 4 }) {
+          SymbolGlyph(icon).fontSize(23).maxFontScale(1).fontColor([this.tab === index ? SUCCESS : MUTED])
+            .fontWeight(this.tab === index ? FontWeight.Bold : FontWeight.Normal).accessibilityLevel('no')
+          if (index === 0 && this.alerts.unreadCount > 0) {
+            Text(String(this.alerts.unreadCount)).fontSize(10).maxFontScale(1).fontWeight(FontWeight.Bold)
+              .fontColor(ACTION_FG).padding(4).backgroundColor(ACTION_BG).borderRadius(12).accessibilityLevel('no')
+          }
+        }.justifyContent(FlexAlign.Center).width('100%')
         Text(this.t(key)).fontSize(12).fontWeight(this.tab === index ? FontWeight.Bold : FontWeight.Normal)
           .fontColor(this.tab === index ? INK : MUTED).textAlign(TextAlign.Center).width('100%')
       }.width('100%')
     }.layoutWeight(1).constraintSize({ minHeight: 56 }).padding({ left: 2, right: 2, top: 8, bottom: 8 })
       .backgroundColor(Color.Transparent).borderRadius(8).id('tab' + index)
-      .accessibilityText(this.t(key)).accessibilitySelected(this.tab === index).onClick(() => { this.selectTab(index); })
+      .accessibilityText(this.t(key) + (index === 0 && this.alerts.unreadCount > 0 ?
+        '. ' + this.t('unread_count') + ': ' + this.alerts.unreadCount : ''))
+      .accessibilitySelected(this.tab === index).onClick(() => { this.selectTab(index); })
   }
 
   @Builder
@@ -766,6 +1019,7 @@ struct Index {
   build() {
     Column() {
       this.header()
+      this.incomingBanner()
       Scroll(this.pageScroll) {
         Column({ space: 16 }) {
           if (this.notice.length > 0) {
@@ -780,7 +1034,9 @@ struct Index {
           else if (this.tab === 3) { this.guideView() }
           else if (this.tab === 4) { this.settingsView() }
           else if (this.tab === 5) { this.diagnosticsView() }
-          else { this.pointDetail() }
+          else if (this.tab === 6) { this.pointDetail() }
+          else if (this.tab === 7) { this.messageDetail() }
+          else { this.authorityView() }
         }.width('100%').constraintSize({ maxWidth: 680 }).padding({ left: 20, right: 20, top: 12, bottom: 24 })
       }.layoutWeight(1).width('100%').scrollBar(BarState.Auto).align(Alignment.Top)
       if (this.tab < 4) { this.navigation() }

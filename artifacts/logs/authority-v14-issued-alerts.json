@@ -1,0 +1,52 @@
+﻿[
+    {
+        "payload":  {
+                        "version":  2,
+                        "keyId":  "safemesh-demo-authority-v1",
+                        "alertId":  "authority-eca37358bc903343c461d2526d00f434",
+                        "revision":  1,
+                        "issuedAt":  1791058361327,
+                        "expiresAt":  1791144761327,
+                        "severity":  "warning",
+                        "area":  "Kraków centrum",
+                        "title":  "Ćwiczenie 01 · punkt informacyjny",
+                        "body":  "ĆWICZENIE. Punkt informacyjny przy Rynku Głównym. Pozostań z grupą i sprawdzaj podpisane komunikaty. To symulacja, nie rzeczywisty alert.",
+                        "shelterIds":  [
+
+                                       ],
+                        "drill":  true,
+                        "maxHops":  8,
+                        "language":  "pl",
+                        "translations":  [
+
+                                         ]
+                    },
+        "signature":  "MEUCIDYd9uN8sl6d/YsjXZ3Kj+of40UBJTUwLyyHRnle87C3AiEA6I51S0OdIz/MsAG7chj/UNjILjJUzYpu4EDihf4Fwxs=",
+        "hops":  0
+    },
+    {
+        "payload":  {
+                        "version":  2,
+                        "keyId":  "safemesh-demo-authority-v1",
+                        "alertId":  "authority-848aa13a930ee34429911ec68d38661d",
+                        "revision":  1,
+                        "issuedAt":  1791058512695,
+                        "expiresAt":  1791144912695,
+                        "severity":  "warning",
+                        "area":  "Kraków centrum",
+                        "title":  "Ćwiczenie 02 · komunikat dla grupy",
+                        "body":  "ĆWICZENIE. Drugi niezależny komunikat dla centrum Krakowa. Sprawdź, czy wszyscy w grupie otrzymali wiadomość. Nie wyznacza to rzeczywistej trasy ewakuacji.",
+                        "shelterIds":  [
+
+                                       ],
+                        "drill":  true,
+                        "maxHops":  8,
+                        "language":  "pl",
+                        "translations":  [
+
+                                         ]
+                    },
+        "signature":  "MEQCIEql91Og4ISmNZCnTfi5mqX+vH0L/l+y+62tZ31dVhaBAiBYvE1W2gMjNKjx4LV4O2Vyf4RnMQoJLTK8w9MqrXNeXA==",
+        "hops":  0
+    }
+]

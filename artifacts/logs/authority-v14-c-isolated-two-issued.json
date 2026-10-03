@@ -1,0 +1,761 @@
+﻿{
+    "bounds":  [
+                   0,
+                   0,
+                   1320,
+                   2856
+               ],
+    "children":  [
+                     {
+                         "type":  "root",
+                         "bounds":  [
+                                        0,
+                                        137,
+                                        1320,
+                                        2856
+                                    ],
+                         "children":  [
+                                          {
+                                              "type":  "Column",
+                                              "bounds":  [
+                                                             0,
+                                                             137,
+                                                             1320,
+                                                             2758
+                                                         ],
+                                              "children":  [
+                                                               {
+                                                                   "type":  "Row",
+                                                                   "bounds":  [
+                                                                                  0,
+                                                                                  137,
+                                                                                  1320,
+                                                                                  332
+                                                                              ],
+                                                                   "children":  [
+                                                                                    {
+                                                                                        "type":  "Text",
+                                                                                        "text":  "SafeMesh",
+                                                                                        "bounds":  [
+                                                                                                       70,
+                                                                                                       189,
+                                                                                                       1110,
+                                                                                                       279
+                                                                                                   ],
+                                                                                        "children":  [
+
+                                                                                                     ]
+                                                                                    },
+                                                                                    {
+                                                                                        "id":  "openSettings",
+                                                                                        "type":  "Button",
+                                                                                        "bounds":  [
+                                                                                                       1124,
+                                                                                                       150,
+                                                                                                       1292,
+                                                                                                       318
+                                                                                                   ],
+                                                                                        "clickable":  true,
+                                                                                        "children":  [
+                                                                                                         {
+                                                                                                             "type":  "SymbolGlyph",
+                                                                                                             "bounds":  [
+                                                                                                                            1170,
+                                                                                                                            196,
+                                                                                                                            1247,
+                                                                                                                            273
+                                                                                                                        ],
+                                                                                                             "children":  [
+
+                                                                                                                          ]
+                                                                                                         }
+                                                                                                     ]
+                                                                                    }
+                                                                                ]
+                                                               },
+                                                               {
+                                                                   "type":  "Scroll",
+                                                                   "bounds":  [
+                                                                                  0,
+                                                                                  332,
+                                                                                  1320,
+                                                                                  2526
+                                                                              ],
+                                                                   "children":  [
+                                                                                    {
+                                                                                        "type":  "Column",
+                                                                                        "bounds":  [
+                                                                                                       0,
+                                                                                                       332,
+                                                                                                       1320,
+                                                                                                       2526
+                                                                                                   ],
+                                                                                        "children":  [
+                                                                                                         {
+                                                                                                             "type":  "Column",
+                                                                                                             "bounds":  [
+                                                                                                                            70,
+                                                                                                                            374,
+                                                                                                                            1250,
+                                                                                                                            2442
+                                                                                                                        ],
+                                                                                                             "children":  [
+                                                                                                                              {
+                                                                                                                                  "type":  "Row",
+                                                                                                                                  "bounds":  [
+                                                                                                                                                 70,
+                                                                                                                                                 374,
+                                                                                                                                                 1250,
+                                                                                                                                                 457
+                                                                                                                                             ],
+                                                                                                                                  "children":  [
+                                                                                                                                                   {
+                                                                                                                                                       "type":  "Text",
+                                                                                                                                                       "text":  "Kraków · centrum",
+                                                                                                                                                       "bounds":  [
+                                                                                                                                                                      70,
+                                                                                                                                                                      389,
+                                                                                                                                                                      862,
+                                                                                                                                                                      442
+                                                                                                                                                                  ],
+                                                                                                                                                       "children":  [
+
+                                                                                                                                                                    ]
+                                                                                                                                                   },
+                                                                                                                                                   {
+                                                                                                                                                       "id":  "exerciseBadge",
+                                                                                                                                                       "type":  "Text",
+                                                                                                                                                       "text":  "ĆWICZENIE · C",
+                                                                                                                                                       "bounds":  [
+                                                                                                                                                                      890,
+                                                                                                                                                                      374,
+                                                                                                                                                                      1250,
+                                                                                                                                                                      457
+                                                                                                                                                                  ],
+                                                                                                                                                       "children":  [
+
+                                                                                                                                                                    ]
+                                                                                                                                                   }
+                                                                                                                                               ]
+                                                                                                                              },
+                                                                                                                              {
+                                                                                                                                  "type":  "Row",
+                                                                                                                                  "bounds":  [
+                                                                                                                                                 70,
+                                                                                                                                                 527,
+                                                                                                                                                 1250,
+                                                                                                                                                 646
+                                                                                                                                             ],
+                                                                                                                                  "children":  [
+                                                                                                                                                   {
+                                                                                                                                                       "type":  "Text",
+                                                                                                                                                       "text":  "Komunikaty",
+                                                                                                                                                       "bounds":  [
+                                                                                                                                                                      70,
+                                                                                                                                                                      527,
+                                                                                                                                                                      1250,
+                                                                                                                                                                      646
+                                                                                                                                                                  ],
+                                                                                                                                                       "children":  [
+
+                                                                                                                                                                    ]
+                                                                                                                                                   }
+                                                                                                                                               ]
+                                                                                                                              },
+                                                                                                                              {
+                                                                                                                                  "type":  "Column",
+                                                                                                                                  "bounds":  [
+                                                                                                                                                 70,
+                                                                                                                                                 702,
+                                                                                                                                                 1250,
+                                                                                                                                                 1526
+                                                                                                                                             ],
+                                                                                                                                  "children":  [
+                                                                                                                                                   {
+                                                                                                                                                       "type":  "Row",
+                                                                                                                                                       "bounds":  [
+                                                                                                                                                                      136,
+                                                                                                                                                                      768,
+                                                                                                                                                                      1184,
+                                                                                                                                                                      838
+                                                                                                                                                                  ],
+                                                                                                                                                       "children":  [
+                                                                                                                                                                        {
+                                                                                                                                                                            "type":  "SymbolGlyph",
+                                                                                                                                                                            "bounds":  [
+                                                                                                                                                                                           136,
+                                                                                                                                                                                           768,
+                                                                                                                                                                                           206,
+                                                                                                                                                                                           838
+                                                                                                                                                                                       ],
+                                                                                                                                                                            "children":  [
+
+                                                                                                                                                                                         ]
+                                                                                                                                                                        },
+                                                                                                                                                                        {
+                                                                                                                                                                            "id":  "emptyVerificationBadge",
+                                                                                                                                                                            "type":  "Text",
+                                                                                                                                                                            "text":  "Brak aktualnego alertu",
+                                                                                                                                                                            "bounds":  [
+                                                                                                                                                                                           234,
+                                                                                                                                                                                           777,
+                                                                                                                                                                                           1184,
+                                                                                                                                                                                           830
+                                                                                                                                                                                       ],
+                                                                                                                                                                            "children":  [
+
+                                                                                                                                                                                         ]
+                                                                                                                                                                        }
+                                                                                                                                                                    ]
+                                                                                                                                                   },
+                                                                                                                                                   {
+                                                                                                                                                       "id":  "readyTitle",
+                                                                                                                                                       "type":  "Text",
+                                                                                                                                                       "text":  "Tu pojawią się wiadomości",
+                                                                                                                                                       "bounds":  [
+                                                                                                                                                                      136,
+                                                                                                                                                                      880,
+                                                                                                                                                                      1184,
+                                                                                                                                                                      1076
+                                                                                                                                                                  ],
+                                                                                                                                                       "children":  [
+
+                                                                                                                                                                    ]
+                                                                                                                                                   },
+                                                                                                                                                   {
+                                                                                                                                                       "id":  "readyBody",
+                                                                                                                                                       "type":  "Text",
+                                                                                                                                                       "text":  "Mapa i poradnik są zapisane na telefonie.",
+                                                                                                                                                       "bounds":  [
+                                                                                                                                                                      136,
+                                                                                                                                                                      1118,
+                                                                                                                                                                      1184,
+                                                                                                                                                                      1250
+                                                                                                                                                                  ],
+                                                                                                                                                       "children":  [
+
+                                                                                                                                                                    ]
+                                                                                                                                                   },
+                                                                                                                                                   {
+                                                                                                                                                       "id":  "connectDevices",
+                                                                                                                                                       "type":  "Button",
+                                                                                                                                                       "bounds":  [
+                                                                                                                                                                      136,
+                                                                                                                                                                      1292,
+                                                                                                                                                                      1184,
+                                                                                                                                                                      1460
+                                                                                                                                                                  ],
+                                                                                                                                                       "clickable":  true,
+                                                                                                                                                       "children":  [
+                                                                                                                                                                        {
+                                                                                                                                                                            "type":  "Text",
+                                                                                                                                                                            "text":  "Połącz urządzenia",
+                                                                                                                                                                            "bounds":  [
+                                                                                                                                                                                           178,
+                                                                                                                                                                                           1345,
+                                                                                                                                                                                           1142,
+                                                                                                                                                                                           1407
+                                                                                                                                                                                       ],
+                                                                                                                                                                            "children":  [
+
+                                                                                                                                                                                         ]
+                                                                                                                                                                        }
+                                                                                                                                                                    ]
+                                                                                                                                                   }
+                                                                                                                                               ]
+                                                                                                                              },
+                                                                                                                              {
+                                                                                                                                  "type":  "Text",
+                                                                                                                                  "text":  "Zapisane miejsce",
+                                                                                                                                  "bounds":  [
+                                                                                                                                                 70,
+                                                                                                                                                 1610,
+                                                                                                                                                 1250,
+                                                                                                                                                 1663
+                                                                                                                                             ],
+                                                                                                                                  "children":  [
+
+                                                                                                                                               ]
+                                                                                                                              },
+                                                                                                                              {
+                                                                                                                                  "id":  "exploreMap",
+                                                                                                                                  "type":  "Button",
+                                                                                                                                  "bounds":  [
+                                                                                                                                                 70,
+                                                                                                                                                 1733,
+                                                                                                                                                 1250,
+                                                                                                                                                 1978
+                                                                                                                                             ],
+                                                                                                                                  "clickable":  true,
+                                                                                                                                  "children":  [
+                                                                                                                                                   {
+                                                                                                                                                       "type":  "Row",
+                                                                                                                                                       "bounds":  [
+                                                                                                                                                                      70,
+                                                                                                                                                                      1733,
+                                                                                                                                                                      1250,
+                                                                                                                                                                      1978
+                                                                                                                                                                  ],
+                                                                                                                                                       "children":  [
+                                                                                                                                                                        {
+                                                                                                                                                                            "type":  "SymbolGlyph",
+                                                                                                                                                                            "bounds":  [
+                                                                                                                                                                                           70,
+                                                                                                                                                                                           1816,
+                                                                                                                                                                                           151,
+                                                                                                                                                                                           1896
+                                                                                                                                                                                       ],
+                                                                                                                                                                            "children":  [
+
+                                                                                                                                                                                         ]
+                                                                                                                                                                        },
+                                                                                                                                                                        {
+                                                                                                                                                                            "type":  "Column",
+                                                                                                                                                                            "bounds":  [
+                                                                                                                                                                                           200,
+                                                                                                                                                                                           1789,
+                                                                                                                                                                                           1174,
+                                                                                                                                                                                           1922
+                                                                                                                                                                                       ],
+                                                                                                                                                                            "children":  [
+                                                                                                                                                                                             {
+                                                                                                                                                                                                 "type":  "Text",
+                                                                                                                                                                                                 "text":  "Wybierz punkt ochronny",
+                                                                                                                                                                                                 "bounds":  [
+                                                                                                                                                                                                                200,
+                                                                                                                                                                                                                1789,
+                                                                                                                                                                                                                1174,
+                                                                                                                                                                                                                1855
+                                                                                                                                                                                                            ],
+                                                                                                                                                                                                 "children":  [
+
+                                                                                                                                                                                                              ]
+                                                                                                                                                                                             },
+                                                                                                                                                                                             {
+                                                                                                                                                                                                 "type":  "Text",
+                                                                                                                                                                                                 "text":  "Znajdź adres na mapie offline.",
+                                                                                                                                                                                                 "bounds":  [
+                                                                                                                                                                                                                200,
+                                                                                                                                                                                                                1869,
+                                                                                                                                                                                                                1174,
+                                                                                                                                                                                                                1922
+                                                                                                                                                                                                            ],
+                                                                                                                                                                                                 "children":  [
+
+                                                                                                                                                                                                              ]
+                                                                                                                                                                                             }
+                                                                                                                                                                                         ]
+                                                                                                                                                                        },
+                                                                                                                                                                        {
+                                                                                                                                                                            "type":  "SymbolGlyph",
+                                                                                                                                                                            "bounds":  [
+                                                                                                                                                                                           1223,
+                                                                                                                                                                                           1829,
+                                                                                                                                                                                           1250,
+                                                                                                                                                                                           1882
+                                                                                                                                                                                       ],
+                                                                                                                                                                            "children":  [
+
+                                                                                                                                                                                         ]
+                                                                                                                                                                        }
+                                                                                                                                                                    ]
+                                                                                                                                                   }
+                                                                                                                                               ]
+                                                                                                                              },
+                                                                                                                              {
+                                                                                                                                  "type":  "Divider",
+                                                                                                                                  "bounds":  [
+                                                                                                                                                 70,
+                                                                                                                                                 2034,
+                                                                                                                                                 1250,
+                                                                                                                                                 2036
+                                                                                                                                             ],
+                                                                                                                                  "children":  [
+
+                                                                                                                                               ]
+                                                                                                                              },
+                                                                                                                              {
+                                                                                                                                  "id":  "exploreRelay",
+                                                                                                                                  "type":  "Button",
+                                                                                                                                  "bounds":  [
+                                                                                                                                                 70,
+                                                                                                                                                 2092,
+                                                                                                                                                 1250,
+                                                                                                                                                 2337
+                                                                                                                                             ],
+                                                                                                                                  "clickable":  true,
+                                                                                                                                  "children":  [
+                                                                                                                                                   {
+                                                                                                                                                       "type":  "Row",
+                                                                                                                                                       "bounds":  [
+                                                                                                                                                                      70,
+                                                                                                                                                                      2092,
+                                                                                                                                                                      1250,
+                                                                                                                                                                      2337
+                                                                                                                                                                  ],
+                                                                                                                                                       "children":  [
+                                                                                                                                                                        {
+                                                                                                                                                                            "type":  "SymbolGlyph",
+                                                                                                                                                                            "bounds":  [
+                                                                                                                                                                                           70,
+                                                                                                                                                                                           2175,
+                                                                                                                                                                                           151,
+                                                                                                                                                                                           2255
+                                                                                                                                                                                       ],
+                                                                                                                                                                            "children":  [
+
+                                                                                                                                                                                         ]
+                                                                                                                                                                        },
+                                                                                                                                                                        {
+                                                                                                                                                                            "type":  "Column",
+                                                                                                                                                                            "bounds":  [
+                                                                                                                                                                                           200,
+                                                                                                                                                                                           2148,
+                                                                                                                                                                                           1174,
+                                                                                                                                                                                           2281
+                                                                                                                                                                                       ],
+                                                                                                                                                                            "children":  [
+                                                                                                                                                                                             {
+                                                                                                                                                                                                 "type":  "Text",
+                                                                                                                                                                                                 "text":  "Połączono",
+                                                                                                                                                                                                 "bounds":  [
+                                                                                                                                                                                                                200,
+                                                                                                                                                                                                                2148,
+                                                                                                                                                                                                                1174,
+                                                                                                                                                                                                                2214
+                                                                                                                                                                                                            ],
+                                                                                                                                                                                                 "children":  [
+
+                                                                                                                                                                                                              ]
+                                                                                                                                                                                             },
+                                                                                                                                                                                             {
+                                                                                                                                                                                                 "type":  "Text",
+                                                                                                                                                                                                 "text":  "0 urządzeń w pobliżu",
+                                                                                                                                                                                                 "bounds":  [
+                                                                                                                                                                                                                200,
+                                                                                                                                                                                                                2228,
+                                                                                                                                                                                                                1174,
+                                                                                                                                                                                                                2281
+                                                                                                                                                                                                            ],
+                                                                                                                                                                                                 "children":  [
+
+                                                                                                                                                                                                              ]
+                                                                                                                                                                                             }
+                                                                                                                                                                                         ]
+                                                                                                                                                                        },
+                                                                                                                                                                        {
+                                                                                                                                                                            "type":  "SymbolGlyph",
+                                                                                                                                                                            "bounds":  [
+                                                                                                                                                                                           1223,
+                                                                                                                                                                                           2188,
+                                                                                                                                                                                           1250,
+                                                                                                                                                                                           2241
+                                                                                                                                                                                       ],
+                                                                                                                                                                            "children":  [
+
+                                                                                                                                                                                         ]
+                                                                                                                                                                        }
+                                                                                                                                                                    ]
+                                                                                                                                                   }
+                                                                                                                                               ]
+                                                                                                                              },
+                                                                                                                              {
+                                                                                                                                  "id":  "exerciseNotice",
+                                                                                                                                  "type":  "Text",
+                                                                                                                                  "text":  "Aplikacja ćwiczebna · nie jest to oficjalny alert",
+                                                                                                                                  "bounds":  [
+                                                                                                                                                 70,
+                                                                                                                                                 2393,
+                                                                                                                                                 1250,
+                                                                                                                                                 2442
+                                                                                                                                             ],
+                                                                                                                                  "children":  [
+
+                                                                                                                                               ]
+                                                                                                                              }
+                                                                                                                          ]
+                                                                                                         }
+                                                                                                     ]
+                                                                                    }
+                                                                                ]
+                                                               },
+                                                               {
+                                                                   "type":  "Column",
+                                                                   "bounds":  [
+                                                                                  0,
+                                                                                  2526,
+                                                                                  1320,
+                                                                                  2758
+                                                                              ],
+                                                                   "children":  [
+                                                                                    {
+                                                                                        "type":  "Divider",
+                                                                                        "bounds":  [
+                                                                                                       0,
+                                                                                                       2526,
+                                                                                                       1320,
+                                                                                                       2528
+                                                                                                   ],
+                                                                                        "children":  [
+
+                                                                                                     ]
+                                                                                    },
+                                                                                    {
+                                                                                        "type":  "Row",
+                                                                                        "bounds":  [
+                                                                                                       0,
+                                                                                                       2528,
+                                                                                                       1320,
+                                                                                                       2759
+                                                                                                   ],
+                                                                                        "children":  [
+                                                                                                         {
+                                                                                                             "id":  "tab0",
+                                                                                                             "type":  "Button",
+                                                                                                             "bounds":  [
+                                                                                                                            28,
+                                                                                                                            2542,
+                                                                                                                            334,
+                                                                                                                            2745
+                                                                                                                        ],
+                                                                                                             "clickable":  true,
+                                                                                                             "children":  [
+                                                                                                                              {
+                                                                                                                                  "type":  "Column",
+                                                                                                                                  "bounds":  [
+                                                                                                                                                 35,
+                                                                                                                                                 2570,
+                                                                                                                                                 327,
+                                                                                                                                                 2717
+                                                                                                                                             ],
+                                                                                                                                  "children":  [
+                                                                                                                                                   {
+                                                                                                                                                       "type":  "Row",
+                                                                                                                                                       "bounds":  [
+                                                                                                                                                                      35,
+                                                                                                                                                                      2570,
+                                                                                                                                                                      327,
+                                                                                                                                                                      2650
+                                                                                                                                                                  ],
+                                                                                                                                                       "children":  [
+                                                                                                                                                                        {
+                                                                                                                                                                            "type":  "SymbolGlyph",
+                                                                                                                                                                            "bounds":  [
+                                                                                                                                                                                           140,
+                                                                                                                                                                                           2570,
+                                                                                                                                                                                           221,
+                                                                                                                                                                                           2650
+                                                                                                                                                                                       ],
+                                                                                                                                                                            "children":  [
+
+                                                                                                                                                                                         ]
+                                                                                                                                                                        }
+                                                                                                                                                                    ]
+                                                                                                                                                   },
+                                                                                                                                                   {
+                                                                                                                                                       "type":  "Text",
+                                                                                                                                                       "text":  "Start",
+                                                                                                                                                       "bounds":  [
+                                                                                                                                                                      35,
+                                                                                                                                                                      2668,
+                                                                                                                                                                      327,
+                                                                                                                                                                      2717
+                                                                                                                                                                  ],
+                                                                                                                                                       "children":  [
+
+                                                                                                                                                                    ]
+                                                                                                                                                   }
+                                                                                                                                               ]
+                                                                                                                              }
+                                                                                                                          ]
+                                                                                                         },
+                                                                                                         {
+                                                                                                             "id":  "tab1",
+                                                                                                             "type":  "Button",
+                                                                                                             "bounds":  [
+                                                                                                                            348,
+                                                                                                                            2542,
+                                                                                                                            654,
+                                                                                                                            2745
+                                                                                                                        ],
+                                                                                                             "clickable":  true,
+                                                                                                             "children":  [
+                                                                                                                              {
+                                                                                                                                  "type":  "Column",
+                                                                                                                                  "bounds":  [
+                                                                                                                                                 355,
+                                                                                                                                                 2570,
+                                                                                                                                                 647,
+                                                                                                                                                 2717
+                                                                                                                                             ],
+                                                                                                                                  "children":  [
+                                                                                                                                                   {
+                                                                                                                                                       "type":  "Row",
+                                                                                                                                                       "bounds":  [
+                                                                                                                                                                      355,
+                                                                                                                                                                      2570,
+                                                                                                                                                                      647,
+                                                                                                                                                                      2650
+                                                                                                                                                                  ],
+                                                                                                                                                       "children":  [
+                                                                                                                                                                        {
+                                                                                                                                                                            "type":  "SymbolGlyph",
+                                                                                                                                                                            "bounds":  [
+                                                                                                                                                                                           460,
+                                                                                                                                                                                           2570,
+                                                                                                                                                                                           541,
+                                                                                                                                                                                           2650
+                                                                                                                                                                                       ],
+                                                                                                                                                                            "children":  [
+
+                                                                                                                                                                                         ]
+                                                                                                                                                                        }
+                                                                                                                                                                    ]
+                                                                                                                                                   },
+                                                                                                                                                   {
+                                                                                                                                                       "type":  "Text",
+                                                                                                                                                       "text":  "Mapa",
+                                                                                                                                                       "bounds":  [
+                                                                                                                                                                      355,
+                                                                                                                                                                      2668,
+                                                                                                                                                                      647,
+                                                                                                                                                                      2717
+                                                                                                                                                                  ],
+                                                                                                                                                       "children":  [
+
+                                                                                                                                                                    ]
+                                                                                                                                                   }
+                                                                                                                                               ]
+                                                                                                                              }
+                                                                                                                          ]
+                                                                                                         },
+                                                                                                         {
+                                                                                                             "id":  "tab2",
+                                                                                                             "type":  "Button",
+                                                                                                             "bounds":  [
+                                                                                                                            667,
+                                                                                                                            2542,
+                                                                                                                            973,
+                                                                                                                            2745
+                                                                                                                        ],
+                                                                                                             "clickable":  true,
+                                                                                                             "children":  [
+                                                                                                                              {
+                                                                                                                                  "type":  "Column",
+                                                                                                                                  "bounds":  [
+                                                                                                                                                 674,
+                                                                                                                                                 2570,
+                                                                                                                                                 966,
+                                                                                                                                                 2717
+                                                                                                                                             ],
+                                                                                                                                  "children":  [
+                                                                                                                                                   {
+                                                                                                                                                       "type":  "Row",
+                                                                                                                                                       "bounds":  [
+                                                                                                                                                                      674,
+                                                                                                                                                                      2570,
+                                                                                                                                                                      966,
+                                                                                                                                                                      2650
+                                                                                                                                                                  ],
+                                                                                                                                                       "children":  [
+                                                                                                                                                                        {
+                                                                                                                                                                            "type":  "SymbolGlyph",
+                                                                                                                                                                            "bounds":  [
+                                                                                                                                                                                           779,
+                                                                                                                                                                                           2570,
+                                                                                                                                                                                           860,
+                                                                                                                                                                                           2650
+                                                                                                                                                                                       ],
+                                                                                                                                                                            "children":  [
+
+                                                                                                                                                                                         ]
+                                                                                                                                                                        }
+                                                                                                                                                                    ]
+                                                                                                                                                   },
+                                                                                                                                                   {
+                                                                                                                                                       "type":  "Text",
+                                                                                                                                                       "text":  "Łączność",
+                                                                                                                                                       "bounds":  [
+                                                                                                                                                                      674,
+                                                                                                                                                                      2668,
+                                                                                                                                                                      966,
+                                                                                                                                                                      2717
+                                                                                                                                                                  ],
+                                                                                                                                                       "children":  [
+
+                                                                                                                                                                    ]
+                                                                                                                                                   }
+                                                                                                                                               ]
+                                                                                                                              }
+                                                                                                                          ]
+                                                                                                         },
+                                                                                                         {
+                                                                                                             "id":  "tab3",
+                                                                                                             "type":  "Button",
+                                                                                                             "bounds":  [
+                                                                                                                            987,
+                                                                                                                            2542,
+                                                                                                                            1293,
+                                                                                                                            2745
+                                                                                                                        ],
+                                                                                                             "clickable":  true,
+                                                                                                             "children":  [
+                                                                                                                              {
+                                                                                                                                  "type":  "Column",
+                                                                                                                                  "bounds":  [
+                                                                                                                                                 994,
+                                                                                                                                                 2570,
+                                                                                                                                                 1286,
+                                                                                                                                                 2717
+                                                                                                                                             ],
+                                                                                                                                  "children":  [
+                                                                                                                                                   {
+                                                                                                                                                       "type":  "Row",
+                                                                                                                                                       "bounds":  [
+                                                                                                                                                                      994,
+                                                                                                                                                                      2570,
+                                                                                                                                                                      1286,
+                                                                                                                                                                      2650
+                                                                                                                                                                  ],
+                                                                                                                                                       "children":  [
+                                                                                                                                                                        {
+                                                                                                                                                                            "type":  "SymbolGlyph",
+                                                                                                                                                                            "bounds":  [
+                                                                                                                                                                                           1099,
+                                                                                                                                                                                           2570,
+                                                                                                                                                                                           1180,
+                                                                                                                                                                                           2650
+                                                                                                                                                                                       ],
+                                                                                                                                                                            "children":  [
+
+                                                                                                                                                                                         ]
+                                                                                                                                                                        }
+                                                                                                                                                                    ]
+                                                                                                                                                   },
+                                                                                                                                                   {
+                                                                                                                                                       "type":  "Text",
+                                                                                                                                                       "text":  "Poradnik",
+                                                                                                                                                       "bounds":  [
+                                                                                                                                                                      994,
+                                                                                                                                                                      2668,
+                                                                                                                                                                      1286,
+                                                                                                                                                                      2717
+                                                                                                                                                                  ],
+                                                                                                                                                       "children":  [
+
+                                                                                                                                                                    ]
+                                                                                                                                                   }
+                                                                                                                                               ]
+                                                                                                                              }
+                                                                                                                          ]
+                                                                                                         }
+                                                                                                     ]
+                                                                                    }
+                                                                                ]
+                                                               }
+                                                           ]
+                                          }
+                                      ]
+                     }
+                 ]
+}

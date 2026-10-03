@@ -146,6 +146,12 @@ The initial read-only design review and subsequent implementation status are rec
 - Public map provenance and source availability categories are part of product correctness, not optional presentation details.
 - Save reproducible tests and runtime artifacts alongside code so reviewers can distinguish measured behavior from intended behavior.
 
+## Submission-form guide (2026-10-03)
+
+Codex reviewed the existing project documentation, validation evidence and main source components to prepare `artifacts/submission/SafeMesh-jak-wypelnic-Hacktribe.pdf` and a companion UTF-8 text file. The guide contains Polish field instructions and English copy for the Hacktribe form. The participant stated that nothing existed before the event; the guide uses that account for the new-project chronology and asks the team to verify it before submission. Team size and unpublished links are not invented.
+
+Local Python Playwright with Microsoft Edge reached the supplied `/add/` URL and was redirected to sign-in. No authenticated form inspection or submission occurred; field names come from the participant's pasted form. Web research checked the current DEFENCE category description and an ITU historical telecommunications-outage statistic. ReportLab generated the PDF; PyMuPDF checked seven-page output, text extraction and rendered previews. Existing test results are attributed to recorded evidence, not claimed as newly executed. No repository push, video upload or project publication was performed.
+
 ## AI feature disclosure
 
 **Not applicable.** AI assisted development only. SafeMesh performs no model inference, sends no user data to an AI service and has no AI-generated runtime warning or navigation flow.

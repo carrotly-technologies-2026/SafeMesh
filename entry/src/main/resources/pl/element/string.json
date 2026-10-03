@@ -286,7 +286,7 @@
     },
     {
       "name": "relay_intro",
-      "value": "Połącz urządzenia testowe, aby wymieniać podpisane wiadomości."
+      "value": "Połącz się, aby odbierać i automatycznie przekazywać podpisane alerty."
     },
     {
       "name": "simulation",
@@ -995,6 +995,282 @@
     {
       "name": "connect_devices",
       "value": "Połącz urządzenia"
+    },
+    {
+      "name": "relay_automatic",
+      "value": "Po połączeniu zweryfikowane alerty są przekazywane automatycznie."
+    },
+    {
+      "name": "message_detail",
+      "value": "Alert"
+    },
+    {
+      "name": "read_message",
+      "value": "Przeczytaj alert"
+    },
+    {
+      "name": "unread_short",
+      "value": "Nieprzeczytany"
+    },
+    {
+      "name": "unread_count",
+      "value": "Nieprzeczytane alerty"
+    },
+    {
+      "name": "issued_at",
+      "value": "Wydano"
+    },
+    {
+      "name": "received_at",
+      "value": "Odebrano"
+    },
+    {
+      "name": "message_unavailable",
+      "value": "Ten alert nie jest już aktualny."
+    },
+    {
+      "name": "back_to_inbox",
+      "value": "Wróć do alertów"
+    },
+    {
+      "name": "read_save_failed",
+      "value": "Alert otwarty, ale nie udało się zapisać statusu przeczytania."
+    },
+    {
+      "name": "issuer_authority",
+      "value": "SafeMesh · nadawca ćwiczeń"
+    },
+    {
+      "name": "receipt_local",
+      "value": "Odbiór w teście lokalnym"
+    },
+    {
+      "name": "receipt_peer",
+      "value": "Odebrano z urządzenia"
+    },
+    {
+      "name": "receipt_hops",
+      "value": "Przekazania"
+    },
+    {
+      "name": "receipt_local_source",
+      "value": "Dodano na tym urządzeniu"
+    },
+    {
+      "name": "receipt_notice",
+      "value": "Nadawca podpisał treść alertu. Czas odbioru, poprzednie urządzenie i liczba przekazań to dane lokalnego testu, nie uwierzytelniona trasa."
+    },
+    {
+      "name": "severity_info",
+      "value": "Informacja"
+    },
+    {
+      "name": "severity_warning",
+      "value": "Ostrzeżenie"
+    },
+    {
+      "name": "severity_critical",
+      "value": "Pilne"
+    },
+    {
+      "name": "authority_console",
+      "value": "Nadawca ćwiczeń"
+    },
+    {
+      "name": "authority_console_hint",
+      "value": "Zaloguj się, aby opublikować własny alert ćwiczebny"
+    },
+    {
+      "name": "authority_intro",
+      "value": "Lokalny panel ćwiczeń. Publikacja wymaga kodu dostępu; wybór urządzenia A nie nadaje uprawnień."
+    },
+    {
+      "name": "authority_login_title",
+      "value": "Logowanie do panelu demo"
+    },
+    {
+      "name": "authority_authenticated",
+      "value": "Nadawca ćwiczeń zalogowany"
+    },
+    {
+      "name": "authority_token",
+      "value": "Kod dostępu"
+    },
+    {
+      "name": "authority_token_hint",
+      "value": "Kod od operatora lokalnego testu"
+    },
+    {
+      "name": "authority_token_notice",
+      "value": "Kod pozostaje w pamięci tej sesji. Jest usuwany po wylogowaniu lub zamknięciu aplikacji."
+    },
+    {
+      "name": "authority_login",
+      "value": "Zaloguj się"
+    },
+    {
+      "name": "authority_signing_in",
+      "value": "Logowanie…"
+    },
+    {
+      "name": "authority_logout",
+      "value": "Wyloguj się"
+    },
+    {
+      "name": "message_language",
+      "value": "Język alertu"
+    },
+    {
+      "name": "message_language_hint",
+      "value": "Tekst zostanie podpisany w tym języku. Inne urządzenia pokażą tę oryginalną wersję."
+    },
+    {
+      "name": "draft_title",
+      "value": "Tytuł"
+    },
+    {
+      "name": "draft_title_hint",
+      "value": "Co się stało?"
+    },
+    {
+      "name": "draft_body",
+      "value": "Treść i zalecenia"
+    },
+    {
+      "name": "draft_body_hint",
+      "value": "Opisz sytuację i działania dla odbiorców."
+    },
+    {
+      "name": "draft_area",
+      "value": "Obszar"
+    },
+    {
+      "name": "draft_area_hint",
+      "value": "Na przykład: centrum Krakowa"
+    },
+    {
+      "name": "draft_severity",
+      "value": "Priorytet"
+    },
+    {
+      "name": "draft_validity",
+      "value": "Ważność"
+    },
+    {
+      "name": "validity_15",
+      "value": "15 minut"
+    },
+    {
+      "name": "validity_60",
+      "value": "1 godzina"
+    },
+    {
+      "name": "validity_240",
+      "value": "4 godziny"
+    },
+    {
+      "name": "validity_1440",
+      "value": "24 godziny"
+    },
+    {
+      "name": "authority_publish_hint",
+      "value": "Publikujesz podpisany alert ćwiczebny. Połączone urządzenia przekazują go automatycznie."
+    },
+    {
+      "name": "authority_publish",
+      "value": "Opublikuj alert"
+    },
+    {
+      "name": "authority_publishing",
+      "value": "Publikowanie…"
+    },
+    {
+      "name": "view_published",
+      "value": "Zobacz opublikowany alert"
+    },
+    {
+      "name": "authority_state_signed_out",
+      "value": "Wpisz lokalny kod dostępu, aby kontynuować."
+    },
+    {
+      "name": "authority_state_signing_in",
+      "value": "Sprawdzanie dostępu do nadawcy ćwiczeń…"
+    },
+    {
+      "name": "authority_state_ready",
+      "value": "Możesz publikować alerty ćwiczebne."
+    },
+    {
+      "name": "authority_state_publishing",
+      "value": "Podpisywanie i weryfikowanie alertu…"
+    },
+    {
+      "name": "authority_state_published",
+      "value": "Podpisano i dodano do kolejki dla pobliskich urządzeń."
+    },
+    {
+      "name": "authority_state_published_waiting",
+      "value": "Podpisano i zapisano; oczekiwanie na pobliskie urządzenia."
+    },
+    {
+      "name": "authority_state_invalid_token",
+      "value": "Kod dostępu nie został przyjęty."
+    },
+    {
+      "name": "authority_state_unavailable",
+      "value": "Lokalny nadawca ćwiczeń jest niedostępny. Sprawdź, czy usługa testowa działa."
+    },
+    {
+      "name": "authority_state_wrong_authority",
+      "value": "Ta usługa nie odpowiada zaufanemu nadawcy ćwiczeń."
+    },
+    {
+      "name": "authority_state_invalid_draft",
+      "value": "Sprawdź tytuł, treść, obszar i czas ważności."
+    },
+    {
+      "name": "authority_state_too_large",
+      "value": "Alert jest za długi. Skróć tekst i spróbuj ponownie."
+    },
+    {
+      "name": "authority_state_rate_limited",
+      "value": "Zbyt wiele żądań. Odczekaj chwilę przed ponowną próbą."
+    },
+    {
+      "name": "authority_state_request_conflict",
+      "value": "To żądanie publikacji jest sprzeczne z wcześniejszym. Rozpocznij nowy alert."
+    },
+    {
+      "name": "authority_state_storage_failed",
+      "value": "Nie udało się zapisać podpisanej wiadomości. Spróbuj ponownie."
+    },
+    {
+      "name": "authority_state_invalid_response",
+      "value": "Usługa ćwiczeń zwróciła nieprawidłową odpowiedź."
+    },
+    {
+      "name": "authority_state_verification_failed",
+      "value": "Nie udało się zweryfikować otrzymanego alertu. Nie opublikowano go na innych urządzeniach."
+    },
+    {
+      "name": "authority_state_failed",
+      "value": "Publikacja nie powiodła się. Sprawdź połączenie testowe i spróbuj ponownie."
+    },
+    {
+      "name": "authority_state_cancelled",
+      "value": "Operacja została anulowana."
+    },
+    {
+      "name": "receipt_authority_source",
+      "value": "Podpisano przez lokalnego nadawcę ćwiczeń"
+    },
+    {
+      "name": "receipt_unknown_source",
+      "value": "Nie zapisano źródła odbioru"
+    },
+    {
+      "name": "authority_state_request_expired",
+      "value": "Poprzednia próba wysłania wygasła. Sprawdź treść i opublikuj ponownie."
     }
   ]
 }

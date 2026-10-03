@@ -1,0 +1,676 @@
+﻿[
+  {
+    "bounds": [
+      0,
+      0,
+      1320,
+      2856
+    ],
+    "children": [
+      {
+        "type": "root",
+        "bounds": [
+          0,
+          137,
+          1320,
+          2856
+        ],
+        "children": [
+          {
+            "type": "Navigation",
+            "bounds": [
+              0,
+              137,
+              1320,
+              2856
+            ],
+            "children": [
+              {
+                "type": "NavigationContent",
+                "bounds": [
+                  0,
+                  137,
+                  1320,
+                  2856
+                ],
+                "children": [
+                  {
+                    "type": "NavDestination",
+                    "bounds": [
+                      0,
+                      137,
+                      1320,
+                      2856
+                    ],
+                    "children": [
+                      {
+                        "type": "TitleBar",
+                        "bounds": [
+                          0,
+                          137,
+                          1320,
+                          332
+                        ],
+                        "children": [
+                          {
+                            "id": "HdsTitleBar",
+                            "type": "HdsTitleBar",
+                            "bounds": [
+                              0,
+                              137,
+                              1320,
+                              332
+                            ],
+                            "children": [
+                              {
+                                "type": "MaskBlur",
+                                "bounds": [
+                                  0,
+                                  137,
+                                  1320,
+                                  444
+                                ],
+                                "hitTestBehavior": "None",
+                                "children": []
+                              },
+                              {
+                                "type": "Mask",
+                                "bounds": [
+                                  0,
+                                  137,
+                                  1320,
+                                  444
+                                ],
+                                "hitTestBehavior": "None",
+                                "children": []
+                              },
+                              {
+                                "type": "Button",
+                                "bounds": [
+                                  56,
+                                  164,
+                                  196,
+                                  304
+                                ],
+                                "clickable": true,
+                                "children": [
+                                  {
+                                    "type": "SymbolGlyph",
+                                    "bounds": [
+                                      84,
+                                      192,
+                                      169,
+                                      276
+                                    ],
+                                    "children": []
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "Text",
+                                "text": "Text & display size",
+                                "bounds": [
+                                  224,
+                                  193,
+                                  834,
+                                  275
+                                ],
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "NavDestinationContent",
+                        "bounds": [
+                          0,
+                          137,
+                          1320,
+                          2856
+                        ],
+                        "children": [
+                          {
+                            "type": "Scroll",
+                            "bounds": [
+                              0,
+                              332,
+                              1320,
+                              2856
+                            ],
+                            "children": [
+                              {
+                                "type": "Column",
+                                "bounds": [
+                                  0,
+                                  332,
+                                  1320,
+                                  2758
+                                ],
+                                "children": [
+                                  {
+                                    "type": "Column",
+                                    "bounds": [
+                                      0,
+                                      332,
+                                      1320,
+                                      1596
+                                    ],
+                                    "children": [
+                                      {
+                                        "type": "Scroll",
+                                        "bounds": [
+                                          56,
+                                          332,
+                                          1264,
+                                          1446
+                                        ],
+                                        "children": [
+                                          {
+                                            "type": "Column",
+                                            "bounds": [
+                                              56,
+                                              332,
+                                              1264,
+                                              1446
+                                            ],
+                                            "children": [
+                                              {
+                                                "type": "Column",
+                                                "bounds": [
+                                                  56,
+                                                  332,
+                                                  1264,
+                                                  1268
+                                                ],
+                                                "children": [
+                                                  {
+                                                    "type": "Column",
+                                                    "bounds": [
+                                                      68,
+                                                      405,
+                                                      1264,
+                                                      659
+                                                    ],
+                                                    "children": [
+                                                      {
+                                                        "type": "Text",
+                                                        "text": "It's been a while, how have you been?",
+                                                        "bounds": [
+                                                          96,
+                                                          433,
+                                                          1050,
+                                                          499
+                                                        ],
+                                                        "children": []
+                                                      },
+                                                      {
+                                                        "type": "Text",
+                                                        "text": "I took this photo while traveling. Just look at that view!",
+                                                        "bounds": [
+                                                          96,
+                                                          499,
+                                                          1236,
+                                                          631
+                                                        ],
+                                                        "children": []
+                                                      }
+                                                    ]
+                                                  },
+                                                  {
+                                                    "type": "Image",
+                                                    "bounds": [
+                                                      284,
+                                                      715,
+                                                      1264,
+                                                      1268
+                                                    ],
+                                                    "children": []
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "type": "Column",
+                                                "bounds": [
+                                                  56,
+                                                  1324,
+                                                  992,
+                                                  1446
+                                                ],
+                                                "children": [
+                                                  {
+                                                    "type": "Text",
+                                                    "text": "Wow, where's this? Looks amazing.",
+                                                    "bounds": [
+                                                      84,
+                                                      1352,
+                                                      964,
+                                                      1418
+                                                    ],
+                                                    "children": []
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "type": "Column",
+                                    "bounds": [
+                                      56,
+                                      1708,
+                                      1264,
+                                      2702
+                                    ],
+                                    "children": [
+                                      {
+                                        "type": "Column",
+                                        "bounds": [
+                                          56,
+                                          1708,
+                                          1264,
+                                          2702
+                                        ],
+                                        "children": [
+                                          {
+                                            "type": "Column",
+                                            "bounds": [
+                                              112,
+                                              1708,
+                                              1208,
+                                              2016
+                                            ],
+                                            "children": [
+                                              {
+                                                "type": "Row",
+                                                "bounds": [
+                                                  112,
+                                                  1708,
+                                                  1208,
+                                                  1876
+                                                ],
+                                                "children": [
+                                                  {
+                                                    "type": "Text",
+                                                    "text": "Text size",
+                                                    "bounds": [
+                                                      112,
+                                                      1759,
+                                                      331,
+                                                      1825
+                                                    ],
+                                                    "children": []
+                                                  },
+                                                  {
+                                                    "type": "Text",
+                                                    "text": "Normal",
+                                                    "bounds": [
+                                                      1044,
+                                                      1764,
+                                                      1208,
+                                                      1821
+                                                    ],
+                                                    "children": []
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "type": "Flex",
+                                                "bounds": [
+                                                  112,
+                                                  1876,
+                                                  1208,
+                                                  2016
+                                                ],
+                                                "children": [
+                                                  {
+                                                    "type": "Image",
+                                                    "bounds": [
+                                                      112,
+                                                      1904,
+                                                      185,
+                                                      1988
+                                                    ],
+                                                    "clickable": true,
+                                                    "children": []
+                                                  },
+                                                  {
+                                                    "type": "Slider",
+                                                    "text": "2.000000",
+                                                    "bounds": [
+                                                      202,
+                                                      1911,
+                                                      1119,
+                                                      1981
+                                                    ],
+                                                    "clickable": true,
+                                                    "scrollable": true,
+                                                    "children": [
+                                                      {
+                                                        "type": "Row",
+                                                        "bounds": [
+                                                          202,
+                                                          1911,
+                                                          1119,
+                                                          1981
+                                                        ],
+                                                        "children": [
+                                                          {
+                                                            "type": "Text",
+                                                            "text": "1",
+                                                            "bounds": [
+                                                              202,
+                                                              1911,
+                                                              359,
+                                                              1981
+                                                            ],
+                                                            "clickable": true,
+                                                            "children": []
+                                                          },
+                                                          {
+                                                            "type": "Text",
+                                                            "text": "2",
+                                                            "bounds": [
+                                                              359,
+                                                              1911,
+                                                              560,
+                                                              1981
+                                                            ],
+                                                            "clickable": true,
+                                                            "children": []
+                                                          },
+                                                          {
+                                                            "type": "Text",
+                                                            "text": "3",
+                                                            "bounds": [
+                                                              560,
+                                                              1911,
+                                                              761,
+                                                              1981
+                                                            ],
+                                                            "clickable": true,
+                                                            "children": []
+                                                          },
+                                                          {
+                                                            "type": "Text",
+                                                            "text": "4",
+                                                            "bounds": [
+                                                              761,
+                                                              1911,
+                                                              962,
+                                                              1981
+                                                            ],
+                                                            "clickable": true,
+                                                            "children": []
+                                                          },
+                                                          {
+                                                            "type": "Text",
+                                                            "text": "5",
+                                                            "bounds": [
+                                                              962,
+                                                              1911,
+                                                              1119,
+                                                              1981
+                                                            ],
+                                                            "clickable": true,
+                                                            "children": []
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  },
+                                                  {
+                                                    "type": "Image",
+                                                    "bounds": [
+                                                      1135,
+                                                      1904,
+                                                      1208,
+                                                      1988
+                                                    ],
+                                                    "clickable": true,
+                                                    "children": []
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "type": "Column",
+                                            "bounds": [
+                                              112,
+                                              2016,
+                                              1208,
+                                              2324
+                                            ],
+                                            "children": [
+                                              {
+                                                "type": "Row",
+                                                "bounds": [
+                                                  112,
+                                                  2016,
+                                                  1208,
+                                                  2184
+                                                ],
+                                                "children": [
+                                                  {
+                                                    "type": "Text",
+                                                    "text": "Text weight",
+                                                    "bounds": [
+                                                      112,
+                                                      2067,
+                                                      412,
+                                                      2133
+                                                    ],
+                                                    "children": []
+                                                  },
+                                                  {
+                                                    "type": "Text",
+                                                    "text": "Normal",
+                                                    "bounds": [
+                                                      1044,
+                                                      2072,
+                                                      1208,
+                                                      2129
+                                                    ],
+                                                    "children": []
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "type": "Flex",
+                                                "bounds": [
+                                                  112,
+                                                  2184,
+                                                  1208,
+                                                  2324
+                                                ],
+                                                "children": [
+                                                  {
+                                                    "type": "Image",
+                                                    "bounds": [
+                                                      112,
+                                                      2212,
+                                                      185,
+                                                      2296
+                                                    ],
+                                                    "clickable": true,
+                                                    "children": []
+                                                  },
+                                                  {
+                                                    "type": "Slider",
+                                                    "text": "1.000000",
+                                                    "bounds": [
+                                                      202,
+                                                      2219,
+                                                      1119,
+                                                      2289
+                                                    ],
+                                                    "clickable": true,
+                                                    "scrollable": true,
+                                                    "children": []
+                                                  },
+                                                  {
+                                                    "type": "Image",
+                                                    "bounds": [
+                                                      1135,
+                                                      2212,
+                                                      1208,
+                                                      2296
+                                                    ],
+                                                    "clickable": true,
+                                                    "children": []
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "type": "Row",
+                                            "bounds": [
+                                              112,
+                                              2324,
+                                              1208,
+                                              2492
+                                            ],
+                                            "children": [
+                                              {
+                                                "type": "Text",
+                                                "text": "Display size",
+                                                "bounds": [
+                                                  112,
+                                                  2375,
+                                                  413,
+                                                  2441
+                                                ],
+                                                "children": []
+                                              },
+                                              {
+                                                "type": "Text",
+                                                "text": "Default",
+                                                "bounds": [
+                                                  1045,
+                                                  2380,
+                                                  1208,
+                                                  2437
+                                                ],
+                                                "children": []
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "type": "Flex",
+                                            "bounds": [
+                                              112,
+                                              2492,
+                                              1208,
+                                              2632
+                                            ],
+                                            "children": [
+                                              {
+                                                "type": "SymbolGlyph",
+                                                "bounds": [
+                                                  112,
+                                                  2520,
+                                                  185,
+                                                  2604
+                                                ],
+                                                "clickable": true,
+                                                "children": []
+                                              },
+                                              {
+                                                "type": "Slider",
+                                                "text": "1.000000",
+                                                "bounds": [
+                                                  202,
+                                                  2527,
+                                                  1118,
+                                                  2597
+                                                ],
+                                                "clickable": true,
+                                                "scrollable": true,
+                                                "children": [
+                                                  {
+                                                    "type": "Row",
+                                                    "bounds": [
+                                                      202,
+                                                      2527,
+                                                      1118,
+                                                      2597
+                                                    ],
+                                                    "children": [
+                                                      {
+                                                        "type": "Text",
+                                                        "text": "0",
+                                                        "bounds": [
+                                                          202,
+                                                          2527,
+                                                          459,
+                                                          2597
+                                                        ],
+                                                        "clickable": true,
+                                                        "children": []
+                                                      },
+                                                      {
+                                                        "type": "Text",
+                                                        "text": "1",
+                                                        "bounds": [
+                                                          459,
+                                                          2527,
+                                                          861,
+                                                          2597
+                                                        ],
+                                                        "children": []
+                                                      },
+                                                      {
+                                                        "type": "Text",
+                                                        "text": "2",
+                                                        "bounds": [
+                                                          861,
+                                                          2527,
+                                                          1118,
+                                                          2597
+                                                        ],
+                                                        "clickable": true,
+                                                        "children": []
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "type": "SymbolGlyph",
+                                                "bounds": [
+                                                  1135,
+                                                  2520,
+                                                  1208,
+                                                  2604
+                                                ],
+                                                "clickable": true,
+                                                "children": []
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

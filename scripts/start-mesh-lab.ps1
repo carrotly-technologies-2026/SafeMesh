@@ -262,7 +262,8 @@ try {
         Write-Warning 'The reused hub has custom topology or pending packet-loss controls. Inspect GET /state before the demo.'
     }
     Write-Host 'On each emulator: open Relay / Lacznosc, choose the emulator test link, then select its A/B/C role.'
-    Write-Host 'Start A and B. Load a signed drill on A and share it. Start C later to test forwarding from B.'
+    Write-Host 'For custom signed exercises, use scripts/start-authority-demo.ps1 and authorize the console on A with its separate operator token.'
+    Write-Host 'Connect the matching A/B/C roles and keep apps in the foreground. Publish an exercise from the authority console on A; recipients B/C verify and forward automatically.'
     Write-Host 'The hub stays running on 127.0.0.1:8765. This launcher does not click UI controls or clear app data.'
     Write-Host "MESH_LAB_READY=1 | Logs: $sessionDirectory"
 } finally { Pop-Location }
