@@ -1,6 +1,66 @@
-# SafeMesh 1.4
+# SafeMesh
 
 **Signed warnings. Offline protective-point maps. A path from one phone to the next.**
+
+HackYeah 2026 · Huawei challenge **“Imagine What’s Next”** · native HarmonyOS app (ArkTS + ArkUI) · minimum API 20, validated on API 24 emulators · current release **v1.4.1**
+
+## For the jury: start here
+
+- **Demo video, 2 min 13 s, captioned:** [SafeMesh-1.4.1-demo.mp4](https://github.com/carrotly-technologies-2026/SafeMesh/releases/download/v1.4.1/SafeMesh-1.4.1-demo.mp4). Three separate emulator apps side by side: an authenticated issuer on A publishes a custom English alert; B verifies, stores, ACKs and relays it; after A leaves, C receives it from B at hop 2; a forged copy is rejected; then the offline map and the NearLink capability check.
+- **Install:** [SafeMesh-1.4.1.hap](https://github.com/carrotly-technologies-2026/SafeMesh/releases/download/v1.4.1/SafeMesh-1.4.1.hap) with its [SHA-256 manifest](https://github.com/carrotly-technologies-2026/SafeMesh/releases/download/v1.4.1/SafeMesh-1.4.1.sha256.txt), both in [Release v1.4.1](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/v1.4.1). It is an unsigned debug package for an API 20+ emulator; see [Install the packaged demo](#install-the-packaged-demo).
+- **Challenge areas:** **Human-Centric Technology** (lead) and **Spatial Experiences**. See [Challenge fit](#challenge-fit).
+- **Platform capabilities:** NearLink Kit, Crypto Architecture Kit, Network Kit, Location Kit, ArkData, Accessibility Kit and Localization Kit. See [Platform capabilities used](#platform-capabilities-used).
+- **Real or simulated:** the three app processes, on-device signature checks, store-and-forward with ACKs, rejection of forged content, the offline map and the UI are real. The radio link between emulators is a clearly labelled local WebSocket hub standing in for NearLink, and the issuer is a local exercise signing service. NearLink on physical phones has **not been tested yet**; the test plan is [docs/PHYSICAL_TESTING.md](docs/PHYSICAL_TESTING.md).
+- **Built during the hackathon:** all code, tests, data processing and documentation in this repository were written on 3–4 October 2026 at HackYeah, with AI coding agents as disclosed in [AI_WORKFLOW.md](AI_WORKFLOW.md). Pre-existing material: the DevEco Studio *Empty Ability* boilerplate (for example the Huawei Apache-2.0 header in `EntryAbility.ets`), the organizers' DevEco CLI patches, and public PSP and OpenStreetMap data.
+
+## Challenge fit
+
+| Area | What SafeMesh does in the demo |
+| --- | --- |
+| **Human-Centric Technology** (lead) | Keeps life-safety information usable when mobile networks fail: warnings stay on the phone and pass to the next person automatically. Recipients can trust what they read, because every phone checks the issuer's signature and rejects altered or expired copies, which counters forwarded misinformation. The UI is inclusive: Polish and English, light and dark, large text checked at the system 1.45× preset, screen-reader labels and spoken announcements. It is also responsible about privacy and claims: exercises are labelled as such, location is never stored or relayed, and limits are stated in the app. |
+| **Spatial Experiences** | The relay follows physical proximity: only phones in range of each other exchange alerts, and a message walks A → B → C through space. The bundled vector map shows 40 State Fire Service protective points around central Kraków, with straight-line distance from a labelled origin or from one optional foreground location fix. |
+
+## Platform capabilities used
+
+| Capability | HarmonyOS / OpenHarmony API | Source |
+| --- | --- | --- |
+| NearLink (星闪) device-to-device link: capability check, advertising, scan by exact name, reliable data channel, framed writes | `@kit.NearLinkKit` (`manager`, `advertising`, `scan`, `dataTransfer`), `ohos.permission.ACCESS_NEARLINK` | `transport/NearLinkTransport.ets` |
+| On-device ECDSA P-256 / SHA-256 verification against a pinned public key; CSPRNG delivery tokens | `@kit.CryptoArchitectureKit` | `model/AlertProtocol.ets`, `model/DeliveryProtocol.ets` |
+| Local WebSocket link between separate emulator apps; bounded loopback HTTP to the exercise issuer | `@kit.NetworkKit` (`webSocket`, `http`) | `transport/EmulatorTransport.ets`, `model/AuthorityClient.ets` |
+| One-shot foreground positioning with runtime permission | `@kit.LocationKit` (`geoLocationManager`), `abilityAccessCtrl` | `model/DeviceLocation.ets` |
+| Durable local storage with chunked, generation-committed writes | `@kit.ArkData` (`preferences`) | `model/LocalStore.ets` |
+| Screen-reader announcements for new alerts, expiry and results | `@kit.AccessibilityKit` | `pages/Index.ets` |
+| System language, locale-aware times, explicit PL/EN resource managers | `@kit.LocalizationKit` (`i18n`, `intl`, `resourceManager`) | `pages/Index.ets`, `views/UiCopy.ets` |
+| System dark mode, font scale, system bar colours, `SymbolGlyph` icons, Canvas map | `@kit.AbilityKit` configuration, `@kit.ArkUI` | `entryability/EntryAbility.ets`, `views/OfflineMap.ets` |
+
+**Background relaying is deliberately not faked.** Relaying runs while the app is in the foreground. HarmonyOS introduced a NearLink continuous-task mode (`MODE_NEARLINK`) only in API 26. On our API 20–24 target the remaining modes (`dataTransfer`, `bluetoothInteraction`) do not describe a NearLink relay, and the system's consistency check would suspend a mismatched task. The next step is API 26 with `MODE_NEARLINK` and the documented `continuousTaskSuspend` reconnect pattern.
+
+## Architecture
+
+```mermaid
+flowchart LR
+  subgraph Host["Laptop (loopback only)"]
+    S["Exercise issuer<br/>demo-authority-server.mjs<br/>private key + bearer token"]
+    H["Emulator test hub<br/>mesh-lab-server.mjs<br/>routes A-B and B-C only"]
+  end
+  subgraph A["Phone A"]
+    AC["AuthorityClient"] --> AE["RelayEngine<br/>verify, dedupe, expiry"]
+    AE --> AQ["DeliveryQueue<br/>data + app ACK, retries"]
+  end
+  subgraph B["Phone B"]
+    BE["RelayEngine + inbox"] --> BQ["DeliveryQueue"]
+  end
+  subgraph C["Phone C"]
+    CE["RelayEngine + inbox"]
+  end
+  S -- "signed envelope" --> AC
+  AQ -- "NearLink, or the hub on emulators" --> BE
+  BQ -- "store-and-forward, hop 2" --> CE
+```
+
+The app follows the MVVM layering from the challenge skills. `pages/Index.ets` renders native ArkUI screens. `viewmodel/` holds observable state: `AlertViewModel` for the inbox and verified cache, `RelayViewModel` for transport and delivery, `AuthorityViewModel` for the issuer console and `MapViewModel` for the map. `model/` holds platform-independent policy and I/O: the signed alert protocol, the delivery wire format and queue, storage, location and the authority client. `transport/` implements one `RelayTransport` contract twice, as `NearLinkTransport` for phones and `EmulatorTransport` for the labelled emulator lab. Every phone verifies before it stores, displays, ACKs or forwards; the hub and the transports never sign, store or acknowledge alerts.
+
+## Overview
 
 SafeMesh is a native HarmonyOS hackathon prototype for a civilian problem: losing mobile service should not also mean losing the warning you received or the map that helps you understand where protective places are located.
 
@@ -10,7 +70,14 @@ Three separate HarmonyOS emulator apps exchange packets through an explicitly la
 
 **Demo only:** SafeMesh is not connected to RCB or an official warning issuer. Bundled and custom alerts are signed exercises. Mapped PSP protective points are reference records; current access, condition and protection are not verified by the app.
 
-**v1.4 validated:** **167 host tests**, **21 ArkTS files / zero errors**, **zero Code Linter issues**, a successful build and all three emulator smoke checks passed. [17/17 assertions over captured native evidence](artifacts/logs/authority-v14-assertions.json) confirm two custom alerts, ACK-loss recovery, B's saved inbox after restart, and forwarding to C at hop 2 while A and the issuer service are offline. See the [v1.4 validation report](artifacts/research/authority-v14-validation.md) for exact evidence, UI checks and limitations. The [v1.3 report and video](artifacts/research/ui-v13-validation.md) and [v1.2 lab report](artifacts/research/mesh-lab.md) remain historical evidence for those revisions.
+**v1.4.1 (current release):**
+- A first launch follows the system language: Polish on a Polish system, English otherwise. Before, it always started in Polish.
+- *Load exercise message* now also queues the alert for peers that are already connected.
+- The NearLink diagnostics show delivery counters, and transport status, links and errors are logged as `SAFEMESH_TRANSPORT_*` for the physical test.
+
+Checks: **168 host tests**, **21 ArkTS files / zero errors**, **zero Code Linter issues** and a successful build ([log](artifacts/logs/v141-checks-build.log)). The same HAP (SHA-256 `a2cf126786d6a1dce58fe96020fc31c63b776dd7a4593eb2e95d8c9e361ffd3e`) ran the three-emulator scenario in the [demo video](https://github.com/carrotly-technologies-2026/SafeMesh/releases/download/v1.4.1/SafeMesh-1.4.1-demo.mp4). See its [UI action log](artifacts/logs/v141-demo-actions.log), [caption timeline](artifacts/logs/v141-demo-timeline.json) and [capture metadata](artifacts/logs/v141-demo-capture.json).
+
+**v1.4.0 validated:** **167 host tests**, **21 ArkTS files / zero errors**, **zero Code Linter issues**, a successful build and all three emulator smoke checks passed. [17/17 assertions over captured native evidence](artifacts/logs/authority-v14-assertions.json) confirm two custom alerts, ACK-loss recovery, B's saved inbox after restart, and forwarding to C at hop 2 while A and the issuer service are offline. See the [v1.4 validation report](artifacts/research/authority-v14-validation.md) for exact evidence, UI checks and limitations. The [v1.3 report and video](artifacts/research/ui-v13-validation.md) and [v1.2 lab report](artifacts/research/mesh-lab.md) remain historical evidence for those revisions.
 
 ## What you can demonstrate
 
@@ -51,8 +118,8 @@ The patch script and its adjacent patch definitions must stay together. The patc
 Open PowerShell in the project folder. Adjust the Studio directory if installed elsewhere:
 
 ```powershell
-Set-Location C:\Users\user\SafeMesh
-$env:DEVECO_CLI_STUDIO_PATH = 'C:\Users\user\DevEcoStudio'
+Set-Location <path-to>\SafeMesh
+$env:DEVECO_CLI_STUDIO_PATH = Join-Path $env:USERPROFILE 'DevEcoStudio'   # adjust if installed elsewhere
 $env:Path += ';' + (Join-Path $env:APPDATA 'npm')
 devecocli.cmd device list --format json
 devecocli.cmd build
@@ -64,7 +131,7 @@ Use the actual device name or serial reported by `device list`. To start the alr
 
 `devecocli run --skip-build` installs the existing build and launches `org.safemesh.alerts/EntryAbility`; it can also be rerun to relaunch the demo without rebuilding.
 
-For a single-emulator rebuild, the helper reads `versionName` from `AppScope/app.json5`, builds, writes `dist/SafeMesh-1.4.0.hap` and its HAP-only SHA-256 manifest, and deploys it. Historical packages are preserved. The authority launcher below uses the build output directly:
+For a single-emulator rebuild, the helper reads `versionName` from `AppScope/app.json5`, builds, writes `dist/SafeMesh-<versionName>.hap` (currently 1.4.1) and its HAP-only SHA-256 manifest, and deploys it. Historical packages are preserved. The authority launcher below uses the build output directly:
 
 ```powershell
 .\scripts\run-demo.ps1
@@ -74,28 +141,26 @@ Use `-Device <serial>` for another target or `-NoRun` to build/package only. If 
 
 ### Install the packaged demo
 
-The validated [v1.4 HAP](dist/SafeMesh-1.4.0.hap) is a debug **unsigned emulator package**, built as `entry/build/default/outputs/default/entry-default-unsigned.hap`. Its SHA-256 is `dd7ca2cd80ee741ca5f1570d2dbe1135084b6cca0ef838f473cfd1c22cd16e5e`. The matching [source ZIP](dist/SafeMesh-1.4.0-source.zip), [SHA-256 manifest](dist/SafeMesh-1.4.0.sha256.txt) and [exact-package credential-scan report](dist/SafeMesh-1.4.0-package-scan.json) accompany it. No v1.4 video is included.
-
-The historical v1.3 release remains available as [HAP](dist/SafeMesh-1.3.0.hap), [source ZIP](dist/SafeMesh-1.3.0-source.zip), [demo video](dist/SafeMesh-1.3.0-demo.mp4) and [SHA-256 manifest](dist/SafeMesh-1.3.0.sha256.txt). It does not contain the v1.4 publisher console or inbox.
-
-Historical packages remain separate: [v1.2 HAP](dist/SafeMesh-mesh-lab-1.2.0.hap) and [checksum](dist/SafeMesh-mesh-lab-1.2.0.sha256.txt); `SafeMesh-demo.hap`, video and source ZIP preserve v1.1. Neither historical package contains the v1.3 screens or bilingual fixture.
-
-Install and launch the v1.4 artifact using the SDK's HDC tool:
+Download `SafeMesh-1.4.1.hap` and `SafeMesh-1.4.1.sha256.txt` from [Release v1.4.1](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/v1.4.1). The HAP is a debug **unsigned emulator package**, built as `entry/build/default/outputs/default/entry-default-unsigned.hap`, with SHA-256 `a2cf126786d6a1dce58fe96020fc31c63b776dd7a4593eb2e95d8c9e361ffd3e`. It installs on an API 20+ HarmonyOS emulator. A physical phone needs a debug-signed build; see [docs/PHYSICAL_TESTING.md](docs/PHYSICAL_TESTING.md#3-signing-for-physical-devices).
 
 ```powershell
 $hdc = Join-Path $env:DEVECO_CLI_STUDIO_PATH 'sdk\default\openharmony\toolchains\hdc.exe'
-& $hdc -t 127.0.0.1:5555 install -r '.\dist\SafeMesh-1.4.0.hap'
+(Get-FileHash .\SafeMesh-1.4.1.hap -Algorithm SHA256).Hash   # compare with the manifest
+& $hdc list targets
+& $hdc -t 127.0.0.1:5555 install -r .\SafeMesh-1.4.1.hap
 & $hdc -t 127.0.0.1:5555 shell aa start -b org.safemesh.alerts -a EntryAbility
 ```
 
-The second command alone launches an installed app. This project's executable validation target is the emulator. No production certificate or private issuer key is included.
+Use the serial printed by `hdc list targets`. The last command alone relaunches an installed app. No production certificate or private issuer key is included.
+
+Packages from earlier checkpoints (v1.4.0 `dd7ca2cd…`, v1.3, v1.2 and v1.1) were written to the git-ignored `dist/` folder of the development machine and are not part of the repository. Their hashes and validation records remain in `artifacts/` and the reports linked below.
 
 ## Publish a custom alert to three emulators
 
 Configure three existing API 24 phone emulators named `HackYeahPhone`, `SafeMeshB` and `SafeMeshC`, then run:
 
 ```powershell
-$env:DEVECO_CLI_STUDIO_PATH = 'C:\Users\user\DevEcoStudio'
+$env:DEVECO_CLI_STUDIO_PATH = Join-Path $env:USERPROFILE 'DevEcoStudio'
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-authority-demo.ps1
 ```
 
@@ -137,15 +202,23 @@ This walkthrough uses the bundled verification fixture and does not require the 
 
 ### Record the emulator demo
 
-The Windows recorder captures the visible `Emulator.exe` client window and uses the FFmpeg bundled with DevEco Studio. Keep one emulator window visible, keep its size unchanged, and operate the app while recording:
+The Windows recorders capture only `Emulator.exe` client windows through `PrintWindow` and encode with the FFmpeg bundled with DevEco Studio. Keep the emulator windows visible and their size unchanged while recording. For one emulator:
 
 ```powershell
-python scripts/record-demo.py --duration 120 --output dist/SafeMesh-1.4.0-demo.mp4
+python scripts/record-demo.py --duration 120 --output dist/SafeMesh-single-demo.mp4
+```
+
+For the three-emulator view used in the v1.4.1 video, `record-mesh-demo.py` captures A, B and C in one loop per frame, so timing across devices is real. Find the process IDs with `Get-CimInstance Win32_Process -Filter "Name='Emulator.exe'" | Select ProcessId, CommandLine`:
+
+```powershell
+python scripts/record-mesh-demo.py --pids <A-pid> <B-pid> <C-pid> --output dist/SafeMesh-mesh-demo.mp4 --stop-file .cache\stop-recording.flag
 ```
 
 Use `--studio <directory>` for a different Studio installation or `--pid <Emulator.exe PID>` when multiple emulator windows are open. Python's standard library is sufficient. The recorder refuses to overwrite an existing output.
 
-No v1.4 recording is claimed yet. The historical [v1.3 demo video](dist/SafeMesh-1.3.0-demo.mp4) is a reviewed, silent **90-second native-window recording** showing its Home, offline Map/list/detail, Guide and PL/EN with light/dark settings. It has 1350 frames at 15 fps and zero late capture frames; [capture and review evidence](artifacts/logs/newui-v13-video-review.json). It predates the inbox and publisher console. Its packet logs establish the v1.3 three-emulator exchange separately. The historical `dist/SafeMesh-demo.mp4` and its [v1.1 validation record](artifacts/VALIDATION.md) are preserved. Recording does not publish or upload anything.
+The [v1.4.1 demo video](https://github.com/carrotly-technologies-2026/SafeMesh/releases/download/v1.4.1/SafeMesh-1.4.1-demo.mp4) is a single take of that three-emulator recording, 142.5 s of live capture at 12 fps with zero late frames. The UI steps were driven by `uitest uiInput` commands and are logged with timestamps in the [action log](artifacts/logs/v141-demo-actions.log). The activation code was typed into the masked field and is not in any log. In the final cut, sign-in and character-by-character typing (raw 20–56 s) play at 3× speed with an on-screen badge. A title card, device labels, captions and an end card were added from the [caption timeline](artifacts/logs/v141-demo-timeline.json). Nothing else was edited.
+
+The historical v1.3 demo video (not in the repository) is a reviewed, silent **90-second native-window recording** showing its Home, offline Map/list/detail, Guide and PL/EN with light/dark settings. It has 1350 frames at 15 fps and zero late capture frames; [capture and review evidence](artifacts/logs/newui-v13-video-review.json). It predates the inbox and publisher console. Its packet logs establish the v1.3 three-emulator exchange separately. The historical `dist/SafeMesh-demo.mp4` and its [v1.1 validation record](artifacts/VALIDATION.md) are preserved. Recording does not publish or upload anything.
 
 ### Refresh an expired exercise
 
@@ -166,7 +239,7 @@ For a later three-emulator fixture refresh with the matching local key, use `sta
 The host suites execute actual checked-in `.ets` implementation after transpilation/type erasure. Platform radio, preferences and Canvas are mocked where necessary; host cryptography uses Node/OpenSSL. These tests complement native checks.
 
 ```powershell
-$env:DEVECO_CLI_STUDIO_PATH = 'C:\Users\user\DevEcoStudio'
+$env:DEVECO_CLI_STUDIO_PATH = Join-Path $env:USERPROFILE 'DevEcoStudio'
 .\scripts\check.ps1 -Build
 ```
 
@@ -280,25 +353,23 @@ tests/                           Host tests of application sources
 artifacts/research/              Primary-source evidence and limitations
 artifacts/logs/                   Build and validation records
 artifacts/screenshots/            Native emulator captures
-dist/SafeMesh-1.4.0.hap           Validated v1.4 emulator package
-dist/SafeMesh-1.4.0-source.zip    v1.4 source archive
-dist/SafeMesh-1.4.0.sha256.txt    v1.4 checksum manifest
-dist/SafeMesh-1.4.0-package-scan.json Exact-package credential scan
-dist/SafeMesh-1.3.0.hap           Historical v1.3 emulator package
-dist/SafeMesh-1.3.0-source.zip    Historical v1.3 source archive
-dist/SafeMesh-1.3.0-demo.mp4      Historical v1.3 native UI demonstration
-dist/SafeMesh-1.3.0.sha256.txt    Historical v1.3 checksum manifest
-dist/SafeMesh-mesh-lab-1.2.0.hap   Historical v1.2 emulator lab package
-dist/SafeMesh-demo.hap            Historical v1.1 submission package
-dist/SafeMesh-demo.mp4            Historical v1.1 single-emulator demonstration
+docs/PHYSICAL_TESTING.md          Runbook for the first physical NearLink test
+scripts/record-mesh-demo.py       Synchronized three-emulator recorder
+dist/                             Git-ignored local packages; releases are on GitHub
 ```
+
+Release v1.4.1 on GitHub carries `SafeMesh-1.4.1.hap`, `SafeMesh-1.4.1-demo.mp4` and `SafeMesh-1.4.1.sha256.txt`.
 
 ## Validation scope
 
-The current target is API 24 emulators. Native v1.4 checks cover two custom signed alerts, recipient inbox/unread behavior, exact text display, ACK loss, B restoration after process restart, and B → C delivery while the issuer is unavailable. The captured-evidence checker passes 17/17 assertions. The local hub is an intentional transport mock. Physical NearLink, radio range, battery behavior and background delivery are outside the demonstrated scope; neither these checks nor the historical v1.3 video establish production readiness.
+The current target is API 24 emulators. The v1.4.1 demo run repeated custom publication, hop-1 and hop-2 delivery with A out of range, and forged-copy rejection on the final HAP. Native v1.4 checks cover two custom signed alerts, recipient inbox/unread behavior, exact text display, ACK loss, B restoration after process restart, and B → C delivery while the issuer is unavailable. The captured-evidence checker passes 17/17 assertions. The local hub is an intentional transport mock. Physical NearLink, radio range, battery behavior and background delivery are outside the demonstrated scope; neither these checks nor the historical v1.3 video establish production readiness.
 
 A deployable warning service also needs an authorized issuer, audited key custody/rotation/revocation, a trusted-time policy, fresh protective-point access information and operational review. Signatures cannot prevent jamming, message dropping or compromised authority keys. No range, guaranteed delivery or certified shelter safety is claimed by this hackathon build.
 
 AI-assisted development is disclosed in [AI_WORKFLOW.md](AI_WORKFLOW.md). The application itself does not use an AI inference service.
 
 Paste-ready submission text, cover image and opening instructions are in [SUBMISSION.md](SUBMISSION.md).
+
+## License
+
+Source code, scripts and documentation: [Apache License 2.0](LICENSE). Bundled map data keeps its own licences and attribution requirements: OpenStreetMap-derived geometry is © OpenStreetMap contributors under the [ODbL 1.0](https://opendatacommons.org/licenses/odbl/1-0/), and protective-point records come from Komenda Główna PSP under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). This applies to `entry/src/main/resources/rawfile/map-pack.json` and `entry/src/main/ets/model/OfflineMapData.ets`; see [Map sources and attribution](#map-sources-and-attribution).
