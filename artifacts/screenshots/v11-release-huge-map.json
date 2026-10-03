@@ -1,0 +1,392 @@
+﻿[
+  {
+    "bounds": [
+      0,
+      0,
+      1320,
+      2856
+    ],
+    "children": [
+      {
+        "type": "root",
+        "bounds": [
+          0,
+          137,
+          1320,
+          2856
+        ],
+        "children": [
+          {
+            "type": "Column",
+            "bounds": [
+              0,
+              137,
+              1320,
+              2758
+            ],
+            "children": [
+              {
+                "type": "Row",
+                "bounds": [
+                  0,
+                  137,
+                  1320,
+                  360
+                ],
+                "children": [
+                  {
+                    "type": "Text",
+                    "text": "safemesh",
+                    "bounds": [
+                      70,
+                      180,
+                      1054,
+                      317
+                    ],
+                    "children": []
+                  },
+                  {
+                    "id": "openSettings",
+                    "type": "Button",
+                    "bounds": [
+                      1082,
+                      164,
+                      1250,
+                      332
+                    ],
+                    "clickable": true,
+                    "children": [
+                      {
+                        "type": "SymbolGlyph",
+                        "bounds": [
+                          1124,
+                          206,
+                          1209,
+                          290
+                        ],
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "Scroll",
+                "bounds": [
+                  0,
+                  360,
+                  1320,
+                  2477
+                ],
+                "scrollable": true,
+                "children": [
+                  {
+                    "type": "Column",
+                    "bounds": [
+                      0,
+                      360,
+                      1320,
+                      2477
+                    ],
+                    "children": [
+                      {
+                        "type": "Text",
+                        "text": "ĆWICZENIE · Prototyp hackathonowy. To nie jest oficjalny alert.",
+                        "bounds": [
+                          70,
+                          430,
+                          1250,
+                          759
+                        ],
+                        "children": []
+                      },
+                      {
+                        "type": "Column",
+                        "bounds": [
+                          70,
+                          815,
+                          1250,
+                          2477
+                        ],
+                        "children": [
+                          {
+                            "type": "Column",
+                            "bounds": [
+                              70,
+                              815,
+                              1250,
+                              1272
+                            ],
+                            "children": [
+                              {
+                                "type": "Text",
+                                "text": "Znajdź punkt ochronny",
+                                "bounds": [
+                                  70,
+                                  815,
+                                  1250,
+                                  1149
+                                ],
+                                "children": []
+                              },
+                              {
+                                "type": "Text",
+                                "text": "Kraków · centrum",
+                                "bounds": [
+                                  70,
+                                  1177,
+                                  1250,
+                                  1272
+                                ],
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "type": "Text",
+                            "text": "Mapa offline centrum Krakowa. Wszystkie punkty są też dostępne na liście poniżej.",
+                            "bounds": [
+                              70,
+                              1335,
+                              1250,
+                              1584
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Text",
+                            "text": "Punkt odniesienia: Rynek Główny (demo). To nie jest Twoja pozycja.",
+                            "bounds": [
+                              70,
+                              1647,
+                              1250,
+                              1813
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "__Common__",
+                            "bounds": [
+                              70,
+                              1876,
+                              1250,
+                              2477
+                            ],
+                            "children": [
+                              {
+                                "type": "Canvas",
+                                "bounds": [
+                                  70,
+                                  1876,
+                                  1250,
+                                  2477
+                                ],
+                                "clickable": true,
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "Row",
+                "bounds": [
+                  0,
+                  2477,
+                  1320,
+                  2758
+                ],
+                "children": [
+                  {
+                    "id": "tab0",
+                    "type": "Button",
+                    "bounds": [
+                      28,
+                      2505,
+                      334,
+                      2730
+                    ],
+                    "clickable": true,
+                    "children": [
+                      {
+                        "type": "Column",
+                        "bounds": [
+                          35,
+                          2533,
+                          327,
+                          2702
+                        ],
+                        "children": [
+                          {
+                            "type": "SymbolGlyph",
+                            "bounds": [
+                              138,
+                              2533,
+                              223,
+                              2617
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Text",
+                            "text": "Start",
+                            "bounds": [
+                              35,
+                              2631,
+                              327,
+                              2702
+                            ],
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "tab1",
+                    "type": "Button",
+                    "bounds": [
+                      348,
+                      2505,
+                      654,
+                      2730
+                    ],
+                    "clickable": true,
+                    "children": [
+                      {
+                        "type": "Column",
+                        "bounds": [
+                          355,
+                          2533,
+                          647,
+                          2702
+                        ],
+                        "children": [
+                          {
+                            "type": "SymbolGlyph",
+                            "bounds": [
+                              458,
+                              2533,
+                              543,
+                              2617
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Text",
+                            "text": "Mapa",
+                            "bounds": [
+                              355,
+                              2631,
+                              647,
+                              2702
+                            ],
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "tab2",
+                    "type": "Button",
+                    "bounds": [
+                      667,
+                      2505,
+                      973,
+                      2730
+                    ],
+                    "clickable": true,
+                    "children": [
+                      {
+                        "type": "Column",
+                        "bounds": [
+                          674,
+                          2533,
+                          966,
+                          2702
+                        ],
+                        "children": [
+                          {
+                            "type": "SymbolGlyph",
+                            "bounds": [
+                              777,
+                              2533,
+                              862,
+                              2617
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Text",
+                            "text": "Łączność",
+                            "bounds": [
+                              674,
+                              2631,
+                              966,
+                              2702
+                            ],
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "tab3",
+                    "type": "Button",
+                    "bounds": [
+                      987,
+                      2505,
+                      1293,
+                      2730
+                    ],
+                    "clickable": true,
+                    "children": [
+                      {
+                        "type": "Column",
+                        "bounds": [
+                          994,
+                          2533,
+                          1286,
+                          2702
+                        ],
+                        "children": [
+                          {
+                            "type": "SymbolGlyph",
+                            "bounds": [
+                              1097,
+                              2533,
+                              1182,
+                              2617
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Text",
+                            "text": "Poradnik",
+                            "bounds": [
+                              994,
+                              2631,
+                              1286,
+                              2702
+                            ],
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,12 @@
+{
+  "capture": "Win32 PrintWindow, Emulator.exe client area only",
+  "audio": false,
+  "durationSeconds": 90,
+  "frames": 1350,
+  "fps": 15,
+  "windowWidth": 591,
+  "windowHeight": 1066,
+  "crop": "8,20,478,1030",
+  "elapsedSeconds": 89.97,
+  "lateFrames": 0
+}
