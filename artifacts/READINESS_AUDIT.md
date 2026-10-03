@@ -67,7 +67,7 @@ The source allows font scaling up to 2.0; the measured maximum ordinary Huge set
 
 ## Hackathon deliverables
 
-The challenge explicitly allows an emulator demonstration with hardware limitations honestly disclosed. Minimum API 20 / target 24, source, a successfully built final v1.1 HAP, setup/build/run instructions, architecture explanation, a 90-second live emulator demo and truthful [AI disclosure](../AI_WORKFLOW.md) are present. Git author and committer remain **Tomek i Hubert** under `AGENTS.md`; development assistance remains disclosed. Release HAP SHA-256: `42406469e63c55df70ba3d9472b48df4b7c3a9a4722f560128fb9e9f2d5cc005`.
+The challenge explicitly allows an emulator demonstration with hardware limitations honestly disclosed. Minimum API 20 / target 24, source, a successfully built final v1.1 HAP, setup/build/run instructions, architecture explanation, a 90-second live emulator demo and truthful [AI disclosure](../AI_WORKFLOW.md) are present. Git author and committer remain the team's configured GitHub identity under `AGENTS.md`; development assistance remains disclosed. Release HAP SHA-256: `42406469e63c55df70ba3d9472b48df4b7c3a9a4722f560128fb9e9f2d5cc005`.
 
 **Public source publication remains outstanding.** The user has currently authorized local Git commits only. Local Git and a ZIP do not fulfill the public-repository requirement; the completed video also remains a local artifact until submitted or published with authorization.
 
