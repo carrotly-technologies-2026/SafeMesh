@@ -1271,6 +1271,14 @@
     {
       "name": "authority_state_request_expired",
       "value": "The previous publishing attempt expired. Review the message and publish again."
+    },
+    {
+      "name": "language_auto",
+      "value": "System"
+    },
+    {
+      "name": "language_auto_hint",
+      "value": "System follows the phone’s language: Polish on a Polish phone, English otherwise."
     }
   ]
 }

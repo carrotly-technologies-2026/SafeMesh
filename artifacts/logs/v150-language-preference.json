@@ -1,0 +1,92 @@
+{
+  "device": "HackYeahPhone API 24 emulator",
+  "systemLocale": "en-Latn-US",
+  "app": "1.5.0",
+  "steps": [
+    {
+      "step": "1-fresh-default",
+      "languageSystem": {
+        "text": "System · English",
+        "selected": "true"
+      },
+      "languagePl": {
+        "text": "Polski",
+        "selected": "false"
+      },
+      "languageEn": {
+        "text": "English",
+        "selected": "false"
+      },
+      "screenTitle": "Settings",
+      "screenshot": "artifacts/screenshots/v150-language-1-fresh-default.png"
+    },
+    {
+      "step": "2-polski-chosen",
+      "languageSystem": {
+        "text": "Systemowy · English",
+        "selected": "false"
+      },
+      "languagePl": {
+        "text": "Polski",
+        "selected": "true"
+      },
+      "languageEn": {
+        "text": "English",
+        "selected": "false"
+      },
+      "screenTitle": "Ustawienia",
+      "screenshot": "artifacts/screenshots/v150-language-2-polski-chosen.png"
+    },
+    {
+      "step": "3-polski-after-relaunch",
+      "languageSystem": {
+        "text": "Systemowy · English",
+        "selected": "false"
+      },
+      "languagePl": {
+        "text": "Polski",
+        "selected": "true"
+      },
+      "languageEn": {
+        "text": "English",
+        "selected": "false"
+      },
+      "screenTitle": "Ustawienia",
+      "screenshot": "artifacts/screenshots/v150-language-3-polski-after-relaunch.png"
+    },
+    {
+      "step": "4-system-chosen",
+      "languageSystem": {
+        "text": "System · English",
+        "selected": "true"
+      },
+      "languagePl": {
+        "text": "Polski",
+        "selected": "false"
+      },
+      "languageEn": {
+        "text": "English",
+        "selected": "false"
+      },
+      "screenTitle": "Settings",
+      "screenshot": "artifacts/screenshots/v150-language-4-system-chosen.png"
+    },
+    {
+      "step": "5-system-after-relaunch",
+      "languageSystem": {
+        "text": "System · English",
+        "selected": "true"
+      },
+      "languagePl": {
+        "text": "Polski",
+        "selected": "false"
+      },
+      "languageEn": {
+        "text": "English",
+        "selected": "false"
+      },
+      "screenTitle": "Settings",
+      "screenshot": "artifacts/screenshots/v150-language-5-system-after-relaunch.png"
+    }
+  ]
+}

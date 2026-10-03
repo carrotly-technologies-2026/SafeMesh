@@ -28,6 +28,7 @@ struct Index {
   @State mapRevision: number = 0;
   @State notice: string = '';
   @State language: string = 'en';
+  @State languagePreference: string = 'system';
   @State themePreference: string = 'system';
   @State settingsBusy: boolean = true;
   @State initialized: boolean = false;
@@ -64,7 +65,7 @@ struct Index {
 
   onPageHide(): void { this.alerts.dispose(); this.relay.suspend(); }
 
-  onPageShow(): void { this.alerts.resume(); this.relay.foreground(); }
+  onPageShow(): void { this.alerts.resume(); this.relay.foreground(); this.followSystemLanguage(); }
 
   onBackPress(): boolean {
     if (this.tab < 4) { return false; }
@@ -85,7 +86,9 @@ struct Index {
     try {
       await this.store.init(context);
       const savedLanguage: string = await this.store.read('ui_language');
-      this.language = savedLanguage === 'pl' || savedLanguage === 'en' ? savedLanguage : this.systemLanguage();
+      // No saved choice (or 'system') follows the device language; 'pl'/'en' are explicit choices.
+      this.languagePreference = savedLanguage === 'pl' || savedLanguage === 'en' ? savedLanguage : 'system';
+      this.language = this.resolvedLanguage(this.languagePreference);
       this.authority.draftLanguage = this.language;
       context.getApplicationContext().setLanguage(this.language);
       this.alerts.setLanguage(this.language);
@@ -104,24 +107,44 @@ struct Index {
     finally { this.initialized = true; this.settingsBusy = false; }
   }
 
-  /** Without a saved choice, a Polish system starts in Polish and every other locale in English. */
+  /** A Polish system language selects Polish; every other locale selects English. */
   private systemLanguage(): string {
     try { return i18n.System.getSystemLanguage().toLowerCase().startsWith('pl') ? 'pl' : 'en'; }
     catch (error) { return 'en'; }
   }
 
-  private async chooseLanguage(language: string): Promise<void> {
-    if (this.settingsBusy) { return; }
-    this.settingsBusy = true;
-    this.notice = '';
-    let applied: boolean = false;
+  private resolvedLanguage(preference: string): string {
+    return preference === 'pl' || preference === 'en' ? preference : this.systemLanguage();
+  }
+
+  /** With the System preference, a device language change applies when the app returns to the foreground. */
+  private followSystemLanguage(): void {
+    if (!this.initialized || this.languagePreference !== 'system') { return; }
+    const language: string = this.systemLanguage();
+    if (language === this.language) { return; }
     try {
       const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
       context.getApplicationContext().setLanguage(language);
       this.language = language;
       this.alerts.setLanguage(language);
+    } catch (error) { this.notice = this.t('language_failed'); }
+  }
+
+  /** preference is 'system', 'pl' or 'en'; the stored value is the preference, not the resolved language. */
+  private async chooseLanguage(preference: string): Promise<void> {
+    if (this.settingsBusy) { return; }
+    this.settingsBusy = true;
+    this.notice = '';
+    let applied: boolean = false;
+    try {
+      const language: string = this.resolvedLanguage(preference);
+      const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+      context.getApplicationContext().setLanguage(language);
+      this.language = language;
+      this.languagePreference = preference;
+      this.alerts.setLanguage(language);
       applied = true;
-      await this.store.write('ui_language', language);
+      await this.store.write('ui_language', preference);
       this.announce(this.t('language_saved'));
     } catch (error) { this.notice = this.t(applied ? 'language_failed' : 'settings_apply_failed'); }
     finally { this.settingsBusy = false; }
@@ -808,10 +831,14 @@ struct Index {
       Text(this.t('theme_auto_hint')).fontSize(12).fontColor(MUTED).width('100%')
       this.section('language_label')
       Column() {
-        this.settingsChoice(() => 'Polski', 'languagePl', () => this.language === 'pl', () => { this.chooseLanguage('pl'); })
+        this.settingsChoice(() => this.t('language_auto') + ' · ' + (this.systemLanguage() === 'pl' ? 'Polski' : 'English'),
+          'languageSystem', () => this.languagePreference === 'system', () => { this.chooseLanguage('system'); })
         this.divider()
-        this.settingsChoice(() => 'English', 'languageEn', () => this.language === 'en', () => { this.chooseLanguage('en'); })
+        this.settingsChoice(() => 'Polski', 'languagePl', () => this.languagePreference === 'pl', () => { this.chooseLanguage('pl'); })
+        this.divider()
+        this.settingsChoice(() => 'English', 'languageEn', () => this.languagePreference === 'en', () => { this.chooseLanguage('en'); })
       }.width('100%').borderRadius(12).clip(true)
+      Text(this.t('language_auto_hint')).fontSize(12).fontColor(MUTED).width('100%')
       Text(this.t('text_size_hint')).fontSize(12).fontColor(MUTED).width('100%')
       this.divider()
       this.rowLink($r('sys.symbol.checkmark_shield'), () => this.t('diagnostics_title'), () => this.t('diagnostics_hint'),
