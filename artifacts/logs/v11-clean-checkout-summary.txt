@@ -1,0 +1,19 @@
+SafeMesh 1.1 clean local checkout verification
+Date: 2026-10-03
+Source SHA: 1bd015dc9ca3cea9c230b78b0253abfc61a8bcae
+Checkout: C:\Users\user\SafeMesh\.cache\repro-v11
+Clone: local git clone --no-hardlinks --no-checkout, then detached checkout of the exact SHA
+Initial git status: clean
+Author and committer: Tomek i Hubert <tomek-hubert@local.invalid>
+Environment override: DEVECO_CLI_STUDIO_PATH=C:\Users\user\DevEcoStudio
+Command: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check.ps1 -Build
+Host tests: 61 passed, 0 failed across 7 source test files
+ArkTS: 17 files, 0 errors; separate advisory warnings retained
+Code Linter: 0 issues, 0 errors, 0 warnings, 0 suggestions
+HAP build: BUILD SUCCESSFUL in 14 s 163 ms; DEVECOCLI_BUILD_EXIT_CODE=0
+Check script: CHECKS: PASS; CHECK_SCRIPT_EXIT=0
+Final git status: only oh-package-lock.json5 marked modified; tooling rewrote LF to CRLF (27 line breaks), normalized content is identical to HEAD
+No source edits, commits, deployment, emulator actions, PATH changes or global Node changes were performed.
+Post-build cleanup: only the new clone's task-owned Hvigor daemon was stopped to release inherited output handles. Existing main-workspace daemon and emulator were untouched.
+Scope: fresh checkout on the SAME machine using its existing Studio/SDK/CLI and caches. This is not clean-machine validation or a claim of byte-identical HAPs.
+Full log: artifacts/logs/v11-clean-checkout.log

@@ -1,0 +1,746 @@
+﻿[
+  {
+    "bounds": [
+      0,
+      0,
+      1320,
+      2856
+    ],
+    "children": [
+      {
+        "type": "root",
+        "bounds": [
+          0,
+          137,
+          1320,
+          2856
+        ],
+        "children": [
+          {
+            "type": "Navigation",
+            "bounds": [
+              0,
+              137,
+              1320,
+              2856
+            ],
+            "children": [
+              {
+                "type": "NavigationContent",
+                "bounds": [
+                  0,
+                  137,
+                  1320,
+                  2856
+                ],
+                "children": [
+                  {
+                    "id": "Setting.Display",
+                    "type": "NavDestination",
+                    "bounds": [
+                      0,
+                      137,
+                      1320,
+                      2856
+                    ],
+                    "children": [
+                      {
+                        "type": "TitleBar",
+                        "bounds": [
+                          0,
+                          137,
+                          1320,
+                          332
+                        ],
+                        "children": [
+                          {
+                            "id": "HdsTitleBar",
+                            "type": "HdsTitleBar",
+                            "bounds": [
+                              0,
+                              137,
+                              1320,
+                              332
+                            ],
+                            "children": [
+                              {
+                                "type": "MaskBlur",
+                                "bounds": [
+                                  0,
+                                  137,
+                                  1320,
+                                  444
+                                ],
+                                "hitTestBehavior": "None",
+                                "children": []
+                              },
+                              {
+                                "type": "Mask",
+                                "bounds": [
+                                  0,
+                                  137,
+                                  1320,
+                                  444
+                                ],
+                                "hitTestBehavior": "None",
+                                "children": []
+                              },
+                              {
+                                "type": "Button",
+                                "bounds": [
+                                  56,
+                                  164,
+                                  196,
+                                  304
+                                ],
+                                "clickable": true,
+                                "children": [
+                                  {
+                                    "type": "SymbolGlyph",
+                                    "bounds": [
+                                      84,
+                                      192,
+                                      169,
+                                      276
+                                    ],
+                                    "children": []
+                                  }
+                                ]
+                              },
+                              {
+                                "id": "Setting.Display.title_id",
+                                "type": "Text",
+                                "text": "Display & brightness",
+                                "bounds": [
+                                  224,
+                                  193,
+                                  916,
+                                  275
+                                ],
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "NavDestinationContent",
+                        "bounds": [
+                          0,
+                          137,
+                          1320,
+                          2856
+                        ],
+                        "children": [
+                          {
+                            "type": "Stack",
+                            "bounds": [
+                              0,
+                              332,
+                              1320,
+                              2758
+                            ],
+                            "children": [
+                              {
+                                "type": "List",
+                                "bounds": [
+                                  0,
+                                  332,
+                                  1320,
+                                  2856
+                                ],
+                                "scrollable": true,
+                                "children": [
+                                  {
+                                    "type": "ListItem",
+                                    "bounds": [
+                                      56,
+                                      332,
+                                      1264,
+                                      528
+                                    ],
+                                    "children": [
+                                      {
+                                        "type": "Column",
+                                        "bounds": [
+                                          56,
+                                          332,
+                                          1264,
+                                          528
+                                        ],
+                                        "children": [
+                                          {
+                                            "type": "Text",
+                                            "text": "View mode",
+                                            "bounds": [
+                                              98,
+                                              443,
+                                              1222,
+                                              500
+                                            ],
+                                            "children": []
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "id": "Setting.Display.display_setting",
+                                    "type": "ListItemGroup",
+                                    "bounds": [
+                                      56,
+                                      528,
+                                      1264,
+                                      1949
+                                    ],
+                                    "children": [
+                                      {
+                                        "type": "ListItem",
+                                        "bounds": [
+                                          70,
+                                          542,
+                                          1250,
+                                          1767
+                                        ],
+                                        "children": [
+                                          {
+                                            "type": "Column",
+                                            "bounds": [
+                                              70,
+                                              542,
+                                              1250,
+                                              1766
+                                            ],
+                                            "children": [
+                                              {
+                                                "type": "Row",
+                                                "bounds": [
+                                                  70,
+                                                  542,
+                                                  1250,
+                                                  1765
+                                                ],
+                                                "children": [
+                                                  {
+                                                    "type": "Column",
+                                                    "bounds": [
+                                                      70,
+                                                      542,
+                                                      660,
+                                                      1765
+                                                    ],
+                                                    "clickable": true,
+                                                    "children": [
+                                                      {
+                                                        "type": "Image",
+                                                        "bounds": [
+                                                          177,
+                                                          668,
+                                                          567,
+                                                          1537
+                                                        ],
+                                                        "clickable": true,
+                                                        "children": []
+                                                      },
+                                                      {
+                                                        "type": "Text",
+                                                        "text": "Light",
+                                                        "bounds": [
+                                                          304,
+                                                          1561,
+                                                          427,
+                                                          1618
+                                                        ],
+                                                        "children": []
+                                                      },
+                                                      {
+                                                        "type": "Radio",
+                                                        "text": "tab_unlock",
+                                                        "bounds": [
+                                                          323,
+                                                          1639,
+                                                          407,
+                                                          1723
+                                                        ],
+                                                        "clickable": true,
+                                                        "checkable": true,
+                                                        "children": [
+                                                          {
+                                                            "type": "Image",
+                                                            "bounds": [
+                                                              336,
+                                                              1652,
+                                                              395,
+                                                              1711
+                                                            ],
+                                                            "hitTestBehavior": "None",
+                                                            "children": []
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  },
+                                                  {
+                                                    "type": "Column",
+                                                    "bounds": [
+                                                      660,
+                                                      542,
+                                                      1250,
+                                                      1765
+                                                    ],
+                                                    "clickable": true,
+                                                    "children": [
+                                                      {
+                                                        "type": "Image",
+                                                        "bounds": [
+                                                          753,
+                                                          668,
+                                                          1143,
+                                                          1537
+                                                        ],
+                                                        "clickable": true,
+                                                        "children": []
+                                                      },
+                                                      {
+                                                        "type": "Text",
+                                                        "text": "Dark",
+                                                        "bounds": [
+                                                          898,
+                                                          1561,
+                                                          1012,
+                                                          1618
+                                                        ],
+                                                        "children": []
+                                                      },
+                                                      {
+                                                        "type": "Radio",
+                                                        "text": "tab_unlock",
+                                                        "bounds": [
+                                                          913,
+                                                          1639,
+                                                          997,
+                                                          1723
+                                                        ],
+                                                        "clickable": true,
+                                                        "checkable": true,
+                                                        "children": []
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "type": "Divider",
+                                                "bounds": [
+                                                  70,
+                                                  1764,
+                                                  1250,
+                                                  1766
+                                                ],
+                                                "children": []
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "type": "ListItem",
+                                        "bounds": [
+                                          70,
+                                          1767,
+                                          1250,
+                                          1935
+                                        ],
+                                        "children": [
+                                          {
+                                            "type": "Column",
+                                            "bounds": [
+                                              70,
+                                              1767,
+                                              1250,
+                                              1935
+                                            ],
+                                            "children": [
+                                              {
+                                                "id": "Setting.Display.display_setting.dark_mode",
+                                                "type": "Row",
+                                                "bounds": [
+                                                  70,
+                                                  1767,
+                                                  1250,
+                                                  1935
+                                                ],
+                                                "clickable": true,
+                                                "children": [
+                                                  {
+                                                    "type": "Row",
+                                                    "bounds": [
+                                                      98,
+                                                      1767,
+                                                      1165,
+                                                      1935
+                                                    ],
+                                                    "children": [
+                                                      {
+                                                        "id": "Setting.Display.display_setting.dark_mode.title",
+                                                        "type": "Text",
+                                                        "text": "Dark mode",
+                                                        "bounds": [
+                                                          98,
+                                                          1818,
+                                                          439,
+                                                          1884
+                                                        ],
+                                                        "children": []
+                                                      },
+                                                      {
+                                                        "id": "Setting.Display.display_setting.dark_mode.result",
+                                                        "type": "Text",
+                                                        "text": "Off",
+                                                        "bounds": [
+                                                          1095,
+                                                          1823,
+                                                          1165,
+                                                          1880
+                                                        ],
+                                                        "children": []
+                                                      }
+                                                    ]
+                                                  },
+                                                  {
+                                                    "type": "Row",
+                                                    "bounds": [
+                                                      1165,
+                                                      1809,
+                                                      1222,
+                                                      1893
+                                                    ],
+                                                    "children": [
+                                                      {
+                                                        "id": "Setting.Display.display_setting.dark_mode.detail",
+                                                        "type": "SymbolGlyph",
+                                                        "bounds": [
+                                                          1179,
+                                                          1809,
+                                                          1222,
+                                                          1893
+                                                        ],
+                                                        "children": []
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "id": "Setting.Display.brightness",
+                                    "type": "ListItemGroup",
+                                    "bounds": [
+                                      56,
+                                      1991,
+                                      1264,
+                                      2215
+                                    ],
+                                    "children": [
+                                      {
+                                        "type": "ListItem",
+                                        "bounds": [
+                                          70,
+                                          2005,
+                                          1250,
+                                          2201
+                                        ],
+                                        "children": [
+                                          {
+                                            "type": "Column",
+                                            "bounds": [
+                                              70,
+                                              2005,
+                                              1250,
+                                              2201
+                                            ],
+                                            "children": [
+                                              {
+                                                "type": "Column",
+                                                "bounds": [
+                                                  70,
+                                                  2005,
+                                                  1250,
+                                                  2201
+                                                ],
+                                                "children": [
+                                                  {
+                                                    "type": "Flex",
+                                                    "bounds": [
+                                                      70,
+                                                      2005,
+                                                      1250,
+                                                      2201
+                                                    ],
+                                                    "children": [
+                                                      {
+                                                        "id": "brightness_reduce_image",
+                                                        "type": "Image",
+                                                        "bounds": [
+                                                          112,
+                                                          2061,
+                                                          185,
+                                                          2145
+                                                        ],
+                                                        "clickable": true,
+                                                        "children": []
+                                                      },
+                                                      {
+                                                        "id": "brightness_slider",
+                                                        "type": "Slider",
+                                                        "text": "26.310036",
+                                                        "bounds": [
+                                                          185,
+                                                          2033,
+                                                          1135,
+                                                          2173
+                                                        ],
+                                                        "clickable": true,
+                                                        "scrollable": true,
+                                                        "children": []
+                                                      },
+                                                      {
+                                                        "id": "brightness_plus_image",
+                                                        "type": "Image",
+                                                        "bounds": [
+                                                          1135,
+                                                          2061,
+                                                          1208,
+                                                          2145
+                                                        ],
+                                                        "clickable": true,
+                                                        "children": []
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "id": "Setting.Display.screen_zoom",
+                                    "type": "ListItemGroup",
+                                    "bounds": [
+                                      56,
+                                      2257,
+                                      1264,
+                                      2453
+                                    ],
+                                    "children": [
+                                      {
+                                        "type": "ListItem",
+                                        "bounds": [
+                                          70,
+                                          2271,
+                                          1250,
+                                          2439
+                                        ],
+                                        "children": [
+                                          {
+                                            "type": "Column",
+                                            "bounds": [
+                                              70,
+                                              2271,
+                                              1250,
+                                              2439
+                                            ],
+                                            "children": [
+                                              {
+                                                "id": "Setting.Display.screen_zoom.screen_zoom_mode",
+                                                "type": "Row",
+                                                "bounds": [
+                                                  70,
+                                                  2271,
+                                                  1250,
+                                                  2439
+                                                ],
+                                                "clickable": true,
+                                                "children": [
+                                                  {
+                                                    "type": "Row",
+                                                    "bounds": [
+                                                      98,
+                                                      2271,
+                                                      1165,
+                                                      2439
+                                                    ],
+                                                    "children": [
+                                                      {
+                                                        "id": "Setting.Display.screen_zoom.screen_zoom_mode.title",
+                                                        "type": "Text",
+                                                        "text": "Text & display size",
+                                                        "bounds": [
+                                                          98,
+                                                          2322,
+                                                          571,
+                                                          2388
+                                                        ],
+                                                        "children": []
+                                                      }
+                                                    ]
+                                                  },
+                                                  {
+                                                    "type": "Row",
+                                                    "bounds": [
+                                                      1165,
+                                                      2313,
+                                                      1222,
+                                                      2397
+                                                    ],
+                                                    "children": [
+                                                      {
+                                                        "id": "Setting.Display.screen_zoom.screen_zoom_mode.detail",
+                                                        "type": "SymbolGlyph",
+                                                        "bounds": [
+                                                          1179,
+                                                          2313,
+                                                          1222,
+                                                          2397
+                                                        ],
+                                                        "children": []
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "id": "Setting.Display.screen_setting",
+                                    "type": "ListItemGroup",
+                                    "bounds": [
+                                      56,
+                                      2495,
+                                      1264,
+                                      2691
+                                    ],
+                                    "children": [
+                                      {
+                                        "type": "ListItem",
+                                        "bounds": [
+                                          70,
+                                          2509,
+                                          1250,
+                                          2677
+                                        ],
+                                        "children": [
+                                          {
+                                            "type": "Column",
+                                            "bounds": [
+                                              70,
+                                              2509,
+                                              1250,
+                                              2677
+                                            ],
+                                            "children": [
+                                              {
+                                                "id": "Setting.Display.screen_setting.screen_refresh_rate",
+                                                "type": "Row",
+                                                "bounds": [
+                                                  70,
+                                                  2509,
+                                                  1250,
+                                                  2677
+                                                ],
+                                                "clickable": true,
+                                                "children": [
+                                                  {
+                                                    "type": "Row",
+                                                    "bounds": [
+                                                      98,
+                                                      2509,
+                                                      1165,
+                                                      2677
+                                                    ],
+                                                    "children": [
+                                                      {
+                                                        "id": "Setting.Display.screen_setting.screen_refresh_rate.title",
+                                                        "type": "Text",
+                                                        "text": "Screen refresh rate",
+                                                        "bounds": [
+                                                          98,
+                                                          2560,
+                                                          643,
+                                                          2626
+                                                        ],
+                                                        "children": []
+                                                      },
+                                                      {
+                                                        "id": "Setting.Display.screen_setting.screen_refresh_rate.result",
+                                                        "type": "Text",
+                                                        "text": "Dynamic",
+                                                        "bounds": [
+                                                          971,
+                                                          2565,
+                                                          1165,
+                                                          2622
+                                                        ],
+                                                        "children": []
+                                                      }
+                                                    ]
+                                                  },
+                                                  {
+                                                    "type": "Row",
+                                                    "bounds": [
+                                                      1165,
+                                                      2551,
+                                                      1222,
+                                                      2635
+                                                    ],
+                                                    "children": [
+                                                      {
+                                                        "id": "Setting.Display.screen_setting.screen_refresh_rate.detail",
+                                                        "type": "SymbolGlyph",
+                                                        "bounds": [
+                                                          1179,
+                                                          2551,
+                                                          1222,
+                                                          2635
+                                                        ],
+                                                        "children": []
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

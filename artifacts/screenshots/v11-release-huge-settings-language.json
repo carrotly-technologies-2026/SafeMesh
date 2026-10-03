@@ -1,0 +1,266 @@
+﻿[
+  {
+    "bounds": [
+      0,
+      0,
+      1320,
+      2856
+    ],
+    "children": [
+      {
+        "type": "root",
+        "bounds": [
+          0,
+          137,
+          1320,
+          2856
+        ],
+        "children": [
+          {
+            "type": "Column",
+            "bounds": [
+              0,
+              137,
+              1320,
+              2758
+            ],
+            "children": [
+              {
+                "type": "Row",
+                "bounds": [
+                  0,
+                  137,
+                  1320,
+                  360
+                ],
+                "children": [
+                  {
+                    "id": "backSettings",
+                    "type": "Button",
+                    "bounds": [
+                      70,
+                      164,
+                      238,
+                      332
+                    ],
+                    "clickable": true,
+                    "children": [
+                      {
+                        "type": "SymbolGlyph",
+                        "bounds": [
+                          112,
+                          206,
+                          197,
+                          290
+                        ],
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Text",
+                    "text": "Ustawienia",
+                    "bounds": [
+                      266,
+                      180,
+                      1250,
+                      317
+                    ],
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "type": "Scroll",
+                "bounds": [
+                  0,
+                  360,
+                  1320,
+                  2758
+                ],
+                "scrollable": true,
+                "children": [
+                  {
+                    "type": "Column",
+                    "bounds": [
+                      0,
+                      360,
+                      1320,
+                      2758
+                    ],
+                    "children": [
+                      {
+                        "type": "Column",
+                        "bounds": [
+                          70,
+                          360,
+                          1250,
+                          2688
+                        ],
+                        "children": [
+                          {
+                            "id": "themeSystem",
+                            "type": "Button",
+                            "bounds": [
+                              70,
+                              360,
+                              1250,
+                              595
+                            ],
+                            "clickable": true,
+                            "children": [
+                              {
+                                "type": "Text",
+                                "text": "✓  Systemowy (automatyczny)",
+                                "bounds": [
+                                  126,
+                                  360,
+                                  1194,
+                                  539
+                                ],
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "id": "themeLight",
+                            "type": "Button",
+                            "bounds": [
+                              70,
+                              658,
+                              1250,
+                              865
+                            ],
+                            "clickable": true,
+                            "children": [
+                              {
+                                "type": "Text",
+                                "text": "Jasny",
+                                "bounds": [
+                                  126,
+                                  714,
+                                  1194,
+                                  809
+                                ],
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "id": "themeDark",
+                            "type": "Button",
+                            "bounds": [
+                              70,
+                              928,
+                              1250,
+                              1135
+                            ],
+                            "clickable": true,
+                            "children": [
+                              {
+                                "type": "Text",
+                                "text": "Ciemny",
+                                "bounds": [
+                                  126,
+                                  984,
+                                  1194,
+                                  1079
+                                ],
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "type": "Text",
+                            "text": "Motyw systemowy zmienia się razem z ustawieniami telefonu. Jasny i ciemny dotyczą tylko SafeMesh.",
+                            "bounds": [
+                              70,
+                              1198,
+                              1250,
+                              1530
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Text",
+                            "text": "Język aplikacji",
+                            "bounds": [
+                              70,
+                              1593,
+                              1250,
+                              1730
+                            ],
+                            "children": []
+                          },
+                          {
+                            "id": "languagePl",
+                            "type": "Button",
+                            "bounds": [
+                              70,
+                              1793,
+                              1250,
+                              2023
+                            ],
+                            "clickable": true,
+                            "children": [
+                              {
+                                "type": "Text",
+                                "text": "✓  Polski",
+                                "bounds": [
+                                  126,
+                                  1849,
+                                  1194,
+                                  1967
+                                ],
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "id": "languageEn",
+                            "type": "Button",
+                            "bounds": [
+                              70,
+                              2086,
+                              1250,
+                              2293
+                            ],
+                            "clickable": true,
+                            "children": [
+                              {
+                                "type": "Text",
+                                "text": "English",
+                                "bounds": [
+                                  126,
+                                  2142,
+                                  1194,
+                                  2237
+                                ],
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "type": "Text",
+                            "text": "Wielkość tekstu zmienisz w ustawieniach telefonu. SafeMesh podąża za nią do dwukrotnego powiększenia.",
+                            "bounds": [
+                              70,
+                              2356,
+                              1250,
+                              2688
+                            ],
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]
