@@ -3,29 +3,7 @@ import { util } from '@kit.ArkTS';
 import { BusinessError } from '@kit.BasicServicesKit';
 // Kit bindings resolve lazily (API 18+); capability is checked before first use.
 import lazy { manager, advertising, dataTransfer, scan } from '@kit.NearLinkKit';
-
-export interface NearLinkStatus {
-  state: string;
-  message: string;
-  supported: boolean;
-  connectedPeers: number;
-}
-
-export interface NearLinkPeer {
-  address: string;
-  name: string;
-  rssi: number;
-  connectable: boolean;
-  connected: boolean;
-  mtu: number;
-}
-
-export interface NearLinkCallbacks {
-  onStatus: (status: NearLinkStatus) => void;
-  onPeer: (peer: NearLinkPeer) => void;
-  onMessage: (address: string, packet: string) => void;
-  onError: (operation: string, code: number, message: string) => void;
-}
+import type { NearLinkCallbacks, NearLinkPeer, NearLinkStatus } from '../../main/ets/transport/RelayTransport';
 
 class PartialPacket {
   bytes: Uint8Array = new Uint8Array(0);

@@ -1,7 +1,7 @@
 import type { common } from '@kit.AbilityKit';
 import type { BusinessError } from '@kit.BasicServicesKit';
 import { webSocket } from '@kit.NetworkKit';
-import type { NearLinkCallbacks, NearLinkPeer, NearLinkStatus } from './NearLinkTransport';
+import type { NearLinkCallbacks, NearLinkPeer, NearLinkStatus } from './RelayTransport';
 
 interface LabHello {
   type: string;

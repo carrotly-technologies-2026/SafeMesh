@@ -24,7 +24,18 @@
   ],
   "targets": [
     {
-      "name": "default"
+      // HarmonyOS: the real NearLink Kit adapter in src/harmonyos.
+      "name": "default",
+      "source": {
+        "sourceRoots": ["./src/harmonyos"]
+      }
+    },
+    {
+      // OpenHarmony / Oniro: NearLink Kit does not exist there; src/oniro holds a stub.
+      "name": "oniro",
+      "source": {
+        "sourceRoots": ["./src/oniro"]
+      }
     },
     {
       "name": "ohosTest",

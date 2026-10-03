@@ -26,7 +26,7 @@ if (!compilerPath) {
 }
 
 const ts = require(compilerPath);
-const sourcePath = fileURLToPath(new URL('../entry/src/main/ets/transport/NearLinkTransport.ets', import.meta.url));
+const sourcePath = fileURLToPath(new URL('../entry/src/harmonyos/transport/NearLinkTransport.ets', import.meta.url));
 const compiled = ts.transpileModule(fs.readFileSync(sourcePath, 'utf8'), {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 },
   fileName: 'NearLinkTransport.ts'

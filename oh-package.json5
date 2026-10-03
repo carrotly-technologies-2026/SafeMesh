@@ -1,5 +1,5 @@
 {
-  "modelVersion": "6.1.1",
+  "modelVersion": "5.1.0",
   "description": "SafeMesh: signed offline exercise alerts, NearLink relay adapter and a bundled Krakow map.",
   "dependencies": {
   },
