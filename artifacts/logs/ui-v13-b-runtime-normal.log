@@ -1,0 +1,42 @@
+10-04 03:22:46.061 16588 16588 I C02d33/HitraceOption: FilterAppTrace org.safemesh.alerts 16588
+10-04 03:22:46.061 16588 16588 W C02c11/APPSPAWN: errno:2 bind mount /system/app/ArkWebCoreLegacy to /mnt/sandbox/100/org.safemesh.alerts/system/app/ArkWebCoreLegacy
+10-04 03:22:46.061 16588 16588 W C02c11/APPSPAWN: errno:2 bind mount /vendor/etc/hiai to /mnt/sandbox/100/org.safemesh.alerts/vendor/etc/hiai
+10-04 03:22:46.061 16588 16588 W C02c11/APPSPAWN: errno:2 bind mount /data/data/hiai to /mnt/sandbox/100/org.safemesh.alerts/data/data/hiai
+10-04 03:22:46.062 16588 16588 W C02c11/APPSPAWN: errno:2 bind mount /data/service/el1/public/themes/100/a/app to /mnt/sandbox/100/org.safemesh.alerts/data/themes/a/app
+10-04 03:22:46.062 16588 16588 W C02c11/APPSPAWN: errno:2 bind mount /data/service/el1/public/themes/100/b/app to /mnt/sandbox/100/org.safemesh.alerts/data/themes/b/app
+10-04 03:22:46.062 16588 16588 W C02c11/APPSPAWN: errno:2 bind mount /data/service/el1/100/for-all-app/fonts to /mnt/sandbox/100/org.safemesh.alerts/data/service/el1/public/for-all-app/fonts
+10-04 03:22:46.062 16588 16588 W C02c11/APPSPAWN: errno:2 bind mount /chip_prod/lib64/passthrough to /mnt/sandbox/100/org.safemesh.alerts/chip_prod/lib64/passthrough
+10-04 03:22:46.062 16588 16588 W C02c11/APPSPAWN: errno:2 bind mount /data/app/el1/bundle/public/com.huawei.hmos.arkwebcorelegacy to /mnt/sandbox/100/org.safemesh.alerts/data/storage/el1/bundle/arkwebcorelegacy
+10-04 03:22:46.063 16588 16588 W C02c11/APPSPAWN: check dir /data/app/el1/public/aot_compiler/ark_cache/org.safemesh.alerts failed,strerror:No such file or directory
+10-04 03:22:46.072 16588 16588 W C02c11/APPSPAWN: errno:2 bind mount /data/preload/app to /mnt/sandbox/100/org.safemesh.alerts/data/preload/app
+10-04 03:22:46.077 16588 16588 I C05a03/Selinux: Hap type for org.safemesh.alerts is changing from u:r:appspawn:s0 to o:r:debug_hap:s0:x94,x334,x512,x868,x1024
+10-04 03:22:46.077 16588 16588 I C05a03/Selinux: Hap setcon finish for org.safemesh.alerts
+10-04 03:22:46.086 16588 16588 I C04500/webview: SelectWebcoreBeforeProcessRun: SelectWebcoreBeforeProcessRun for app org.safemesh.alerts.
+10-04 03:22:46.145 16588 16588 I C03900/ACE_UIContent: [69]AceForwardCompatibility [org.safemesh.alerts] force:1 newpipe:1
+10-04 03:22:46.149 16588 16588 I C03f00/ArkCompiler: [ecmascript] asmint: 1, aot: 0, jit: 1, baseline jit: 0, bundle name: org.safemesh.alerts, arkTSMode: dynamic
+10-04 03:22:46.207 16588 16588 E C01e00/ResourceManager: LoadThemesRes failed, userId = 100, bundleName = org.safemesh.alerts
+10-04 03:22:46.288 16588 16588 I A00000/SafeMeshUI: SAFEMESH_UI_CONFIGURATION fontSizeScale=1 colorMode=1
+10-04 03:22:46.289 16588 16588 I A00000/SafeMeshUI: SAFEMESH_UI_CONFIGURATION fontSizeScale=1 colorMode=1
+10-04 03:22:46.290 16588 16588 I A00000/SafeMeshUI: SAFEMESH_UI_CONFIGURATION fontSizeScale=1 colorMode=1
+10-04 03:22:46.309 16588 16588 I C0421c/WMSCompat: SendCombinedCompatibleConfigToArkUI: bundleName: org.safemesh.alerts, combinedCompatibleConfig size: 2
+10-04 03:22:46.309 16588 16588 I C0421c/WMSCompat: SendCombinedCompatibleConfigToArkUI: bundleName:org.safemesh.alerts, logicalDeviceConfig size:2, arkUIAndWebConfig size:60
+10-04 03:22:46.320 16588 20814 I C04732/GameController: [(GetSelfBundleName:49)]The current bundleName [org.safemesh.alerts]. version [1.3.0]
+10-04 03:22:46.320 16588 20814 I C04732/GameController: [(IsCommonApp:94)]The [org.safemesh.alerts] is a common app.
+10-04 03:22:46.345 16588 16588 I C03900/Ace: [(-2:-1:undefined)] [org.safemesh.alerts][entry][-1]: UIContent: apiCompatibleVersion: 60000020, apiTargetVersion: 60101024, and apiReleaseType: Release, useNewPipe: 1, enableCustomComponentCrossAbility: 0
+10-04 03:22:46.365 16588 16588 I C03900/Ace: [(-2:-1:undefined)] [org.safemesh.alerts][entry][-1]: SetLanguage: en, colorMode: light, deviceAccess: 1
+10-04 03:22:46.365 16588 16588 I C03900/Ace: [(-2:-1:undefined)] [org.safemesh.alerts][entry][-1]: Initialize UIContent isModelJson:true
+10-04 03:22:46.399 16588 16588 I C03900/Ace: [(100000:100000:scope)] [org.safemesh.alerts][entry][100000]: SetMinPlatformVersion is 60000020
+10-04 03:22:46.405 16588 16588 I C03900/Ace: [(-2:100000:singleton)] [org.safemesh.alerts][entry][100000]: Initialize: pages/Index
+10-04 03:22:46.408 16588 16588 I C03900/Ace: [(-2:100000:singleton)] [org.safemesh.alerts][entry][100000]: UpdateWindowVisible: 1, hasDecor: 0
+10-04 03:22:46.408 16588 16588 I C03900/Ace: [(-2:100000:singleton)] [org.safemesh.alerts][entry][100000]: NotifyWindowMode mode = 1
+10-04 03:22:46.410 16588 16588 I C03900/Ace: [(-2:100000:singleton)] [org.safemesh.alerts][entry][100000]: window foreground
+10-04 03:22:46.411 16588 16588 I C03959/AceLayout: [(-2:100000:singleton)] [org.safemesh.alerts][entry][100000]: UpdateViewportConfig Viewport config: size: (1320, 2856) orientation: 0 density: 3.500000 position: (0, 0) transformHint: 0 displayId: 0, windowSizeChangeReason 0, is rsTransaction nullptr 1, , keyboardInfo is null
+10-04 03:22:46.448 16588 16588 I C015b0/NETSTACK: [websocket_module.cpp:41] IsAtomicService  bundleName is org.safemesh.alerts, isAtomicService is 0
+10-04 03:22:46.527 16588 16588 I C03900/Ace: [(-2:100000:singleton)] [100000][org.safemesh.alerts][entry] UpdateConfigurationSyncForAll, name:{"0#ohos.system.isPreferredLanguage":"1","0#ohos.system.language":"pl","0#ohos.system.locale":"pl-US"}
+10-04 03:22:46.528 16588 16588 I A00000/SafeMeshUI: SAFEMESH_UI_CONFIGURATION fontSizeScale=1 colorMode=1
+10-04 03:22:46.538 16588 16588 I C03900/Ace: [(-2:100000:singleton)] [100000][org.safemesh.alerts][entry] UpdateConfiguration, name:{"0#ohos.system.isPreferredLanguage":"1","0#ohos.system.language":"pl","0#ohos.system.locale":"pl-US"}
+10-04 03:22:46.570 16588 16588 I C03900/Ace: [(-2:100000:singleton)] [100000][org.safemesh.alerts][entry] UpdateConfigurationSyncForAll, name:{"0#ohos.system.colorMode":"light","0#ohos.system.colorMode.isSetByApp":"isSetByApp"}
+10-04 03:22:46.571 16588 16588 I A00000/SafeMeshUI: SAFEMESH_UI_CONFIGURATION fontSizeScale=1 colorMode=1
+10-04 03:22:46.584 16588 16588 I C03900/Ace: [(-2:100000:singleton)] [100000][org.safemesh.alerts][entry] UpdateConfiguration, name:{"0#ohos.system.colorMode":"light","0#ohos.system.colorMode.isSetByApp":"isSetByApp"}
+10-04 03:22:46.776 16588 20786 I C03900/Ace: [(-1:100000:singleton)] [org.safemesh.alerts][entry][100000]: window focus
+10-04 03:22:46.776 16588 20786 I C03900/Ace: [(-1:100000:singleton)] [org.safemesh.alerts][entry][100000]:window active

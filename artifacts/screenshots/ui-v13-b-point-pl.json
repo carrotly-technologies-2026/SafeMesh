@@ -1,0 +1,292 @@
+[
+  {
+    "bounds": [
+      0,
+      0,
+      1320,
+      2856
+    ],
+    "children": [
+      {
+        "type": "root",
+        "bounds": [
+          0,
+          137,
+          1320,
+          2856
+        ],
+        "children": [
+          {
+            "type": "Column",
+            "bounds": [
+              0,
+              137,
+              1320,
+              2758
+            ],
+            "children": [
+              {
+                "type": "Row",
+                "bounds": [
+                  0,
+                  137,
+                  1320,
+                  332
+                ],
+                "children": [
+                  {
+                    "id": "backSettings",
+                    "type": "Button",
+                    "bounds": [
+                      28,
+                      150,
+                      196,
+                      318
+                    ],
+                    "clickable": true,
+                    "children": [
+                      {
+                        "type": "SymbolGlyph",
+                        "bounds": [
+                          74,
+                          196,
+                          151,
+                          273
+                        ],
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Text",
+                    "text": "Miejsce ochronne",
+                    "bounds": [
+                      210,
+                      187,
+                      1292,
+                      281
+                    ],
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "type": "Scroll",
+                "bounds": [
+                  0,
+                  332,
+                  1320,
+                  2758
+                ],
+                "children": [
+                  {
+                    "type": "Column",
+                    "bounds": [
+                      0,
+                      332,
+                      1320,
+                      2058
+                    ],
+                    "children": [
+                      {
+                        "type": "Column",
+                        "bounds": [
+                          70,
+                          374,
+                          1250,
+                          1974
+                        ],
+                        "children": [
+                          {
+                            "id": "pointAddress",
+                            "type": "Text",
+                            "text": "Rynek Główny 1, Kraków",
+                            "bounds": [
+                              70,
+                              374,
+                              1250,
+                              489
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Text",
+                            "text": "44 m · w linii prostej",
+                            "bounds": [
+                              70,
+                              559,
+                              1250,
+                              621
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Divider",
+                            "bounds": [
+                              70,
+                              691,
+                              1250,
+                              693
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Column",
+                            "bounds": [
+                              70,
+                              763,
+                              1250,
+                              1110
+                            ],
+                            "children": [
+                              {
+                                "type": "Text",
+                                "text": "Dostęp według źródła",
+                                "bounds": [
+                                  70,
+                                  791,
+                                  1250,
+                                  844
+                                ],
+                                "children": []
+                              },
+                              {
+                                "id": "pointAccess",
+                                "type": "Text",
+                                "text": "Na żądanie",
+                                "bounds": [
+                                  70,
+                                  886,
+                                  1250,
+                                  968
+                                ],
+                                "children": []
+                              },
+                              {
+                                "type": "Text",
+                                "text": "Dostęp nie jest sprawdzany na bieżąco. Punkt w bazie nie oznacza potwierdzonego schronu.",
+                                "bounds": [
+                                  70,
+                                  996,
+                                  1250,
+                                  1110
+                                ],
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "id": "savePoint",
+                            "type": "Button",
+                            "bounds": [
+                              70,
+                              1180,
+                              1250,
+                              1348
+                            ],
+                            "clickable": true,
+                            "children": [
+                              {
+                                "type": "Text",
+                                "text": "Zapisz punkt",
+                                "bounds": [
+                                  112,
+                                  1233,
+                                  1208,
+                                  1295
+                                ],
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "id": "showOnMap",
+                            "type": "Button",
+                            "bounds": [
+                              70,
+                              1418,
+                              1250,
+                              1586
+                            ],
+                            "clickable": true,
+                            "children": [
+                              {
+                                "type": "Text",
+                                "text": "Pokaż na mapie",
+                                "bounds": [
+                                  112,
+                                  1471,
+                                  1208,
+                                  1533
+                                ],
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "type": "Divider",
+                            "bounds": [
+                              70,
+                              1656,
+                              1250,
+                              1658
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Column",
+                            "bounds": [
+                              70,
+                              1728,
+                              1250,
+                              1974
+                            ],
+                            "children": [
+                              {
+                                "type": "Text",
+                                "text": "KG PSP · zbiór punktów ochronnych",
+                                "bounds": [
+                                  70,
+                                  1728,
+                                  1250,
+                                  1785
+                                ],
+                                "children": []
+                              },
+                              {
+                                "type": "Text",
+                                "text": "Dane punktów: 2026-09-28",
+                                "bounds": [
+                                  70,
+                                  1806,
+                                  1250,
+                                  1855
+                                ],
+                                "children": []
+                              },
+                              {
+                                "type": "Text",
+                                "text": "Mapa zawiera 40 wybranych punktów PSP w centrum Krakowa. Nie obejmuje wszystkich punktów w okolicy.",
+                                "bounds": [
+                                  70,
+                                  1876,
+                                  1250,
+                                  1974
+                                ],
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

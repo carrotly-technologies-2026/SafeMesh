@@ -1,0 +1,940 @@
+[
+  {
+    "bounds": [
+      0,
+      0,
+      1320,
+      2856
+    ],
+    "children": [
+      {
+        "type": "root",
+        "bounds": [
+          0,
+          137,
+          1320,
+          2856
+        ],
+        "children": [
+          {
+            "type": "Column",
+            "bounds": [
+              0,
+              137,
+              1320,
+              2758
+            ],
+            "children": [
+              {
+                "type": "Row",
+                "bounds": [
+                  0,
+                  137,
+                  1320,
+                  332
+                ],
+                "children": [
+                  {
+                    "type": "Text",
+                    "text": "Mapa",
+                    "bounds": [
+                      70,
+                      187,
+                      1110,
+                      281
+                    ],
+                    "children": []
+                  },
+                  {
+                    "id": "openSettings",
+                    "type": "Button",
+                    "bounds": [
+                      1124,
+                      150,
+                      1292,
+                      318
+                    ],
+                    "clickable": true,
+                    "children": [
+                      {
+                        "type": "SymbolGlyph",
+                        "bounds": [
+                          1170,
+                          196,
+                          1247,
+                          273
+                        ],
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "Scroll",
+                "bounds": [
+                  0,
+                  332,
+                  1320,
+                  2526
+                ],
+                "scrollable": true,
+                "children": [
+                  {
+                    "type": "Column",
+                    "bounds": [
+                      0,
+                      332,
+                      1320,
+                      2526
+                    ],
+                    "children": [
+                      {
+                        "type": "Column",
+                        "bounds": [
+                          70,
+                          374,
+                          1250,
+                          2500
+                        ],
+                        "children": [
+                          {
+                            "type": "Row",
+                            "bounds": [
+                              70,
+                              374,
+                              1250,
+                              444
+                            ],
+                            "children": [
+                              {
+                                "type": "Text",
+                                "text": "Kraków · centrum",
+                                "bounds": [
+                                  70,
+                                  374,
+                                  1094,
+                                  444
+                                ],
+                                "children": []
+                              },
+                              {
+                                "type": "Text",
+                                "text": "Offline",
+                                "bounds": [
+                                  1122,
+                                  385,
+                                  1250,
+                                  434
+                                ],
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "id": "searchPoints",
+                            "type": "TextInput",
+                            "text": "glowny",
+                            "bounds": [
+                              70,
+                              486,
+                              1250,
+                              654
+                            ],
+                            "clickable": true,
+                            "longClickable": true,
+                            "scrollable": true,
+                            "children": []
+                          },
+                          {
+                            "type": "Row",
+                            "bounds": [
+                              70,
+                              696,
+                              1250,
+                              864
+                            ],
+                            "children": [
+                              {
+                                "id": "mapModemap",
+                                "type": "Button",
+                                "bounds": [
+                                  70,
+                                  696,
+                                  653,
+                                  864
+                                ],
+                                "clickable": true,
+                                "children": [
+                                  {
+                                    "type": "Text",
+                                    "text": "Mapa",
+                                    "bounds": [
+                                      298,
+                                      752,
+                                      425,
+                                      809
+                                    ],
+                                    "children": []
+                                  }
+                                ]
+                              },
+                              {
+                                "id": "mapModelist",
+                                "type": "Button",
+                                "bounds": [
+                                  667,
+                                  696,
+                                  1250,
+                                  864
+                                ],
+                                "clickable": true,
+                                "children": [
+                                  {
+                                    "type": "Text",
+                                    "text": "Lista",
+                                    "bounds": [
+                                      904,
+                                      752,
+                                      1013,
+                                      809
+                                    ],
+                                    "children": []
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "id": "mapOrigin",
+                            "type": "Text",
+                            "text": "Punkt odniesienia: Rynek Główny (demo), nie Twoja pozycja.",
+                            "bounds": [
+                              70,
+                              906,
+                              1250,
+                              955
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Row",
+                            "bounds": [
+                              70,
+                              1025,
+                              1250,
+                              1087
+                            ],
+                            "children": [
+                              {
+                                "type": "Text",
+                                "text": "Wyniki",
+                                "bounds": [
+                                  70,
+                                  1025,
+                                  1133,
+                                  1087
+                                ],
+                                "children": []
+                              },
+                              {
+                                "id": "resultCount",
+                                "type": "Text",
+                                "text": "5 / 40",
+                                "bounds": [
+                                  1133,
+                                  1030,
+                                  1250,
+                                  1083
+                                ],
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "type": "Column",
+                            "bounds": [
+                              70,
+                              1129,
+                              1250,
+                              2360
+                            ],
+                            "children": [
+                              {
+                                "id": "point_OZO-361CCBF67BB8",
+                                "type": "Button",
+                                "bounds": [
+                                  70,
+                                  1129,
+                                  1250,
+                                  1374
+                                ],
+                                "clickable": true,
+                                "children": [
+                                  {
+                                    "type": "Row",
+                                    "bounds": [
+                                      70,
+                                      1129,
+                                      1250,
+                                      1374
+                                    ],
+                                    "children": [
+                                      {
+                                        "type": "Column",
+                                        "bounds": [
+                                          70,
+                                          1185,
+                                          1038,
+                                          1318
+                                        ],
+                                        "children": [
+                                          {
+                                            "type": "Text",
+                                            "text": "Rynek Główny 1, Kraków",
+                                            "bounds": [
+                                              70,
+                                              1185,
+                                              1038,
+                                              1251
+                                            ],
+                                            "children": []
+                                          },
+                                          {
+                                            "type": "Text",
+                                            "text": "Na żądanie · Zapisany",
+                                            "bounds": [
+                                              70,
+                                              1269,
+                                              1038,
+                                              1318
+                                            ],
+                                            "children": []
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "type": "Text",
+                                        "text": "44 m",
+                                        "bounds": [
+                                          1080,
+                                          1225,
+                                          1185,
+                                          1278
+                                        ],
+                                        "children": []
+                                      },
+                                      {
+                                        "type": "SymbolGlyph",
+                                        "bounds": [
+                                          1227,
+                                          1228,
+                                          1250,
+                                          1274
+                                        ],
+                                        "children": []
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "Divider",
+                                "bounds": [
+                                  70,
+                                  1374,
+                                  1250,
+                                  1376
+                                ],
+                                "children": []
+                              },
+                              {
+                                "id": "point_OZO-5AA4A93F09FD",
+                                "type": "Button",
+                                "bounds": [
+                                  70,
+                                  1375,
+                                  1250,
+                                  1620
+                                ],
+                                "clickable": true,
+                                "children": [
+                                  {
+                                    "type": "Row",
+                                    "bounds": [
+                                      70,
+                                      1375,
+                                      1250,
+                                      1620
+                                    ],
+                                    "children": [
+                                      {
+                                        "type": "Column",
+                                        "bounds": [
+                                          70,
+                                          1431,
+                                          1012,
+                                          1564
+                                        ],
+                                        "children": [
+                                          {
+                                            "type": "Text",
+                                            "text": "Rynek Główny 25, Kraków",
+                                            "bounds": [
+                                              70,
+                                              1431,
+                                              1012,
+                                              1497
+                                            ],
+                                            "children": []
+                                          },
+                                          {
+                                            "type": "Text",
+                                            "text": "Na żądanie",
+                                            "bounds": [
+                                              70,
+                                              1515,
+                                              1012,
+                                              1564
+                                            ],
+                                            "children": []
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "type": "Text",
+                                        "text": "104 m",
+                                        "bounds": [
+                                          1054,
+                                          1471,
+                                          1185,
+                                          1524
+                                        ],
+                                        "children": []
+                                      },
+                                      {
+                                        "type": "SymbolGlyph",
+                                        "bounds": [
+                                          1227,
+                                          1474,
+                                          1250,
+                                          1520
+                                        ],
+                                        "children": []
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "Divider",
+                                "bounds": [
+                                  70,
+                                  1620,
+                                  1250,
+                                  1622
+                                ],
+                                "children": []
+                              },
+                              {
+                                "id": "point_OZO-CDFAE1F6B7E5",
+                                "type": "Button",
+                                "bounds": [
+                                  70,
+                                  1622,
+                                  1250,
+                                  1867
+                                ],
+                                "clickable": true,
+                                "children": [
+                                  {
+                                    "type": "Row",
+                                    "bounds": [
+                                      70,
+                                      1622,
+                                      1250,
+                                      1867
+                                    ],
+                                    "children": [
+                                      {
+                                        "type": "Column",
+                                        "bounds": [
+                                          70,
+                                          1678,
+                                          1012,
+                                          1811
+                                        ],
+                                        "children": [
+                                          {
+                                            "type": "Text",
+                                            "text": "Rynek Główny 33, Kraków",
+                                            "bounds": [
+                                              70,
+                                              1678,
+                                              1012,
+                                              1744
+                                            ],
+                                            "children": []
+                                          },
+                                          {
+                                            "type": "Text",
+                                            "text": "Całodobowo",
+                                            "bounds": [
+                                              70,
+                                              1762,
+                                              1012,
+                                              1811
+                                            ],
+                                            "children": []
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "type": "Text",
+                                        "text": "121 m",
+                                        "bounds": [
+                                          1054,
+                                          1718,
+                                          1185,
+                                          1771
+                                        ],
+                                        "children": []
+                                      },
+                                      {
+                                        "type": "SymbolGlyph",
+                                        "bounds": [
+                                          1227,
+                                          1721,
+                                          1250,
+                                          1767
+                                        ],
+                                        "children": []
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "Divider",
+                                "bounds": [
+                                  70,
+                                  1866,
+                                  1250,
+                                  1868
+                                ],
+                                "children": []
+                              },
+                              {
+                                "id": "point_OZO-C65D171608FE",
+                                "type": "Button",
+                                "bounds": [
+                                  70,
+                                  1868,
+                                  1250,
+                                  2113
+                                ],
+                                "clickable": true,
+                                "children": [
+                                  {
+                                    "type": "Row",
+                                    "bounds": [
+                                      70,
+                                      1868,
+                                      1250,
+                                      2113
+                                    ],
+                                    "children": [
+                                      {
+                                        "type": "Column",
+                                        "bounds": [
+                                          70,
+                                          1924,
+                                          1012,
+                                          2057
+                                        ],
+                                        "children": [
+                                          {
+                                            "type": "Text",
+                                            "text": "Rynek Główny 35, Kraków",
+                                            "bounds": [
+                                              70,
+                                              1924,
+                                              1012,
+                                              1990
+                                            ],
+                                            "children": []
+                                          },
+                                          {
+                                            "type": "Text",
+                                            "text": "Na żądanie",
+                                            "bounds": [
+                                              70,
+                                              2008,
+                                              1012,
+                                              2057
+                                            ],
+                                            "children": []
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "type": "Text",
+                                        "text": "149 m",
+                                        "bounds": [
+                                          1054,
+                                          1964,
+                                          1185,
+                                          2017
+                                        ],
+                                        "children": []
+                                      },
+                                      {
+                                        "type": "SymbolGlyph",
+                                        "bounds": [
+                                          1227,
+                                          1967,
+                                          1250,
+                                          2013
+                                        ],
+                                        "children": []
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "Divider",
+                                "bounds": [
+                                  70,
+                                  2112,
+                                  1250,
+                                  2114
+                                ],
+                                "children": []
+                              },
+                              {
+                                "id": "point_OZO-4827017092BB",
+                                "type": "Button",
+                                "bounds": [
+                                  70,
+                                  2114,
+                                  1250,
+                                  2359
+                                ],
+                                "clickable": true,
+                                "children": [
+                                  {
+                                    "type": "Row",
+                                    "bounds": [
+                                      70,
+                                      2114,
+                                      1250,
+                                      2359
+                                    ],
+                                    "children": [
+                                      {
+                                        "type": "Column",
+                                        "bounds": [
+                                          70,
+                                          2170,
+                                          1012,
+                                          2303
+                                        ],
+                                        "children": [
+                                          {
+                                            "type": "Text",
+                                            "text": "Rynek Główny 46, Kraków",
+                                            "bounds": [
+                                              70,
+                                              2170,
+                                              1012,
+                                              2236
+                                            ],
+                                            "children": []
+                                          },
+                                          {
+                                            "type": "Text",
+                                            "text": "Na żądanie",
+                                            "bounds": [
+                                              70,
+                                              2254,
+                                              1012,
+                                              2303
+                                            ],
+                                            "children": []
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "type": "Text",
+                                        "text": "149 m",
+                                        "bounds": [
+                                          1054,
+                                          2210,
+                                          1185,
+                                          2263
+                                        ],
+                                        "children": []
+                                      },
+                                      {
+                                        "type": "SymbolGlyph",
+                                        "bounds": [
+                                          1227,
+                                          2213,
+                                          1250,
+                                          2259
+                                        ],
+                                        "children": []
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "Divider",
+                                "bounds": [
+                                  70,
+                                  2359,
+                                  1250,
+                                  2361
+                                ],
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "type": "Text",
+                            "text": "Odległości w linii prostej. Bez wyznaczania trasy. Lista obejmuje wybrane punkty.",
+                            "bounds": [
+                              70,
+                              2402,
+                              1250,
+                              2500
+                            ],
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "Column",
+                "bounds": [
+                  0,
+                  2526,
+                  1320,
+                  2758
+                ],
+                "children": [
+                  {
+                    "type": "Divider",
+                    "bounds": [
+                      0,
+                      2526,
+                      1320,
+                      2528
+                    ],
+                    "children": []
+                  },
+                  {
+                    "type": "Row",
+                    "bounds": [
+                      0,
+                      2528,
+                      1320,
+                      2759
+                    ],
+                    "children": [
+                      {
+                        "id": "tab0",
+                        "type": "Button",
+                        "bounds": [
+                          28,
+                          2542,
+                          334,
+                          2745
+                        ],
+                        "clickable": true,
+                        "children": [
+                          {
+                            "type": "Column",
+                            "bounds": [
+                              35,
+                              2570,
+                              327,
+                              2717
+                            ],
+                            "children": [
+                              {
+                                "type": "SymbolGlyph",
+                                "bounds": [
+                                  140,
+                                  2570,
+                                  221,
+                                  2650
+                                ],
+                                "children": []
+                              },
+                              {
+                                "type": "Text",
+                                "text": "Start",
+                                "bounds": [
+                                  35,
+                                  2668,
+                                  327,
+                                  2717
+                                ],
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "id": "tab1",
+                        "type": "Button",
+                        "bounds": [
+                          348,
+                          2542,
+                          654,
+                          2745
+                        ],
+                        "clickable": true,
+                        "children": [
+                          {
+                            "type": "Column",
+                            "bounds": [
+                              355,
+                              2570,
+                              647,
+                              2717
+                            ],
+                            "children": [
+                              {
+                                "type": "SymbolGlyph",
+                                "bounds": [
+                                  460,
+                                  2570,
+                                  541,
+                                  2650
+                                ],
+                                "children": []
+                              },
+                              {
+                                "type": "Text",
+                                "text": "Mapa",
+                                "bounds": [
+                                  355,
+                                  2668,
+                                  647,
+                                  2717
+                                ],
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "id": "tab2",
+                        "type": "Button",
+                        "bounds": [
+                          667,
+                          2542,
+                          973,
+                          2745
+                        ],
+                        "clickable": true,
+                        "children": [
+                          {
+                            "type": "Column",
+                            "bounds": [
+                              674,
+                              2570,
+                              966,
+                              2717
+                            ],
+                            "children": [
+                              {
+                                "type": "SymbolGlyph",
+                                "bounds": [
+                                  779,
+                                  2570,
+                                  860,
+                                  2650
+                                ],
+                                "children": []
+                              },
+                              {
+                                "type": "Text",
+                                "text": "Łączność",
+                                "bounds": [
+                                  674,
+                                  2668,
+                                  966,
+                                  2717
+                                ],
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "id": "tab3",
+                        "type": "Button",
+                        "bounds": [
+                          987,
+                          2542,
+                          1293,
+                          2745
+                        ],
+                        "clickable": true,
+                        "children": [
+                          {
+                            "type": "Column",
+                            "bounds": [
+                              994,
+                              2570,
+                              1286,
+                              2717
+                            ],
+                            "children": [
+                              {
+                                "type": "SymbolGlyph",
+                                "bounds": [
+                                  1099,
+                                  2570,
+                                  1180,
+                                  2650
+                                ],
+                                "children": []
+                              },
+                              {
+                                "type": "Text",
+                                "text": "Poradnik",
+                                "bounds": [
+                                  994,
+                                  2668,
+                                  1286,
+                                  2717
+                                ],
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

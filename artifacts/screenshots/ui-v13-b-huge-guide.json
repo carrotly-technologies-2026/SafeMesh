@@ -1,0 +1,677 @@
+[
+  {
+    "bounds": [
+      0,
+      0,
+      1320,
+      2856
+    ],
+    "children": [
+      {
+        "type": "root",
+        "bounds": [
+          0,
+          137,
+          1320,
+          2856
+        ],
+        "children": [
+          {
+            "type": "Column",
+            "bounds": [
+              0,
+              137,
+              1320,
+              2758
+            ],
+            "children": [
+              {
+                "type": "Row",
+                "bounds": [
+                  0,
+                  137,
+                  1320,
+                  332
+                ],
+                "children": [
+                  {
+                    "type": "Text",
+                    "text": "Poradnik",
+                    "bounds": [
+                      70,
+                      166,
+                      1110,
+                      303
+                    ],
+                    "children": []
+                  },
+                  {
+                    "id": "openSettings",
+                    "type": "Button",
+                    "bounds": [
+                      1124,
+                      150,
+                      1292,
+                      318
+                    ],
+                    "clickable": true,
+                    "children": [
+                      {
+                        "type": "SymbolGlyph",
+                        "bounds": [
+                          1170,
+                          196,
+                          1247,
+                          273
+                        ],
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "Scroll",
+                "bounds": [
+                  0,
+                  332,
+                  1320,
+                  2504
+                ],
+                "scrollable": true,
+                "children": [
+                  {
+                    "type": "Column",
+                    "bounds": [
+                      0,
+                      332,
+                      1320,
+                      2504
+                    ],
+                    "children": [
+                      {
+                        "type": "Column",
+                        "bounds": [
+                          70,
+                          374,
+                          1250,
+                          2504
+                        ],
+                        "children": [
+                          {
+                            "type": "Text",
+                            "text": "Na podstawie Poradnika Bezpieczeństwa. Stosuj aktualne polecenia służb.",
+                            "bounds": [
+                              70,
+                              374,
+                              1250,
+                              641
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Column",
+                            "bounds": [
+                              70,
+                              697,
+                              1250,
+                              2430
+                            ],
+                            "children": [
+                              {
+                                "type": "Column",
+                                "bounds": [
+                                  70,
+                                  697,
+                                  1250,
+                                  1542
+                                ],
+                                "children": [
+                                  {
+                                    "id": "guideItem0",
+                                    "type": "Button",
+                                    "bounds": [
+                                      70,
+                                      697,
+                                      1250,
+                                      1025
+                                    ],
+                                    "clickable": true,
+                                    "children": [
+                                      {
+                                        "type": "Row",
+                                        "bounds": [
+                                          70,
+                                          697,
+                                          1250,
+                                          1025
+                                        ],
+                                        "children": [
+                                          {
+                                            "type": "Text",
+                                            "text": "01",
+                                            "bounds": [
+                                              70,
+                                              823,
+                                              161,
+                                              900
+                                            ],
+                                            "children": []
+                                          },
+                                          {
+                                            "type": "Text",
+                                            "text": "Sprawdź pobliskie miejsca",
+                                            "bounds": [
+                                              203,
+                                              760,
+                                              1145,
+                                              962
+                                            ],
+                                            "children": []
+                                          },
+                                          {
+                                            "type": "SymbolGlyph",
+                                            "bounds": [
+                                              1187,
+                                              830,
+                                              1250,
+                                              893
+                                            ],
+                                            "children": []
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "type": "Text",
+                                    "text": "Przed zagrożeniem sprawdź wejście i zasady dostępu. Punkt na mapie nie potwierdza otwarcia ani bezpiecznego dojścia.",
+                                    "bounds": [
+                                      70,
+                                      1025,
+                                      1250,
+                                      1540
+                                    ],
+                                    "children": []
+                                  },
+                                  {
+                                    "type": "Divider",
+                                    "bounds": [
+                                      70,
+                                      1540,
+                                      1250,
+                                      1542
+                                    ],
+                                    "children": []
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "Column",
+                                "bounds": [
+                                  70,
+                                  1542,
+                                  1250,
+                                  1872
+                                ],
+                                "children": [
+                                  {
+                                    "id": "guideItem1",
+                                    "type": "Button",
+                                    "bounds": [
+                                      70,
+                                      1542,
+                                      1250,
+                                      1870
+                                    ],
+                                    "clickable": true,
+                                    "children": [
+                                      {
+                                        "type": "Row",
+                                        "bounds": [
+                                          70,
+                                          1542,
+                                          1250,
+                                          1870
+                                        ],
+                                        "children": [
+                                          {
+                                            "type": "Text",
+                                            "text": "02",
+                                            "bounds": [
+                                              70,
+                                              1668,
+                                              161,
+                                              1745
+                                            ],
+                                            "children": []
+                                          },
+                                          {
+                                            "type": "Text",
+                                            "text": "Przygotuj potrzebne rzeczy",
+                                            "bounds": [
+                                              203,
+                                              1605,
+                                              1145,
+                                              1807
+                                            ],
+                                            "children": []
+                                          },
+                                          {
+                                            "type": "SymbolGlyph",
+                                            "bounds": [
+                                              1187,
+                                              1675,
+                                              1250,
+                                              1738
+                                            ],
+                                            "children": []
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "type": "Divider",
+                                    "bounds": [
+                                      70,
+                                      1870,
+                                      1250,
+                                      1872
+                                    ],
+                                    "children": []
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "Column",
+                                "bounds": [
+                                  70,
+                                  1872,
+                                  1250,
+                                  2202
+                                ],
+                                "children": [
+                                  {
+                                    "id": "guideItem2",
+                                    "type": "Button",
+                                    "bounds": [
+                                      70,
+                                      1872,
+                                      1250,
+                                      2200
+                                    ],
+                                    "clickable": true,
+                                    "children": [
+                                      {
+                                        "type": "Row",
+                                        "bounds": [
+                                          70,
+                                          1872,
+                                          1250,
+                                          2200
+                                        ],
+                                        "children": [
+                                          {
+                                            "type": "Text",
+                                            "text": "03",
+                                            "bounds": [
+                                              70,
+                                              1998,
+                                              161,
+                                              2075
+                                            ],
+                                            "children": []
+                                          },
+                                          {
+                                            "type": "Text",
+                                            "text": "Czytaj oficjalne komunikaty",
+                                            "bounds": [
+                                              203,
+                                              1935,
+                                              1145,
+                                              2137
+                                            ],
+                                            "children": []
+                                          },
+                                          {
+                                            "type": "SymbolGlyph",
+                                            "bounds": [
+                                              1187,
+                                              2005,
+                                              1250,
+                                              2068
+                                            ],
+                                            "children": []
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "type": "Divider",
+                                    "bounds": [
+                                      70,
+                                      2200,
+                                      1250,
+                                      2202
+                                    ],
+                                    "children": []
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "Column",
+                                "bounds": [
+                                  70,
+                                  2201,
+                                  1250,
+                                  2430
+                                ],
+                                "children": [
+                                  {
+                                    "id": "guideItem3",
+                                    "type": "Button",
+                                    "bounds": [
+                                      70,
+                                      2201,
+                                      1250,
+                                      2428
+                                    ],
+                                    "clickable": true,
+                                    "children": [
+                                      {
+                                        "type": "Row",
+                                        "bounds": [
+                                          70,
+                                          2201,
+                                          1250,
+                                          2428
+                                        ],
+                                        "children": [
+                                          {
+                                            "type": "Text",
+                                            "text": "04",
+                                            "bounds": [
+                                              70,
+                                              2276,
+                                              161,
+                                              2353
+                                            ],
+                                            "children": []
+                                          },
+                                          {
+                                            "type": "Text",
+                                            "text": "Przekazuj wiadomości",
+                                            "bounds": [
+                                              203,
+                                              2264,
+                                              1145,
+                                              2365
+                                            ],
+                                            "children": []
+                                          },
+                                          {
+                                            "type": "SymbolGlyph",
+                                            "bounds": [
+                                              1187,
+                                              2283,
+                                              1250,
+                                              2346
+                                            ],
+                                            "children": []
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "type": "Divider",
+                                    "bounds": [
+                                      70,
+                                      2428,
+                                      1250,
+                                      2430
+                                    ],
+                                    "children": []
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "type": "Text",
+                            "text": "Zapisano na telefonie. Internet nie jest potrzebny.",
+                            "bounds": [
+                              70,
+                              2486,
+                              1250,
+                              2504
+                            ],
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "Column",
+                "bounds": [
+                  0,
+                  2504,
+                  1320,
+                  2758
+                ],
+                "children": [
+                  {
+                    "type": "Divider",
+                    "bounds": [
+                      0,
+                      2504,
+                      1320,
+                      2506
+                    ],
+                    "children": []
+                  },
+                  {
+                    "type": "Row",
+                    "bounds": [
+                      0,
+                      2506,
+                      1320,
+                      2759
+                    ],
+                    "children": [
+                      {
+                        "id": "tab0",
+                        "type": "Button",
+                        "bounds": [
+                          28,
+                          2520,
+                          334,
+                          2745
+                        ],
+                        "clickable": true,
+                        "children": [
+                          {
+                            "type": "Column",
+                            "bounds": [
+                              35,
+                              2548,
+                              327,
+                              2717
+                            ],
+                            "children": [
+                              {
+                                "type": "SymbolGlyph",
+                                "bounds": [
+                                  140,
+                                  2548,
+                                  221,
+                                  2628
+                                ],
+                                "children": []
+                              },
+                              {
+                                "type": "Text",
+                                "text": "Start",
+                                "bounds": [
+                                  35,
+                                  2646,
+                                  327,
+                                  2717
+                                ],
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "id": "tab1",
+                        "type": "Button",
+                        "bounds": [
+                          348,
+                          2520,
+                          654,
+                          2745
+                        ],
+                        "clickable": true,
+                        "children": [
+                          {
+                            "type": "Column",
+                            "bounds": [
+                              355,
+                              2548,
+                              647,
+                              2717
+                            ],
+                            "children": [
+                              {
+                                "type": "SymbolGlyph",
+                                "bounds": [
+                                  460,
+                                  2548,
+                                  541,
+                                  2628
+                                ],
+                                "children": []
+                              },
+                              {
+                                "type": "Text",
+                                "text": "Mapa",
+                                "bounds": [
+                                  355,
+                                  2646,
+                                  647,
+                                  2717
+                                ],
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "id": "tab2",
+                        "type": "Button",
+                        "bounds": [
+                          667,
+                          2520,
+                          973,
+                          2745
+                        ],
+                        "clickable": true,
+                        "children": [
+                          {
+                            "type": "Column",
+                            "bounds": [
+                              674,
+                              2548,
+                              966,
+                              2717
+                            ],
+                            "children": [
+                              {
+                                "type": "SymbolGlyph",
+                                "bounds": [
+                                  779,
+                                  2548,
+                                  860,
+                                  2628
+                                ],
+                                "children": []
+                              },
+                              {
+                                "type": "Text",
+                                "text": "Łączność",
+                                "bounds": [
+                                  674,
+                                  2646,
+                                  966,
+                                  2717
+                                ],
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "id": "tab3",
+                        "type": "Button",
+                        "bounds": [
+                          987,
+                          2520,
+                          1293,
+                          2745
+                        ],
+                        "clickable": true,
+                        "children": [
+                          {
+                            "type": "Column",
+                            "bounds": [
+                              994,
+                              2548,
+                              1286,
+                              2717
+                            ],
+                            "children": [
+                              {
+                                "type": "SymbolGlyph",
+                                "bounds": [
+                                  1099,
+                                  2548,
+                                  1180,
+                                  2628
+                                ],
+                                "children": []
+                              },
+                              {
+                                "type": "Text",
+                                "text": "Poradnik",
+                                "bounds": [
+                                  994,
+                                  2646,
+                                  1286,
+                                  2717
+                                ],
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

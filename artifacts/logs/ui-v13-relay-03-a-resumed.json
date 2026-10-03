@@ -1,0 +1,82 @@
+{
+  "protocol": 1,
+  "transport": "local-emulator-websocket",
+  "host": "127.0.0.1",
+  "port": 8765,
+  "connected": [
+    "A",
+    "C"
+  ],
+  "links": [
+    [
+      "A",
+      "B"
+    ],
+    [
+      "B",
+      "C"
+    ]
+  ],
+  "routes": {
+    "A->B": {
+      "attempted": 0,
+      "forwarded": 0,
+      "dropped": 0,
+      "blocked": 0,
+      "offline": 0,
+      "backpressure": 0,
+      "injected": 0
+    },
+    "A->C": {
+      "attempted": 0,
+      "forwarded": 0,
+      "dropped": 0,
+      "blocked": 0,
+      "offline": 0,
+      "backpressure": 0,
+      "injected": 0
+    },
+    "B->A": {
+      "attempted": 0,
+      "forwarded": 0,
+      "dropped": 0,
+      "blocked": 0,
+      "offline": 0,
+      "backpressure": 0,
+      "injected": 0
+    },
+    "B->C": {
+      "attempted": 0,
+      "forwarded": 0,
+      "dropped": 0,
+      "blocked": 0,
+      "offline": 0,
+      "backpressure": 0,
+      "injected": 0
+    },
+    "C->A": {
+      "attempted": 0,
+      "forwarded": 0,
+      "dropped": 0,
+      "blocked": 0,
+      "offline": 0,
+      "backpressure": 0,
+      "injected": 0
+    },
+    "C->B": {
+      "attempted": 0,
+      "forwarded": 0,
+      "dropped": 0,
+      "blocked": 0,
+      "offline": 0,
+      "backpressure": 0,
+      "injected": 0
+    }
+  },
+  "dropNext": [],
+  "limits": {
+    "clients": 3,
+    "messageBytes": 65536,
+    "packetBytes": 16384
+  }
+}
