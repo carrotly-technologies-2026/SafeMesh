@@ -1,0 +1,459 @@
+[
+  {
+    "bounds": [
+      0,
+      0,
+      1320,
+      2856
+    ],
+    "children": [
+      {
+        "type": "root",
+        "bounds": [
+          0,
+          137,
+          1320,
+          2856
+        ],
+        "children": [
+          {
+            "type": "Column",
+            "bounds": [
+              0,
+              137,
+              1320,
+              2758
+            ],
+            "children": [
+              {
+                "type": "Row",
+                "bounds": [
+                  0,
+                  137,
+                  1320,
+                  332
+                ],
+                "children": [
+                  {
+                    "type": "Text",
+                    "text": "SafeMesh",
+                    "bounds": [
+                      70,
+                      169,
+                      1110,
+                      300
+                    ],
+                    "children": []
+                  },
+                  {
+                    "id": "openSettings",
+                    "type": "Button",
+                    "bounds": [
+                      1124,
+                      150,
+                      1292,
+                      318
+                    ],
+                    "clickable": true,
+                    "children": [
+                      {
+                        "type": "SymbolGlyph",
+                        "bounds": [
+                          1170,
+                          196,
+                          1247,
+                          273
+                        ],
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "Scroll",
+                "bounds": [
+                  0,
+                  332,
+                  1320,
+                  2504
+                ],
+                "scrollable": true,
+                "children": [
+                  {
+                    "type": "Column",
+                    "bounds": [
+                      0,
+                      332,
+                      1320,
+                      2504
+                    ],
+                    "children": [
+                      {
+                        "type": "Column",
+                        "bounds": [
+                          70,
+                          374,
+                          1250,
+                          2504
+                        ],
+                        "children": [
+                          {
+                            "type": "Row",
+                            "bounds": [
+                              70,
+                              374,
+                              1250,
+                              479
+                            ],
+                            "children": [
+                              {
+                                "type": "Text",
+                                "text": "Kraków · centrum",
+                                "bounds": [
+                                  70,
+                                  388,
+                                  832,
+                                  465
+                                ],
+                                "children": []
+                              },
+                              {
+                                "id": "exerciseBadge",
+                                "type": "Text",
+                                "text": "ĆWICZENIE",
+                                "bounds": [
+                                  860,
+                                  374,
+                                  1250,
+                                  479
+                                ],
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "type": "Text",
+                            "text": "Komunikaty",
+                            "bounds": [
+                              70,
+                              549,
+                              1250,
+                              721
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Column",
+                            "bounds": [
+                              70,
+                              777,
+                              1250,
+                              2445
+                            ],
+                            "children": [
+                              {
+                                "type": "Row",
+                                "bounds": [
+                                  136,
+                                  843,
+                                  1184,
+                                  997
+                                ],
+                                "children": [
+                                  {
+                                    "type": "SymbolGlyph",
+                                    "bounds": [
+                                      136,
+                                      885,
+                                      206,
+                                      955
+                                    ],
+                                    "children": []
+                                  },
+                                  {
+                                    "id": "verificationBadge",
+                                    "type": "Text",
+                                    "text": "Podpis poprawny · nadawca ćwiczebny",
+                                    "bounds": [
+                                      234,
+                                      843,
+                                      1184,
+                                      997
+                                    ],
+                                    "children": []
+                                  }
+                                ]
+                              },
+                              {
+                                "id": "alertTitle",
+                                "type": "Text",
+                                "text": "Przerwa w łączności",
+                                "bounds": [
+                                  136,
+                                  1039,
+                                  1184,
+                                  1325
+                                ],
+                                "children": []
+                              },
+                              {
+                                "id": "alertBody",
+                                "type": "Text",
+                                "text": "To ćwiczenie — do aplikacji dotarła podpisana wiadomość. Pozostaw aplikację otwartą, aby przekazać ją dalej; punkty ochronne PSP znajdziesz na mapie offline, a ich dostępność trzeba sprawdzić.",
+                                "bounds": [
+                                  136,
+                                  1367,
+                                  1184,
+                                  2222
+                                ],
+                                "children": []
+                              },
+                              {
+                                "type": "Divider",
+                                "bounds": [
+                                  136,
+                                  2264,
+                                  1184,
+                                  2266
+                                ],
+                                "children": []
+                              },
+                              {
+                                "type": "Text",
+                                "text": "Ważny do 6 paź, 18:49 UTC",
+                                "bounds": [
+                                  136,
+                                  2308,
+                                  1184,
+                                  2379
+                                ],
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "Column",
+                "bounds": [
+                  0,
+                  2504,
+                  1320,
+                  2758
+                ],
+                "children": [
+                  {
+                    "type": "Divider",
+                    "bounds": [
+                      0,
+                      2504,
+                      1320,
+                      2506
+                    ],
+                    "children": []
+                  },
+                  {
+                    "type": "Row",
+                    "bounds": [
+                      0,
+                      2506,
+                      1320,
+                      2759
+                    ],
+                    "children": [
+                      {
+                        "id": "tab0",
+                        "type": "Button",
+                        "bounds": [
+                          28,
+                          2520,
+                          334,
+                          2745
+                        ],
+                        "clickable": true,
+                        "children": [
+                          {
+                            "type": "Column",
+                            "bounds": [
+                              35,
+                              2548,
+                              327,
+                              2717
+                            ],
+                            "children": [
+                              {
+                                "type": "SymbolGlyph",
+                                "bounds": [
+                                  140,
+                                  2548,
+                                  221,
+                                  2628
+                                ],
+                                "children": []
+                              },
+                              {
+                                "type": "Text",
+                                "text": "Start",
+                                "bounds": [
+                                  35,
+                                  2646,
+                                  327,
+                                  2717
+                                ],
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "id": "tab1",
+                        "type": "Button",
+                        "bounds": [
+                          348,
+                          2520,
+                          654,
+                          2745
+                        ],
+                        "clickable": true,
+                        "children": [
+                          {
+                            "type": "Column",
+                            "bounds": [
+                              355,
+                              2548,
+                              647,
+                              2717
+                            ],
+                            "children": [
+                              {
+                                "type": "SymbolGlyph",
+                                "bounds": [
+                                  460,
+                                  2548,
+                                  541,
+                                  2628
+                                ],
+                                "children": []
+                              },
+                              {
+                                "type": "Text",
+                                "text": "Mapa",
+                                "bounds": [
+                                  355,
+                                  2646,
+                                  647,
+                                  2717
+                                ],
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "id": "tab2",
+                        "type": "Button",
+                        "bounds": [
+                          667,
+                          2520,
+                          973,
+                          2745
+                        ],
+                        "clickable": true,
+                        "children": [
+                          {
+                            "type": "Column",
+                            "bounds": [
+                              674,
+                              2548,
+                              966,
+                              2717
+                            ],
+                            "children": [
+                              {
+                                "type": "SymbolGlyph",
+                                "bounds": [
+                                  779,
+                                  2548,
+                                  860,
+                                  2628
+                                ],
+                                "children": []
+                              },
+                              {
+                                "type": "Text",
+                                "text": "Łączność",
+                                "bounds": [
+                                  674,
+                                  2646,
+                                  966,
+                                  2717
+                                ],
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "id": "tab3",
+                        "type": "Button",
+                        "bounds": [
+                          987,
+                          2520,
+                          1293,
+                          2745
+                        ],
+                        "clickable": true,
+                        "children": [
+                          {
+                            "type": "Column",
+                            "bounds": [
+                              994,
+                              2548,
+                              1286,
+                              2717
+                            ],
+                            "children": [
+                              {
+                                "type": "SymbolGlyph",
+                                "bounds": [
+                                  1099,
+                                  2548,
+                                  1180,
+                                  2628
+                                ],
+                                "children": []
+                              },
+                              {
+                                "type": "Text",
+                                "text": "Poradnik",
+                                "bounds": [
+                                  994,
+                                  2646,
+                                  1286,
+                                  2717
+                                ],
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

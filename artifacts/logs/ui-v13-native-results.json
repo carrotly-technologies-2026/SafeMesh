@@ -1,0 +1,59 @@
+{
+  "sourceCommit": "247323e",
+  "checks": [
+    {
+      "name": "Home has no duplicated offline Canvas",
+      "pass": true
+    },
+    {
+      "name": "A resumes role after background pause",
+      "pass": true
+    },
+    {
+      "name": "C isolated with no alert before B reconnects",
+      "pass": true
+    },
+    {
+      "name": "one ACK dropped and data retried",
+      "pass": true
+    },
+    {
+      "name": "B accepted first hop and recognized retry duplicate",
+      "pass": true
+    },
+    {
+      "name": "B restored same valid alert after process restart",
+      "pass": true
+    },
+    {
+      "name": "C accepted hop two with A offline",
+      "pass": true
+    },
+    {
+      "name": "no direct A to C route",
+      "pass": true
+    },
+    {
+      "name": "forged signed translation and expired data rejected",
+      "pass": true
+    },
+    {
+      "name": "rejected packets receive no ACK",
+      "pass": true
+    },
+    {
+      "name": "valid duplicate re-acknowledged",
+      "pass": true
+    },
+    {
+      "name": "rejection leaves connected UI visible",
+      "pass": true
+    },
+    {
+      "name": "HAP matches final compiled artifact",
+      "pass": true
+    }
+  ],
+  "passed": 13,
+  "failed": 0
+}

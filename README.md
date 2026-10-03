@@ -1,29 +1,29 @@
-# SafeMesh 1.2
+# SafeMesh 1.3
 
 **Signed warnings. Offline protective-point maps. A path from one phone to the next.**
 
 SafeMesh is a native HarmonyOS hackathon prototype for a civilian problem: losing mobile service should not also mean losing the warning you received or the map that helps you understand where protective places are located.
 
-The app combines on-device signature verification, a bundled central Kraków map, private local storage and a store-and-forward relay with peer acknowledgements and bounded retries. Version **1.2** adds packet exchange between **three separate HarmonyOS emulator apps**, through an explicitly labelled local WebSocket transport mock. Native tests demonstrated A → B, loss of an ACK and retry, then B → C after B restarted and A disconnected. The same app verifier, storage and delivery queue run on each emulator; physical NearLink remains unverified.
+The app combines on-device signature verification, a bundled central Kraków map, private local storage and a store-and-forward relay with peer acknowledgements and bounded retries. Version **1.3** separates everyday screens from exercise tools, adds **signed Polish and English alert content**, and handles expiry and foreground relay recovery. Home shows the current alert, saved place and connection; the interactive map lives in Map, while exercise loading lives in Tests and diagnostics.
 
-The app retains the single-device six-check drill, a public NearLink API adapter awaiting physical validation, optional foreground location, durable point saving, search across all 40 bundled points, and **Settings / Ustawienia** opened by the header gear for saved PL/EN and Light/Dark/System choices.
+Three separate HarmonyOS emulator apps exchange packets through an explicitly labelled local WebSocket transport mock. The **v1.3 native run** demonstrated A → B with ACK loss/retry, then B → C after B restarted and A disconnected, plus rejection of a forged translation and an expired packet. Physical NearLink remains unverified.
 
 **Demo only:** SafeMesh is not connected to RCB or an official warning issuer. All bundled alerts are signed exercises. Mapped PSP protective points are reference records; current access, condition and protection are not verified by the app.
 
-The [multi-emulator lab report](artifacts/research/mesh-lab.md) records the v1.2 packet tests, commands and limitations. The [readiness and HarmonyOS UX audit](artifacts/READINESS_AUDIT.md) preserves the earlier UX checkpoint. Passing these tests is not a claim of complete product readiness or Huawei certification.
+The [v1.3 validation report](artifacts/research/ui-v13-validation.md) contains current screenshots, language/theme/large-text checks, native packet evidence and recording details. The [multi-emulator lab report](artifacts/research/mesh-lab.md) preserves v1.2 evidence; the [readiness audit](artifacts/READINESS_AUDIT.md) records earlier checkpoints.
 
 ## What you can demonstrate
 
 | Screen | Working prototype behavior |
 | --- | --- |
-| Home | Receive a signed exercise, verify it with native ECDSA P-256/SHA-256, retain accepted content locally and show its expiry. |
-| Map | Explore bundled OSM vector geometry and all 40 PSP protective points in central Kraków. Search addresses, select a point and save it locally. The initial marker is a labeled demo origin at Rynek; an explicit location request can replace it with a suitable device fix. |
-| Relay | Connect separate emulator apps as A/B/C over the local test link, relay signed alerts, inspect ACK/retry counters and retain messages across app restart. The original in-process six-check drill also remains available. |
-| NearLink panel | Check actual capability. On compatible hardware, request permission, advertise, discover a named peer and synchronize every valid cached alert. Track queued messages, peer acknowledgements, retries and exhausted attempts. The emulator reports unavailable radio and zero physical peers. |
+| Home / Start | Read the current verified alert and validity time, open the saved protective point, and see connection status. With no current message, **Connect devices / Połącz urządzenia** opens Relay. Home does not load exercise messages or embed a map. |
+| Map / Mapa | Switch between Map and List; search all 40 central Kraków PSP addresses, including searches without Polish diacritics. Select a marker or row to open point details, save it, or show it on the map. Back returns to the originating screen. |
+| Relay / Łączność | Choose emulator A/B/C, connect to the local test link, inspect neighbors and ACK/retry counters, and send verified cached messages. Open diagnostics for exercise controls. |
 | Guide | Read a short offline preparedness reminder and see what the prototype's verification claim means. |
-| Settings / Ustawienia | Choose **PL / EN** and **Light / Dark / System** (**Jasny / Ciemny / Systemowy**). Choices are saved locally; System follows the device's appearance automatically. Signed alert text remains unchanged when changing interface language. |
+| Settings / Ustawienia | Open the header gear to choose saved **PL / EN** and **Light / Dark / System** preferences. System follows the device appearance. A language switch selects the matching issuer-signed alert variant. |
+| Tests and diagnostics / Testy i diagnostyka | Enter from Settings or Relay. Load an exercise, run the six-check local verification test, inspect delivery diagnostics or check NearLink capability. Back returns to the screen that opened diagnostics. |
 
-The starter map is inside the HAP, so it is available on first launch without an installation-time download. Map refresh is currently a preparation script. Distances are straight-line distances from the currently labeled origin; the app does not calculate an evacuation route or confirm that an approach is safe.
+The starter map is inside the HAP, so it is available on first launch without an installation-time download. Its initial origin is explicitly labelled as a demo point at Rynek. Map refresh is a preparation script. Distances are straight-line distances from the labelled origin; the app does not calculate an evacuation route or confirm that an approach is safe.
 
 **Use my location** performs one foreground request after a permission prompt, with a ten-second fix timeout. A usable fix must be inside the bundled area and report accuracy of 250 metres or better. Permission denial, disabled location, timeout, poor accuracy or a position outside the pack preserve the previous origin and show an explanation. The demo origin remains explicit until a fix is accepted, and can be restored manually. Device coordinates are neither saved to disk nor relayed to peers.
 
@@ -63,7 +63,7 @@ Use the actual device name or serial reported by `device list`. To start the alr
 
 `devecocli run --skip-build` installs the existing build and launches `org.safemesh.alerts/EntryAbility`; it can also be rerun to relaunch the demo without rebuilding.
 
-For a single-emulator rebuild, the convenience script builds, checks the exit code, copies the current unsigned HAP to `dist/SafeMesh-demo.hap`, writes `dist/SHA256SUMS.txt`, and deploys it. These fixed output names replace the retained v1.1 HAP and checksum manifest if rerun; the v1.2 lab launcher below uses the build output directly:
+For a single-emulator rebuild, the helper reads `versionName` from `AppScope/app.json5`, builds, writes `dist/SafeMesh-1.3.0.hap` and its HAP-only SHA-256 manifest, and deploys it. Historical v1.1/v1.2 packages are preserved. The lab launcher below uses the build output directly:
 
 ```powershell
 .\scripts\run-demo.ps1
@@ -73,17 +73,19 @@ Use `-Device <serial>` for another target or `-NoRun` to build/package only. If 
 
 ### Install the packaged demo
 
-The v1.2 package is [SafeMesh-mesh-lab-1.2.0.hap](dist/SafeMesh-mesh-lab-1.2.0.hap), with a [separate SHA-256 manifest](dist/SafeMesh-mesh-lab-1.2.0.sha256.txt). It is the debug **unsigned emulator package**, copied from `entry/build/default/outputs/default/entry-default-unsigned.hap`. The configured emulator accepts this HAP; that is not a phone-signing guarantee. The existing `SafeMesh-demo.hap`, video and source ZIP remain the historical v1.1 submission assets.
+The v1.3 release files are [HAP](dist/SafeMesh-1.3.0.hap), [source ZIP](dist/SafeMesh-1.3.0-source.zip), [demo video](dist/SafeMesh-1.3.0-demo.mp4) and [SHA-256 manifest](dist/SafeMesh-1.3.0.sha256.txt). The HAP is a debug **unsigned emulator package**, copied from `entry/build/default/outputs/default/entry-default-unsigned.hap`.
 
-For an existing packaged artifact, install and launch using the SDK's HDC tool:
+Historical packages remain separate: [v1.2 HAP](dist/SafeMesh-mesh-lab-1.2.0.hap) and [checksum](dist/SafeMesh-mesh-lab-1.2.0.sha256.txt); `SafeMesh-demo.hap`, video and source ZIP preserve v1.1. Neither historical package contains the v1.3 screens or bilingual fixture.
+
+Install and launch the packaged artifact using the SDK's HDC tool:
 
 ```powershell
 $hdc = Join-Path $env:DEVECO_CLI_STUDIO_PATH 'sdk\default\openharmony\toolchains\hdc.exe'
-& $hdc -t 127.0.0.1:5555 install -r '.\dist\SafeMesh-mesh-lab-1.2.0.hap'
+& $hdc -t 127.0.0.1:5555 install -r '.\dist\SafeMesh-1.3.0.hap'
 & $hdc -t 127.0.0.1:5555 shell aa start -b org.safemesh.alerts -a EntryAbility
 ```
 
-The second command alone launches an installed app. Physical Huawei phones require an appropriate development certificate, provisioning profile and registered device, configured through DevEco Studio signing. No production certificate or private issuer key is included.
+The second command alone launches an installed app. This project's executable validation target is the emulator. No production certificate or private issuer key is included.
 
 ## Three-emulator packet demo
 
@@ -96,9 +98,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-mesh-lab.ps1
 
 The helper builds once, starts the named instances, discovers their actual device serials, verifies or starts the loopback hub, checks HDC reverse ports and installs/launches the same HAP on all three. Use `-SkipBuild` for an existing build; use `-EmulatorA`, `-EmulatorB` and `-EmulatorC` for other instance names. It does not create/download emulators, accept licences, uninstall apps or erase their data. Logs and a newly started hub's PID are kept in ignored `.cache/mesh-lab/`.
 
-In **Relay / Łączność**, open the emulator test panel, choose A/B/C on the corresponding emulator and connect. Keep each app in the foreground. The visible mock-transport label distinguishes this mode from NearLink radio. The hub routes only configured A–B/B–C edges, never a direct A–C link, and does not store or acknowledge alerts.
+In **Relay / Łączność**, choose A/B/C on the corresponding emulator and select **Connect / Połącz**. Keep each app in the foreground. On A, open **Tests and diagnostics / Testy i diagnostyka**, then **Load and send exercise / Wczytaj i wyślij ćwiczenie**. Alternatively, load the exercise there, return to Relay and select **Send message / Wyślij wiadomość**. Home on each receiving app shows its verified signed content.
 
-The [step-by-step lab report](artifacts/research/mesh-lab.md) covers isolating C, dropping B's first ACK, restarting B with its saved alert, bringing C into range, and injecting tampered/expired/duplicate packets. Captured native evidence shows **B accepted hop 1**, **C later accepted hop 2**, invalid/expired packets received no ACK or forwarding, and verified content remained displayed.
+The visible emulator-transport label distinguishes this mode from NearLink radio. The hub routes only configured A–B/B–C edges, never a direct A–C link, and does not store or acknowledge alerts. Leaving the app foreground pauses its link and timers. Returning resumes only a previously active connection; an explicit Disconnect stays disconnected. After a fresh process launch, use Connect again.
+
+The [v1.3 native report](artifacts/research/ui-v13-validation.md#three-process-delivery-on-the-final-hap) records isolating C, dropping B's first ACK, restarting B with its saved alert, bringing C into range and injecting tampered/expired/duplicate packets. **B accepted hop 1**, **C later accepted hop 2 with A offline**, and rejected packets received no ACK. The separate [v1.2 lab report](artifacts/research/mesh-lab.md) preserves the earlier run.
 
 For a repeat with a new exercise key, rebuild and redeploy **all three apps together**:
 
@@ -110,27 +114,27 @@ This rotates the demo key and makes old cached exercises fail verification witho
 
 ## A two-minute single-emulator demo
 
-1. Open **Home** and select **Receive a signed drill**. Point out the exercise label, native signature result and validity period.
-2. Open **Map**. Search one of the 40 addresses, zoom, select a marker, read its source availability category and save it. Optionally request location and show the labeled demo fallback if a usable fix is unavailable. Explain that records are bundled and access is not confirmed live.
-3. Open **Relay** and select **Run the signed relay drill**. Show A → B → C, followed by duplicate suppression, forged-text rejection and expiry rejection. The expected result is **6 / 6 checks passed on this device**.
-4. Select **Check hardware**. On the emulator, explain the explicit unsupported-radio result. The simulation exercises native cryptography and relay policy; it does not claim to transmit radio packets.
-5. Open **Settings / Ustawienia** using the gear in the upper-right corner. Choose **PL / EN**, then demonstrate **Light / Dark / System**. Relaunch to check that the selections restore; System automatically follows the device theme. Alert signatures cover the original message text, so changing interface language does not translate a signed alert.
+1. Start on **Home / Start**: the empty state offers **Connect devices / Połącz urządzenia**. Open the header gear, then **Tests and diagnostics / Testy i diagnostyka** → **Load exercise message / Wczytaj wiadomość ćwiczebną** (`diagnosticDrill`). Return to Home to inspect the verified alert and expiry.
+2. Open **Map / Mapa**. Search an address with or without Polish diacritics (`searchPoints`), switch Map/List, and open a marker or result. In point details, save the point (`savePoint`), use **Show on map / Pokaż na mapie**, or go Back. Home should show the saved address; the map remains on its own tab.
+3. Open **Settings / Ustawienia** and switch **Polski / English** (`languagePl` / `languageEn`). Check that both UI and signed alert content change language. Try Light/Dark/System, then relaunch to check stored preferences and saved content.
+4. Open diagnostics from Settings or Relay, then **Run verification test / Uruchom test weryfikacji** (`runRelay`). The intended result is six passing checks: A → B → C, duplicate suppression, forged-content rejection and expiry rejection. This test runs within one app process.
+5. In diagnostics, **Check NearLink support / Sprawdź obsługę NearLink** (`checkNearLink`) shows the emulator's unsupported-radio result. Use the three-emulator walkthrough above for actual inter-app packet exchange over the local transport mock.
 
 ### Record the emulator demo
 
 The Windows recorder captures the visible `Emulator.exe` client window and uses the FFmpeg bundled with DevEco Studio. Keep one emulator window visible, keep its size unchanged, and operate the app while recording:
 
 ```powershell
-python scripts/record-demo.py --duration 120 --output dist/SafeMesh-demo.mp4
+python scripts/record-demo.py --duration 120 --output dist/SafeMesh-1.3.0-demo.mp4
 ```
 
 Use `--studio <directory>` for a different Studio installation or `--pid <Emulator.exe PID>` when multiple emulator windows are open. Python's standard library is sufficient. The recorder refuses to overwrite an existing output.
 
-The local video artifact [dist/SafeMesh-demo.mp4](dist/SafeMesh-demo.mp4) is the **historical v1.1** reviewed, silent 90-second recording: map, in-process six-check drill and appearance/language settings. Its capture metadata and checksum are in the [v1.1 validation record](artifacts/VALIDATION.md). It does not show the v1.2 exchange between three emulator processes. Recording does not publish or upload anything.
+The new [v1.3 demo video](dist/SafeMesh-1.3.0-demo.mp4) is a reviewed, silent **90-second native-window recording** showing the revised Home, offline Map/list/detail, Guide and PL/EN with light/dark settings. It has 1350 frames at 15 fps and zero late capture frames; [capture and review evidence](artifacts/logs/newui-v13-video-review.json). It is a UI demonstration; the packet logs establish the three-emulator exchange separately. The historical `dist/SafeMesh-demo.mp4` and its [v1.1 validation record](artifacts/VALIDATION.md) are preserved. Recording does not publish or upload anything.
 
 ### Refresh an expired exercise
 
-The checked-in fresh fixture expires at **2026-10-06T17:45:51.662Z**. Its validity is intentionally limited to 72 hours. The app must reject it after that time.
+The checked-in bilingual fixture expires at **2026-10-06T18:49:45.616Z**. Its validity is intentionally limited to 72 hours. The app rejects it after that time.
 
 Before a later presentation, regenerate the exercise fixtures, rebuild, repackage and redeploy with one command:
 
@@ -153,21 +157,24 @@ The helper discovers every `tests/*.test.mjs` suite, runs host tests, ArkTS chec
 
 | Suite | Coverage |
 | --- | --- |
-| `tests/protocol.test.mjs` | Genuine signatures, signed-field mutation, trust scope, expiry, replay, concurrent arrivals, bounded parsing/cache, restore, revision policy and the native empty-encoder regression. |
+| `tests/protocol.test.mjs` | Genuine signatures, signed v2 translations, exact v1 canonical compatibility, malformed/unsigned language rejection, trust scope, expiry, replay, bounded parsing/cache, restore and native empty-encoder regression. |
+| `tests/alert-display.test.mjs` | Actual ViewModel with real ECDSA: PL/EN selection, original-language fallback, forged translation rejection, restore, expiry fallback and paused/resumed timers. |
 | `tests/nearlink.test.mjs` | Capability gate, exact-name discovery, confirmed connections, MTU framing, split/coalesced reads, invalid input and cleanup. |
 | `tests/map.test.mjs` | Dataset preservation, attribution, geometry, coordinate projection, selection, distances, clipping and Canvas submission bounds. |
 | `tests/integration.test.mjs` | ViewModel persistence/restore, rejected-input handling, forwarding, concurrency, errors and expiry. |
 | `tests/storage.test.mjs` | Native string-size limits, chunked snapshots, generation commits, interrupted writes, initialization and concurrent access. |
-| `tests/delivery.test.mjs` | Full-cache synchronization, delayed/reconnected peers, strict ACK matching, loss/retry policy, expiry, deadlines, transport switching, retired callbacks and three independent ViewModels. |
+| `tests/delivery.test.mjs` | Full-cache synchronization, delayed/reconnected peers, strict ACK matching, loss/retry policy, expiry, deadlines, transport switching, retired callbacks, foreground lifecycle and three independent ViewModels. |
 | `tests/location.test.mjs` | Native one-shot location permission/capability handling, usable results and failure paths. |
 | `tests/emulator-transport.test.mjs` | Actual ArkTS WebSocket adapter with platform mocks: handshake, peer updates, packet bounds, sender filtering, deadlines, error diagnostics and stop races. |
 | `tests/mesh-lab-server.test.mjs` | Actual local sockets and RFC WebSocket framing, topology, injected loss, malformed input, host/origin checks, heartbeat cleanup and public fixture derivation. |
 
 Tests discover the TypeScript compiler inside DevEco Studio through `DEVECO_CLI_STUDIO_PATH`; see [NearLink evidence](artifacts/research/nearlink.md) for fallback locations. Protocol/integration/storage tests also accept `ARKTS_TYPESCRIPT_PATH`. The map suite uses Node 24's type-erasure support. Host fixture time is controlled inside the relevant tests; the native app uses the actual device clock.
 
-The final v1.2 check/build passed **96 host checks across nine suites**, **19 ArkTS files / zero errors** with 29 separate advisories, **zero lint issues** and **BUILD SUCCESSFUL**. See the [combined final log](artifacts/logs/mesh-lab-final-checks-build.log). Separate native evidence records [8 / 8 relay-scenario assertions](artifacts/logs/mesh-lab-native-results.json) and [automatic stale-connection removal after B restarted](artifacts/logs/mesh-lab-08-stale-peer-removed.json). The [lab report](artifacts/research/mesh-lab.md) distinguishes the full packet-scenario build from the final package's subsequent diagnostic change.
+**Version 1.3 checks:** **130 host tests passed**, **19 ArkTS files / zero errors** with 34 separate permission, exception and deprecated-API advisories, **zero Code Linter issues**, and a successful HAP build. See the [final check/build log](artifacts/logs/ui-v13-final-checks-build.log). All three emulator deployments passed smoke checks; [13/13 assertions over native evidence](artifacts/logs/ui-v13-native-results.json) passed. UI validation covered PL/EN, light/dark/system appearance, saved-point restoration and the real **1.45× Huge** system text preset.
 
-Historical v1.1 evidence remains available: **61 host checks / seven suites**, **17 ArkTS files / zero errors**, lint/build and **Smoke: PASS** in the [v1.1 checks log](artifacts/logs/v11-checks.log), [run log](artifacts/logs/v11-run.log) and [validation record](artifacts/VALIDATION.md). Native-icon navigation, gear/back behavior and a [same-host clean-checkout build](artifacts/logs/v11-clean-checkout.log) were also verified for that revision; those results are not relabelled as v1.2 checks.
+Historical **v1.2** check/build passed **96 host checks across nine suites**, **19 ArkTS files / zero errors** with 29 separate advisories, **zero lint issues** and **BUILD SUCCESSFUL**. See the [combined log](artifacts/logs/mesh-lab-final-checks-build.log), [8 / 8 native relay-scenario assertions](artifacts/logs/mesh-lab-native-results.json), and [automatic stale-connection removal after B restarted](artifacts/logs/mesh-lab-08-stale-peer-removed.json). The [lab report](artifacts/research/mesh-lab.md) identifies the exact builds used. These are not v1.3 results.
+
+Historical **v1.1** evidence remains available: **61 host checks / seven suites**, **17 ArkTS files / zero errors**, lint/build and **Smoke: PASS** in the [checks log](artifacts/logs/v11-checks.log), [run log](artifacts/logs/v11-run.log) and [validation record](artifacts/VALIDATION.md). Native-icon navigation, gear/back behavior and a [same-host clean-checkout build](artifacts/logs/v11-clean-checkout.log) were verified for that revision only.
 
 Required native checkpoints include a successful HAP build and launch, **6 / 6** signature/relay drill checks, explicit unavailable NearLink radio on the emulator, and restored alerts/saved points after relaunch. Device location, themes and large-text behavior need their own recorded interaction checks. Permission/exception advisories from the ArkTS checker are separate from Code Linter results; the manifest declares the needed permissions and the corresponding native adapters request them at runtime. An emulator smoke check alone is not proof of every feature.
 
@@ -184,9 +191,13 @@ Phone A ──► Phone B retains alert ──► Phone C
 
 The relay engine authenticates a bounded, canonical payload before displaying or forwarding it. A pinned exercise public key can authorize exercises only. Accepted messages are copied into a bounded cache, revisions are checked, expired messages are removed and replay history is re-verified when restored. The maximum cooperative hop budget is eight; an unsigned hop counter is not proof of an adversary's path length.
 
+Version 2 signs the source language and every alternate title, body and area under the separate `SafeMesh.Alert.v2` canonical domain. The fixture contains a Polish original and one English alternate. Only `pl` and `en` are accepted; duplicates, malformed alternatives and oversized content are rejected. The complete canonical content remains bounded to 4 KiB. Switching language selects already-verified content and leaves packet bytes and signature unchanged.
+
+Version 1 canonical bytes remain exact. A valid v1 alert displays its original text with an explicit unknown-language fallback; unsigned translation metadata is rejected. A v2 alert missing the requested alternate also shows a labelled original-language fallback. Old-format support does not bypass the pinned key, signature or expiry checks. When the visible alert expires, the app selects the newest still-valid cached alert, or clears the alert if none remain.
+
 NearLink provides device-to-device links; SafeMesh supplies the application relay policy. The public adapter uses `@kit.NearLinkKit`, `ohos.permission.ACCESS_NEARLINK`, a custom application UUID and reliable byte transfer. Its bounded framing allows a message to span the negotiated MTU.
 
-The app synchronizes **all current verified cached alerts** with a delayed or reconnected peer. Version 1.2 reuses this exact policy over either the NearLink adapter or the local emulator link. The foreground queue is limited to eight peers and 128 alerts per peer, sends at most four packets per batch, and rechecks authenticity-cache membership and expiry before sending. Each item gets at most three attempts per connection, with bounded ACK waits and a three-second wait for each native send. Expired items leave the queue. Stop clears queue-owned timers and prevents late startup callbacks from reviving the relay.
+The app synchronizes **all current verified cached alerts** with a delayed or reconnected peer, using the same relay policy over the local emulator link and the optional NearLink adapter. The foreground queue is limited to eight peers and 128 alerts per peer, sends at most four packets per batch, and rechecks cache membership and expiry before sending. Each item gets at most three attempts per connection, with bounded ACK waits and a three-second wait for each native send. Expired items leave the queue. Background suspension stops links and timers; foreground recovery reconnects a previously active link and resynchronizes valid saved content. Explicit Disconnect cancels recovery.
 
 An ACK must match the expected connected peer, a fresh random delivery token, the issuer key ID, alert ID and revision. Receivers ACK only a verified accepted message or a verified duplicate; duplicates are acknowledged again to recover from ACK loss, without being forwarded again. Forged or expired data never gets a success ACK. Local write success alone is not recorded as acknowledged delivery. Legacy raw signed alerts are still accepted on input; ACK-based delivery requires a compatible current peer.
 
@@ -240,14 +251,18 @@ tests/                           Host tests of application sources
 artifacts/research/              Primary-source evidence and limitations
 artifacts/logs/                   Build and validation records
 artifacts/screenshots/            Native emulator captures
-dist/SafeMesh-mesh-lab-1.2.0.hap   Version 1.2 emulator lab package
+dist/SafeMesh-1.3.0.hap           v1.3 emulator package
+dist/SafeMesh-1.3.0-source.zip    v1.3 source archive
+dist/SafeMesh-1.3.0-demo.mp4      v1.3 native UI demonstration
+dist/SafeMesh-1.3.0.sha256.txt    v1.3 checksum manifest
+dist/SafeMesh-mesh-lab-1.2.0.hap   Historical v1.2 emulator lab package
 dist/SafeMesh-demo.hap            Historical v1.1 submission package
 dist/SafeMesh-demo.mp4            Historical v1.1 single-emulator demonstration
 ```
 
-## Next validation gate
+## Validation scope
 
-The three-emulator test demonstrates signed packets moving between separate native app processes, including storage across B's restart. The next transport gate is the same scenario on three supported physical phones using actual NearLink: A sends to B, A disappears, and B later delivers to C without internet. Validate the optional Kit-loading path on those devices, then measure locked-screen behavior, interrupted links, unavailable radio, permission denial and packet bursts before making reliability or battery claims.
+The current target is API 24 emulators. Native v1.3 checks cover signed A → B → C delivery, ACK loss, B restoration, bilingual display and foreground recovery. The local hub is an intentional transport mock. Physical NearLink, radio range, battery behavior and background delivery are outside the demonstrated scope.
 
 A deployable warning service also needs an authorized issuer, audited key custody/rotation/revocation, a trusted-time policy, fresh protective-point access information and operational review. Signatures cannot prevent jamming, message dropping or compromised authority keys. No range, guaranteed delivery or certified shelter safety is claimed by this hackathon build.
 

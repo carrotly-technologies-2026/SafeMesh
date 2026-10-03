@@ -1,0 +1,12 @@
+10-04 03:20:02.792  5423  5423 I C03900/Ace: [a92ab15562a80b3, 34eadc, 131fb5e] [(-2:100000:singleton)] [org.safemesh.alerts][entry][100000]: UIContent OnNewWant
+10-04 03:20:02.794  5423  5423 I C03900/Ace: [a92ab15562a80b3, 34eadc, 131fb5e] [(-2:100000:singleton)] [org.safemesh.alerts][entry][100000]: UpdateWindowVisible: 1, hasDecor: 0
+10-04 03:20:02.795  5423  5423 I C03900/Ace: [a92ab15562a80b3, 34eadc, 131fb5e] [(-2:100000:singleton)] [org.safemesh.alerts][entry][100000]: window foreground
+10-04 03:20:02.824  5423  5423 I C03900/Ace: [a92ab15562a80b3, d28d66, a7cede] [(-2:100000:singleton)] [100000][org.safemesh.alerts][entry] UpdateConfigurationSyncForAll, name:{"0#ohos.system.fontSizeScale":"1.450000"}
+10-04 03:20:02.824  5423  5423 I A00000/SafeMeshUI: [a92ab15562a80b3, d28d66, a7cede] SAFEMESH_UI_CONFIGURATION fontSizeScale=1.45 colorMode=1
+10-04 03:20:02.839  5423  5423 I C03900/Ace: [a92ab15562a80b3, 15ee7c6, 270a1c4] [(-2:100000:singleton)] [100000][org.safemesh.alerts][entry] UpdateConfigurationSyncForAll, name:{"0#ohos.system.fontWeightScale":"1.000000"}
+10-04 03:20:02.840  5423  5423 I A00000/SafeMeshUI: [a92ab15562a80b3, 15ee7c6, 270a1c4] SAFEMESH_UI_CONFIGURATION fontSizeScale=1.45 colorMode=1
+10-04 03:20:02.876  5423  5423 I C03900/Ace: [a92ab15562a80b3, 48e7be, d28d66] [(-2:100000:singleton)] [100000][org.safemesh.alerts][entry] UpdateConfiguration, name:{"0#ohos.system.fontSizeScale":"1.450000"}
+10-04 03:20:02.890  5423  5423 I C03900/Ace: [a92ab15562a80b3, 241a453, 15ee7c6] [(-2:100000:singleton)] [100000][org.safemesh.alerts][entry] UpdateConfiguration, name:{"0#ohos.system.fontWeightScale":"1.000000"}
+10-04 03:20:03.584  5423  5513 I C03900/Ace: [(-1:100000:singleton)] [org.safemesh.alerts][entry][100000]: window focus
+10-04 03:20:03.584  5423  5513 I C03900/Ace: [(-1:100000:singleton)] [org.safemesh.alerts][entry][100000]:window active
+10-04 03:20:03.612  5423  5423 I C03959/AceLayout: [(-2:100000:singleton)] [org.safemesh.alerts][entry][100000]: UpdateViewportConfig Viewport config: size: (1320, 2856) orientation: 0 density: 3.500000 position: (0, 0) transformHint: 0 displayId: 0, windowSizeChangeReason 23, is rsTransaction nullptr 1, updateAvoidAreas size: 5[(0,top [0 0 1320 136] )(1,top [517 45 285 103] )(2,empty)(3,empty)(4,bottom [429 2758 462 98] )], keyboardRect Rect (0.00, 0.00) - [0.00 x 0.00]

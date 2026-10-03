@@ -1,0 +1,742 @@
+[
+  {
+    "bounds": [
+      0,
+      0,
+      1320,
+      2856
+    ],
+    "children": [
+      {
+        "type": "root",
+        "bounds": [
+          0,
+          137,
+          1320,
+          2856
+        ],
+        "children": [
+          {
+            "type": "Column",
+            "bounds": [
+              0,
+              137,
+              1320,
+              2758
+            ],
+            "children": [
+              {
+                "type": "Row",
+                "bounds": [
+                  0,
+                  137,
+                  1320,
+                  332
+                ],
+                "children": [
+                  {
+                    "type": "Text",
+                    "text": "Łączność",
+                    "bounds": [
+                      70,
+                      187,
+                      1110,
+                      281
+                    ],
+                    "children": []
+                  },
+                  {
+                    "id": "openSettings",
+                    "type": "Button",
+                    "bounds": [
+                      1124,
+                      150,
+                      1292,
+                      318
+                    ],
+                    "clickable": true,
+                    "children": [
+                      {
+                        "type": "SymbolGlyph",
+                        "bounds": [
+                          1170,
+                          196,
+                          1247,
+                          273
+                        ],
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "Scroll",
+                "bounds": [
+                  0,
+                  332,
+                  1320,
+                  2526
+                ],
+                "scrollable": true,
+                "children": [
+                  {
+                    "type": "Column",
+                    "bounds": [
+                      0,
+                      332,
+                      1320,
+                      2526
+                    ],
+                    "children": [
+                      {
+                        "type": "Column",
+                        "bounds": [
+                          70,
+                          374,
+                          1250,
+                          2526
+                        ],
+                        "children": [
+                          {
+                            "type": "Text",
+                            "text": "Połącz urządzenia testowe, aby wymieniać podpisane wiadomości.",
+                            "bounds": [
+                              70,
+                              374,
+                              1250,
+                              506
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Row",
+                            "bounds": [
+                              70,
+                              569,
+                              1250,
+                              839
+                            ],
+                            "children": [
+                              {
+                                "type": "SymbolGlyph",
+                                "bounds": [
+                                  70,
+                                  648,
+                                  182,
+                                  760
+                                ],
+                                "children": []
+                              },
+                              {
+                                "type": "Column",
+                                "bounds": [
+                                  224,
+                                  597,
+                                  1250,
+                                  811
+                                ],
+                                "children": [
+                                  {
+                                    "id": "labStatus",
+                                    "type": "Text",
+                                    "text": "Połączono",
+                                    "bounds": [
+                                      224,
+                                      597,
+                                      1250,
+                                      691
+                                    ],
+                                    "children": []
+                                  },
+                                  {
+                                    "id": "labBanner",
+                                    "type": "Text",
+                                    "text": "Test emulatorów · połączenie lokalne, bez radia NearLink",
+                                    "bounds": [
+                                      224,
+                                      705,
+                                      1250,
+                                      811
+                                    ],
+                                    "children": []
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "type": "Text",
+                            "text": "Rola urządzenia",
+                            "bounds": [
+                              70,
+                              902,
+                              1250,
+                              955
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Row",
+                            "bounds": [
+                              70,
+                              1018,
+                              1250,
+                              1186
+                            ],
+                            "children": [
+                              {
+                                "id": "labNodeA",
+                                "type": "Button",
+                                "bounds": [
+                                  70,
+                                  1018,
+                                  445,
+                                  1186
+                                ],
+                                "clickable": true,
+                                "children": [
+                                  {
+                                    "type": "Text",
+                                    "text": "A",
+                                    "bounds": [
+                                      235,
+                                      1065,
+                                      279,
+                                      1139
+                                    ],
+                                    "children": []
+                                  }
+                                ]
+                              },
+                              {
+                                "id": "labNodeB",
+                                "type": "Button",
+                                "bounds": [
+                                  473,
+                                  1018,
+                                  848,
+                                  1186
+                                ],
+                                "clickable": true,
+                                "children": [
+                                  {
+                                    "type": "Text",
+                                    "text": "B",
+                                    "bounds": [
+                                      639,
+                                      1065,
+                                      681,
+                                      1139
+                                    ],
+                                    "children": []
+                                  }
+                                ]
+                              },
+                              {
+                                "id": "labNodeC",
+                                "type": "Button",
+                                "bounds": [
+                                  875,
+                                  1018,
+                                  1250,
+                                  1186
+                                ],
+                                "clickable": true,
+                                "children": [
+                                  {
+                                    "type": "Text",
+                                    "text": "C",
+                                    "bounds": [
+                                      1041,
+                                      1065,
+                                      1083,
+                                      1139
+                                    ],
+                                    "children": []
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "id": "labStop",
+                            "type": "Button",
+                            "bounds": [
+                              70,
+                              1249,
+                              1250,
+                              1417
+                            ],
+                            "clickable": true,
+                            "children": [
+                              {
+                                "type": "Text",
+                                "text": "Rozłącz B",
+                                "bounds": [
+                                  112,
+                                  1302,
+                                  1208,
+                                  1364
+                                ],
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "type": "Divider",
+                            "bounds": [
+                              70,
+                              1480,
+                              1250,
+                              1482
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Row",
+                            "bounds": [
+                              70,
+                              1545,
+                              1250,
+                              1607
+                            ],
+                            "children": [
+                              {
+                                "type": "Text",
+                                "text": "Sąsiednie urządzenia",
+                                "bounds": [
+                                  70,
+                                  1545,
+                                  1220,
+                                  1607
+                                ],
+                                "children": []
+                              },
+                              {
+                                "id": "labPeerCount",
+                                "type": "Text",
+                                "text": "1",
+                                "bounds": [
+                                  1220,
+                                  1545,
+                                  1250,
+                                  1607
+                                ],
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "type": "Row",
+                            "bounds": [
+                              70,
+                              1670,
+                              1250,
+                              1838
+                            ],
+                            "children": [
+                              {
+                                "type": "Text",
+                                "text": "C",
+                                "bounds": [
+                                  70,
+                                  1719,
+                                  196,
+                                  1789
+                                ],
+                                "children": []
+                              },
+                              {
+                                "type": "Text",
+                                "text": "Połączenie aktywne",
+                                "bounds": [
+                                  231,
+                                  1726,
+                                  1145,
+                                  1783
+                                ],
+                                "children": []
+                              },
+                              {
+                                "type": "SymbolGlyph",
+                                "bounds": [
+                                  1180,
+                                  1719,
+                                  1250,
+                                  1789
+                                ],
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "type": "Divider",
+                            "bounds": [
+                              70,
+                              1901,
+                              1250,
+                              1903
+                            ],
+                            "children": []
+                          },
+                          {
+                            "id": "labMetrics",
+                            "type": "Row",
+                            "bounds": [
+                              70,
+                              1966,
+                              1250,
+                              2301
+                            ],
+                            "children": [
+                              {
+                                "type": "Column",
+                                "bounds": [
+                                  70,
+                                  1966,
+                                  445,
+                                  2252
+                                ],
+                                "children": [
+                                  {
+                                    "type": "Text",
+                                    "text": "0",
+                                    "bounds": [
+                                      231,
+                                      2022,
+                                      284,
+                                      2129
+                                    ],
+                                    "children": []
+                                  },
+                                  {
+                                    "type": "Text",
+                                    "text": "Oczekujące",
+                                    "bounds": [
+                                      70,
+                                      2147,
+                                      445,
+                                      2196
+                                    ],
+                                    "children": []
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "Column",
+                                "bounds": [
+                                  473,
+                                  1966,
+                                  848,
+                                  2301
+                                ],
+                                "children": [
+                                  {
+                                    "type": "Text",
+                                    "text": "1",
+                                    "bounds": [
+                                      634,
+                                      2022,
+                                      687,
+                                      2129
+                                    ],
+                                    "children": []
+                                  },
+                                  {
+                                    "type": "Text",
+                                    "text": "Odebrane przez aplikację",
+                                    "bounds": [
+                                      473,
+                                      2147,
+                                      848,
+                                      2245
+                                    ],
+                                    "children": []
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "Column",
+                                "bounds": [
+                                  875,
+                                  1966,
+                                  1250,
+                                  2252
+                                ],
+                                "children": [
+                                  {
+                                    "type": "Text",
+                                    "text": "0",
+                                    "bounds": [
+                                      1036,
+                                      2022,
+                                      1089,
+                                      2129
+                                    ],
+                                    "children": []
+                                  },
+                                  {
+                                    "type": "Text",
+                                    "text": "Ponowienia",
+                                    "bounds": [
+                                      875,
+                                      2147,
+                                      1250,
+                                      2196
+                                    ],
+                                    "children": []
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "id": "labShare",
+                            "type": "Button",
+                            "bounds": [
+                              70,
+                              2363,
+                              1250,
+                              2526
+                            ],
+                            "clickable": true,
+                            "children": [
+                              {
+                                "type": "Text",
+                                "text": "Wyślij wiadomość",
+                                "bounds": [
+                                  112,
+                                  2416,
+                                  1208,
+                                  2478
+                                ],
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "Column",
+                "bounds": [
+                  0,
+                  2526,
+                  1320,
+                  2758
+                ],
+                "children": [
+                  {
+                    "type": "Divider",
+                    "bounds": [
+                      0,
+                      2526,
+                      1320,
+                      2528
+                    ],
+                    "children": []
+                  },
+                  {
+                    "type": "Row",
+                    "bounds": [
+                      0,
+                      2528,
+                      1320,
+                      2759
+                    ],
+                    "children": [
+                      {
+                        "id": "tab0",
+                        "type": "Button",
+                        "bounds": [
+                          28,
+                          2542,
+                          334,
+                          2745
+                        ],
+                        "clickable": true,
+                        "children": [
+                          {
+                            "type": "Column",
+                            "bounds": [
+                              35,
+                              2570,
+                              327,
+                              2717
+                            ],
+                            "children": [
+                              {
+                                "type": "SymbolGlyph",
+                                "bounds": [
+                                  140,
+                                  2570,
+                                  221,
+                                  2650
+                                ],
+                                "children": []
+                              },
+                              {
+                                "type": "Text",
+                                "text": "Start",
+                                "bounds": [
+                                  35,
+                                  2668,
+                                  327,
+                                  2717
+                                ],
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "id": "tab1",
+                        "type": "Button",
+                        "bounds": [
+                          348,
+                          2542,
+                          654,
+                          2745
+                        ],
+                        "clickable": true,
+                        "children": [
+                          {
+                            "type": "Column",
+                            "bounds": [
+                              355,
+                              2570,
+                              647,
+                              2717
+                            ],
+                            "children": [
+                              {
+                                "type": "SymbolGlyph",
+                                "bounds": [
+                                  460,
+                                  2570,
+                                  541,
+                                  2650
+                                ],
+                                "children": []
+                              },
+                              {
+                                "type": "Text",
+                                "text": "Mapa",
+                                "bounds": [
+                                  355,
+                                  2668,
+                                  647,
+                                  2717
+                                ],
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "id": "tab2",
+                        "type": "Button",
+                        "bounds": [
+                          667,
+                          2542,
+                          973,
+                          2745
+                        ],
+                        "clickable": true,
+                        "children": [
+                          {
+                            "type": "Column",
+                            "bounds": [
+                              674,
+                              2570,
+                              966,
+                              2717
+                            ],
+                            "children": [
+                              {
+                                "type": "SymbolGlyph",
+                                "bounds": [
+                                  779,
+                                  2570,
+                                  860,
+                                  2650
+                                ],
+                                "children": []
+                              },
+                              {
+                                "type": "Text",
+                                "text": "Łączność",
+                                "bounds": [
+                                  674,
+                                  2668,
+                                  966,
+                                  2717
+                                ],
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "id": "tab3",
+                        "type": "Button",
+                        "bounds": [
+                          987,
+                          2542,
+                          1293,
+                          2745
+                        ],
+                        "clickable": true,
+                        "children": [
+                          {
+                            "type": "Column",
+                            "bounds": [
+                              994,
+                              2570,
+                              1286,
+                              2717
+                            ],
+                            "children": [
+                              {
+                                "type": "SymbolGlyph",
+                                "bounds": [
+                                  1099,
+                                  2570,
+                                  1180,
+                                  2650
+                                ],
+                                "children": []
+                              },
+                              {
+                                "type": "Text",
+                                "text": "Poradnik",
+                                "bounds": [
+                                  994,
+                                  2668,
+                                  1286,
+                                  2717
+                                ],
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

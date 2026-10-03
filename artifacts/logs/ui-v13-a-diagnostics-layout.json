@@ -1,0 +1,380 @@
+[
+  {
+    "bounds": [
+      0,
+      0,
+      1320,
+      2856
+    ],
+    "children": [
+      {
+        "type": "root",
+        "bounds": [
+          0,
+          137,
+          1320,
+          2856
+        ],
+        "children": [
+          {
+            "type": "Column",
+            "bounds": [
+              0,
+              137,
+              1320,
+              2758
+            ],
+            "children": [
+              {
+                "type": "Row",
+                "bounds": [
+                  0,
+                  137,
+                  1320,
+                  332
+                ],
+                "children": [
+                  {
+                    "id": "backSettings",
+                    "type": "Button",
+                    "bounds": [
+                      28,
+                      150,
+                      196,
+                      318
+                    ],
+                    "clickable": true,
+                    "children": [
+                      {
+                        "type": "SymbolGlyph",
+                        "bounds": [
+                          74,
+                          196,
+                          151,
+                          273
+                        ],
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Text",
+                    "text": "Testy i diagnostyka",
+                    "bounds": [
+                      210,
+                      187,
+                      1292,
+                      281
+                    ],
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "type": "Scroll",
+                "bounds": [
+                  0,
+                  332,
+                  1320,
+                  2758
+                ],
+                "scrollable": true,
+                "children": [
+                  {
+                    "type": "Column",
+                    "bounds": [
+                      0,
+                      332,
+                      1320,
+                      2758
+                    ],
+                    "children": [
+                      {
+                        "type": "Column",
+                        "bounds": [
+                          70,
+                          374,
+                          1250,
+                          2758
+                        ],
+                        "children": [
+                          {
+                            "type": "Text",
+                            "text": "Testy korzystają z wiadomości ćwiczebnych. Nie wysyłają oficjalnych alertów.",
+                            "bounds": [
+                              70,
+                              374,
+                              1250,
+                              498
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Text",
+                            "text": "Wiadomość ćwiczebna",
+                            "bounds": [
+                              70,
+                              582,
+                              1250,
+                              635
+                            ],
+                            "children": []
+                          },
+                          {
+                            "id": "diagnosticDrill",
+                            "type": "Button",
+                            "bounds": [
+                              70,
+                              705,
+                              1250,
+                              873
+                            ],
+                            "clickable": true,
+                            "children": [
+                              {
+                                "type": "Text",
+                                "text": "Wczytaj wiadomość ćwiczebną",
+                                "bounds": [
+                                  112,
+                                  758,
+                                  1208,
+                                  820
+                                ],
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "id": "labSendDrill",
+                            "type": "Button",
+                            "bounds": [
+                              70,
+                              929,
+                              1250,
+                              1097
+                            ],
+                            "clickable": true,
+                            "children": [
+                              {
+                                "type": "Text",
+                                "text": "Wczytaj i wyślij ćwiczenie",
+                                "bounds": [
+                                  112,
+                                  982,
+                                  1208,
+                                  1044
+                                ],
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "type": "Divider",
+                            "bounds": [
+                              70,
+                              1153,
+                              1250,
+                              1155
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Text",
+                            "text": "Lokalny test weryfikacji",
+                            "bounds": [
+                              70,
+                              1239,
+                              1250,
+                              1292
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Text",
+                            "text": "Ten test działa na jednym urządzeniu, bez transmisji radiowej.",
+                            "bounds": [
+                              70,
+                              1362,
+                              1250,
+                              1468
+                            ],
+                            "children": []
+                          },
+                          {
+                            "id": "runRelay",
+                            "type": "Button",
+                            "bounds": [
+                              70,
+                              1524,
+                              1250,
+                              1692
+                            ],
+                            "clickable": true,
+                            "children": [
+                              {
+                                "type": "Text",
+                                "text": "Uruchom test weryfikacji",
+                                "bounds": [
+                                  112,
+                                  1577,
+                                  1208,
+                                  1639
+                                ],
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "id": "relayTestStatus",
+                            "type": "Text",
+                            "text": "Wszystkie próby poprawne",
+                            "bounds": [
+                              70,
+                              1748,
+                              1250,
+                              1814
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Column",
+                            "bounds": [
+                              70,
+                              1870,
+                              1250,
+                              2138
+                            ],
+                            "children": [
+                              {
+                                "type": "Text",
+                                "text": "Odbiór w A",
+                                "bounds": [
+                                  70,
+                                  1898,
+                                  1250,
+                                  1960
+                                ],
+                                "children": []
+                              },
+                              {
+                                "type": "Text",
+                                "text": "Pierwsze urządzenie sprawdza podpis oryginalnej wiadomości.",
+                                "bounds": [
+                                  70,
+                                  1981,
+                                  1250,
+                                  2087
+                                ],
+                                "children": []
+                              },
+                              {
+                                "type": "Divider",
+                                "bounds": [
+                                  70,
+                                  2108,
+                                  1250,
+                                  2110
+                                ],
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "type": "Column",
+                            "bounds": [
+                              70,
+                              2194,
+                              1250,
+                              2462
+                            ],
+                            "children": [
+                              {
+                                "type": "Text",
+                                "text": "Przekazanie A → B",
+                                "bounds": [
+                                  70,
+                                  2222,
+                                  1250,
+                                  2284
+                                ],
+                                "children": []
+                              },
+                              {
+                                "type": "Text",
+                                "text": "Drugie urządzenie sprawdza wiadomość otrzymaną od A.",
+                                "bounds": [
+                                  70,
+                                  2305,
+                                  1250,
+                                  2411
+                                ],
+                                "children": []
+                              },
+                              {
+                                "type": "Divider",
+                                "bounds": [
+                                  70,
+                                  2432,
+                                  1250,
+                                  2434
+                                ],
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "type": "Column",
+                            "bounds": [
+                              70,
+                              2517,
+                              1250,
+                              2758
+                            ],
+                            "children": [
+                              {
+                                "type": "Text",
+                                "text": "Przekazanie B → C",
+                                "bounds": [
+                                  70,
+                                  2545,
+                                  1250,
+                                  2607
+                                ],
+                                "children": []
+                              },
+                              {
+                                "type": "Text",
+                                "text": "Trzecie urządzenie sprawdza wiadomość przekazaną przez B.",
+                                "bounds": [
+                                  70,
+                                  2628,
+                                  1250,
+                                  2734
+                                ],
+                                "children": []
+                              },
+                              {
+                                "type": "Divider",
+                                "bounds": [
+                                  70,
+                                  2755,
+                                  1250,
+                                  2757
+                                ],
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

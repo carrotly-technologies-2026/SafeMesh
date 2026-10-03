@@ -1,0 +1,19 @@
+SafeMesh v1.3 native UI validation, emulator B 127.0.0.1:5557
+Host session date 2026-10-03; device clock displayed 2026-10-04.
+Scope: B only. No source edits, builds, deployments, A/C interactions, or transport connection made by this validation task.
+
+PASS: Settings diagnostics loaded the signed exercise. Home PL showed its Polish title/body, exercise identity, verified signature and UTC expiry. Changing to English changed both interface and the signed English payload variant without loading a second exercise. Evidence: ui-v13-b-home-pl/en and ui-v13-b-settings-en, each JSON+PNG under artifacts/screenshots.
+
+PASS: Dark changed Settings and MapCanvas in the running app. System then returned the app and canvas to the actual light system appearance. Explicit Light was selected before handback. Evidence: ui-v13-b-settings-dark-en, ui-v13-b-map-dark-en, ui-v13-b-settings-system-pl.json and ui-v13-b-map-system-pl.png.
+
+OBSERVED/FIXED SEPARATELY BY ROOT: Old deployed build's dark Map top system bar was black without visible clock/icons. Root reproduced this and validated its later Window color fix on A. B screenshots in this audit predate that final build. Settings dark screenshot DOES show white clock/icons; the initial contrary report was a resized-preview interpretation and was withdrawn after original-size inspection. No additional source change requested from this audit.
+
+PASS: Native search "glowny" returned 5/40 points with Polish addresses and availability labels. Opened Rynek Glowny 1 details, saved it, and returned: query "glowny", list mode and 5/40 results preserved. Details showed access caveat, source and data date. Home displayed the saved address; opening it returned to the correct details. Evidence: ui-v13-b-search-preserved-pl, ui-v13-b-point-pl, ui-v13-b-saved-home-pl (JSON+PNG), ui-v13-b-saved-open-pl.json.
+
+SETUP NOTE: First use of B's Celia keyboard required onboarding. Full mode was not accepted; Basic mode was chosen. Some earlier artifacts named search-pl/search-results-pl contain system onboarding, not successful app search. The actual verified search evidence is search-preserved-pl. Keyboard was dismissed on entering point details.
+
+PASS: Native Display settings Huge applied real app fontSizeScale=1.45, confirmed by SAFEMESH_UI_CONFIGURATION in ui-v13-b-runtime-huge.log. Senior mode offer was cancelled. Visually inspected Huge Home, map list, canvas, Settings, Relay and Guide screenshots: visible text wraps, all four bottom labels fit, gear/back remain accessible; no clipped control labels or overlapping content observed in these captured portrait states. Evidence: ui-v13-b-huge-{home,map-list,map,settings,relay,guide}.{json,png}. This is not a claim of 2x, landscape, physical-device or screen-reader validation.
+
+PASS: Restored system text Normal (native slider 2, Normal label), app reports fontSizeScale=1. Device system remained Light. Force-stopped SafeMesh and started EntryAbility again without install/uninstall. Stored exercise, saved Rynek Glowny 1, Polish language and explicit Light preference restored. Evidence: ui-v13-b-system-font-normal.json, ui-v13-b-runtime-normal.log, ui-v13-b-restart-home/settings.{json,png}.
+
+Handback: B foreground on Home, Polish, app Light, system Light/Normal, transport not connected. Root notified immediately and authorized to replace/reset B for clean mesh receipt testing. No further B interaction after handback.

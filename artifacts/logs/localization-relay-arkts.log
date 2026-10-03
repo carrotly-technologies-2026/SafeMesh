@@ -1,0 +1,68 @@
+No errors found in 2 file(s).
+devecocli.cmd :
+At line:3 char:1
++ & devecocli.cmd check arkts --project 'C:\Users\user\SafeMesh' entry/ ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+Warnings (30):
+entry\src\main\ets\transport\NearLinkTransport.ets:127:20 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:129:20 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:131:20 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:133:12 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:135:55 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:140:27 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:169:20 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:172:18 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:174:20 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:203:26 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:210:28 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:267:28 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:305:82 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:309:31 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:313:83 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:317:26 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:321:91 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:326:32 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:330:87 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\EmulatorTransport.ets:115:46 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.INTERNET
+entry\src\main\ets\transport\EmulatorTransport.ets:180:16 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.INTERNET
+entry\src\main\ets\transport\EmulatorTransport.ets:324:20 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.INTERNET
+entry\src\main\ets\model\AlertProtocol.ets:193:13 - warning: Function may throw exceptions. Special handling is require
+d.
+entry\src\main\ets\model\AlertProtocol.ets:193:13 - warning: Function may throw exceptions. Special handling is require
+d.
+entry\src\main\ets\model\AlertProtocol.ets:194:46 - warning: Function may throw exceptions. Special handling is require
+d.
+entry\src\main\ets\model\AlertProtocol.ets:195:11 - warning: Function may throw exceptions. Special handling is require
+d.
+entry\src\main\ets\model\AlertProtocol.ets:200:12 - warning: Function may throw exceptions. Special handling is require
+d.
+entry\src\main\ets\model\DeliveryProtocol.ets:29:29 - warning: Function may throw exceptions. Special handling is requi
+red.
+entry\src\main\ets\model\DeliveryProtocol.ets:29:29 - warning: Function may throw exceptions. Special handling is requi
+red.
+entry\src\main\ets\model\LocalStore.ets:113:24 - warning: Function may throw exceptions. Special handling is required.

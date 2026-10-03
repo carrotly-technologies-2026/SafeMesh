@@ -1,0 +1,566 @@
+[
+  {
+    "bounds": [
+      0,
+      0,
+      1320,
+      2856
+    ],
+    "children": [
+      {
+        "type": "root",
+        "bounds": [
+          0,
+          137,
+          1320,
+          2856
+        ],
+        "children": [
+          {
+            "type": "Column",
+            "bounds": [
+              0,
+              137,
+              1320,
+              2758
+            ],
+            "children": [
+              {
+                "type": "Row",
+                "bounds": [
+                  0,
+                  137,
+                  1320,
+                  332
+                ],
+                "children": [
+                  {
+                    "id": "backSettings",
+                    "type": "Button",
+                    "bounds": [
+                      28,
+                      150,
+                      196,
+                      318
+                    ],
+                    "clickable": true,
+                    "children": [
+                      {
+                        "type": "SymbolGlyph",
+                        "bounds": [
+                          74,
+                          196,
+                          151,
+                          273
+                        ],
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Text",
+                    "text": "Ustawienia",
+                    "bounds": [
+                      210,
+                      187,
+                      1292,
+                      281
+                    ],
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "type": "Scroll",
+                "bounds": [
+                  0,
+                  332,
+                  1320,
+                  2758
+                ],
+                "scrollable": true,
+                "children": [
+                  {
+                    "type": "Column",
+                    "bounds": [
+                      0,
+                      332,
+                      1320,
+                      2758
+                    ],
+                    "children": [
+                      {
+                        "type": "Column",
+                        "bounds": [
+                          70,
+                          374,
+                          1250,
+                          2758
+                        ],
+                        "children": [
+                          {
+                            "type": "Text",
+                            "text": "Wygląd",
+                            "bounds": [
+                              70,
+                              402,
+                              1250,
+                              455
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Column",
+                            "bounds": [
+                              70,
+                              511,
+                              1250,
+                              1082
+                            ],
+                            "children": [
+                              {
+                                "id": "themeSystem",
+                                "type": "Button",
+                                "bounds": [
+                                  70,
+                                  511,
+                                  1250,
+                                  700
+                                ],
+                                "clickable": true,
+                                "children": [
+                                  {
+                                    "type": "Row",
+                                    "bounds": [
+                                      70,
+                                      511,
+                                      1250,
+                                      700
+                                    ],
+                                    "children": [
+                                      {
+                                        "type": "Text",
+                                        "text": "Systemowy",
+                                        "bounds": [
+                                          126,
+                                          573,
+                                          1061,
+                                          639
+                                        ],
+                                        "children": []
+                                      },
+                                      {
+                                        "type": "SymbolGlyph",
+                                        "bounds": [
+                                          1117,
+                                          567,
+                                          1194,
+                                          644
+                                        ],
+                                        "children": []
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "Divider",
+                                "bounds": [
+                                  70,
+                                  700,
+                                  1250,
+                                  702
+                                ],
+                                "children": []
+                              },
+                              {
+                                "id": "themeLight",
+                                "type": "Button",
+                                "bounds": [
+                                  70,
+                                  702,
+                                  1250,
+                                  891
+                                ],
+                                "clickable": true,
+                                "children": [
+                                  {
+                                    "type": "Row",
+                                    "bounds": [
+                                      70,
+                                      702,
+                                      1250,
+                                      891
+                                    ],
+                                    "children": [
+                                      {
+                                        "type": "Text",
+                                        "text": "Jasny",
+                                        "bounds": [
+                                          126,
+                                          764,
+                                          1061,
+                                          830
+                                        ],
+                                        "children": []
+                                      },
+                                      {
+                                        "type": "SymbolGlyph",
+                                        "bounds": [
+                                          1117,
+                                          758,
+                                          1194,
+                                          835
+                                        ],
+                                        "children": []
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "Divider",
+                                "bounds": [
+                                  70,
+                                  891,
+                                  1250,
+                                  893
+                                ],
+                                "children": []
+                              },
+                              {
+                                "id": "themeDark",
+                                "type": "Button",
+                                "bounds": [
+                                  70,
+                                  893,
+                                  1250,
+                                  1082
+                                ],
+                                "clickable": true,
+                                "children": [
+                                  {
+                                    "type": "Row",
+                                    "bounds": [
+                                      70,
+                                      893,
+                                      1250,
+                                      1082
+                                    ],
+                                    "children": [
+                                      {
+                                        "type": "Text",
+                                        "text": "Ciemny",
+                                        "bounds": [
+                                          126,
+                                          955,
+                                          1061,
+                                          1021
+                                        ],
+                                        "children": []
+                                      },
+                                      {
+                                        "type": "SymbolGlyph",
+                                        "bounds": [
+                                          1117,
+                                          949,
+                                          1194,
+                                          1026
+                                        ],
+                                        "children": []
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "type": "Text",
+                            "text": "Systemowy dopasowuje wygląd do ustawień telefonu.",
+                            "bounds": [
+                              70,
+                              1124,
+                              1250,
+                              1173
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Text",
+                            "text": "Język aplikacji",
+                            "bounds": [
+                              70,
+                              1243,
+                              1250,
+                              1296
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Column",
+                            "bounds": [
+                              70,
+                              1352,
+                              1250,
+                              1732
+                            ],
+                            "children": [
+                              {
+                                "id": "languagePl",
+                                "type": "Button",
+                                "bounds": [
+                                  70,
+                                  1352,
+                                  1250,
+                                  1541
+                                ],
+                                "clickable": true,
+                                "children": [
+                                  {
+                                    "type": "Row",
+                                    "bounds": [
+                                      70,
+                                      1352,
+                                      1250,
+                                      1541
+                                    ],
+                                    "children": [
+                                      {
+                                        "type": "Text",
+                                        "text": "Polski",
+                                        "bounds": [
+                                          126,
+                                          1414,
+                                          1061,
+                                          1480
+                                        ],
+                                        "children": []
+                                      },
+                                      {
+                                        "type": "SymbolGlyph",
+                                        "bounds": [
+                                          1117,
+                                          1408,
+                                          1194,
+                                          1485
+                                        ],
+                                        "children": []
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "Divider",
+                                "bounds": [
+                                  70,
+                                  1541,
+                                  1250,
+                                  1543
+                                ],
+                                "children": []
+                              },
+                              {
+                                "id": "languageEn",
+                                "type": "Button",
+                                "bounds": [
+                                  70,
+                                  1543,
+                                  1250,
+                                  1732
+                                ],
+                                "clickable": true,
+                                "children": [
+                                  {
+                                    "type": "Row",
+                                    "bounds": [
+                                      70,
+                                      1543,
+                                      1250,
+                                      1732
+                                    ],
+                                    "children": [
+                                      {
+                                        "type": "Text",
+                                        "text": "English",
+                                        "bounds": [
+                                          126,
+                                          1605,
+                                          1061,
+                                          1671
+                                        ],
+                                        "children": []
+                                      },
+                                      {
+                                        "type": "SymbolGlyph",
+                                        "bounds": [
+                                          1117,
+                                          1599,
+                                          1194,
+                                          1676
+                                        ],
+                                        "children": []
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "type": "Text",
+                            "text": "Wielkość tekstu zależy od ustawień telefonu, do 2×.",
+                            "bounds": [
+                              70,
+                              1773,
+                              1250,
+                              1822
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Divider",
+                            "bounds": [
+                              70,
+                              1864,
+                              1250,
+                              1866
+                            ],
+                            "children": []
+                          },
+                          {
+                            "id": "settingsDiagnostics",
+                            "type": "Button",
+                            "bounds": [
+                              70,
+                              1908,
+                              1250,
+                              2153
+                            ],
+                            "clickable": true,
+                            "children": [
+                              {
+                                "type": "Row",
+                                "bounds": [
+                                  70,
+                                  1908,
+                                  1250,
+                                  2153
+                                ],
+                                "children": [
+                                  {
+                                    "type": "SymbolGlyph",
+                                    "bounds": [
+                                      70,
+                                      1991,
+                                      151,
+                                      2071
+                                    ],
+                                    "children": []
+                                  },
+                                  {
+                                    "type": "Column",
+                                    "bounds": [
+                                      200,
+                                      1964,
+                                      1174,
+                                      2097
+                                    ],
+                                    "children": [
+                                      {
+                                        "type": "Text",
+                                        "text": "Testy i diagnostyka",
+                                        "bounds": [
+                                          200,
+                                          1964,
+                                          1174,
+                                          2030
+                                        ],
+                                        "children": []
+                                      },
+                                      {
+                                        "type": "Text",
+                                        "text": "Wiadomości ćwiczebne i wyniki weryfikacji",
+                                        "bounds": [
+                                          200,
+                                          2044,
+                                          1174,
+                                          2097
+                                        ],
+                                        "children": []
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "type": "SymbolGlyph",
+                                    "bounds": [
+                                      1223,
+                                      2004,
+                                      1250,
+                                      2057
+                                    ],
+                                    "children": []
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "type": "Text",
+                            "text": "O SafeMesh",
+                            "bounds": [
+                              70,
+                              2223,
+                              1250,
+                              2276
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Text",
+                            "text": "Prototyp ćwiczebny: podpisane alerty i punkty ochronne offline. Nie jest oficjalnym systemem ostrzegania.",
+                            "bounds": [
+                              70,
+                              2332,
+                              1250,
+                              2503
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Text",
+                            "text": "Dane punktów: 2026-09-28 · 404 KB",
+                            "bounds": [
+                              70,
+                              2545,
+                              1250,
+                              2594
+                            ],
+                            "children": []
+                          },
+                          {
+                            "type": "Hyperlink",
+                            "text": "KG PSP · zbiór punktów ochronnych",
+                            "bounds": [
+                              70,
+                              2636,
+                              1250,
+                              2758
+                            ],
+                            "clickable": true,
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

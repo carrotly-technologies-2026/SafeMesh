@@ -1,0 +1,84 @@
+✔ delivery codecs bound packets and never confuse acknowledgements with alerts (6.007ms)
+✔ all current messages enter a delayed peer queue and each pump is bounded to four writes (8.2945ms)
+✔ only an expected peer, sent token, issuer, alert ID and revision can acknowledge an item (1.894ms)
+✔ loss uses bounded 2s/4s retries, then reports failure instead of claiming delivery (1.5618ms)
+✔ a lost ACK triggers a duplicate ACK without forwarding the alert twice to the next peer (2.241ms)
+✔ expiry prunes pending packets and stale acknowledgements cannot revive them (1.0547ms)
+SAFEMESH_RELAY_RECEIVE node=nearlink status=ack_matched alertId=cached-0 hops=-1
+SAFEMESH_RELAY_RECEIVE node=nearlink status=ack_matched alertId=cached-1 hops=-1
+SAFEMESH_RELAY_RECEIVE node=nearlink status=ack_matched alertId=cached-2 hops=-1
+✔ restored ViewModel synchronizes all messages to a late peer and re-syncs on reconnect (16.5022ms)
+SAFEMESH_RELAY_RECEIVE node=nearlink status=invalid alertId=alert-A hops=0
+SAFEMESH_RELAY_RECEIVE node=nearlink status=expired alertId=expired hops=0
+SAFEMESH_RELAY_RECEIVE node=nearlink status=malformed alertId= hops=-1
+SAFEMESH_RELAY_RECEIVE node=nearlink status=accepted alertId=alert-A hops=0
+SAFEMESH_RELAY_RECEIVE node=nearlink status=duplicate alertId=alert-A hops=0
+SAFEMESH_RESTORE_ERROR Error: disk unavailable
+✔ VM sends success ACK only for verified current data; duplicates ACK without re-flooding (3.7541ms)
+SAFEMESH_RESTORE_ERROR Error: disk unavailable
+SAFEMESH_RESTORE_ERROR Error: disk unavailable
+SAFEMESH_RELAY_RECEIVE node=nearlink status=invalid alertId=alert-A hops=0
+SAFEMESH_RELAY_RECEIVE node=nearlink status=accepted alertId=alert-A hops=0
+✔ startup read failure blocks relay and a later successful restoration can recover (5.6225ms)
+✔ stop cancels queued work and late callbacks cannot restart radio transmission (6.2919ms)
+✔ queue bounds retain no more than eight peers and 128 alerts per peer (76.8609ms)
+✔ a hung native send has a three-second app deadline and remains pending without a false receipt (1.02ms)
+✔ stop releases a hung send immediately and handles a later native rejection (3.0636ms)
+✔ stop during restore, native startup or discovery cannot revive foreground radio work (1.8288ms)
+✔ switching emulator roles and back to hardware ignores all callbacks from the retired transport (2.1407ms)
+SAFEMESH_RELAY_RECEIVE node=B status=accepted alertId=three-app-hop hops=1
+SAFEMESH_RELAY_RECEIVE node=A status=ack_matched alertId=three-app-hop hops=-1
+✔ a stopped or superseded emulator startup cannot overwrite or close the replacement link (0.769ms)
+SAFEMESH_RELAY_RECEIVE node=C status=accepted alertId=three-app-hop hops=2
+SAFEMESH_RELAY_RECEIVE node=B status=ack_matched alertId=three-app-hop hops=-1
+✔ three independent app ViewModels relay A to B then to delayed C after A disconnects (4.3372ms)
+SAFEMESH_RELAY_RECEIVE node=B status=expired alertId=expired hops=0
+SAFEMESH_RELAY_RECEIVE node=B status=invalid alertId=forged hops=0
+✔ emulator delivery still rejects forged and expired content without success acknowledgements (2.0602ms)
+✔ foreground does not start an unused link, but resumes the active role and cached delivery after suspension (2.9751ms)
+✔ explicit stop cancels auto-resume even when foreground is waiting on background cleanup (0.4218ms)
+✔ suspension during connection startup cancels it and does not manufacture a resume intent (1.2709ms)
+SAFEMESH_RELAY_RECEIVE node=nearlink status=ack_matched alertId=localized-state hops=-1
+SAFEMESH_RELAY_RECEIVE node=nearlink status=ack_unmatched alertId=localized-state hops=-1
+SAFEMESH_RELAY_RECEIVE node=nearlink status=malformed alertId= hops=-1
+SAFEMESH_RELAY_RECEIVE node=nearlink status=accepted alertId=new-localized-state hops=0
+SAFEMESH_RELAY_RECEIVE node=nearlink status=duplicate alertId=new-localized-state hops=0
+SAFEMESH_RELAY_RECEIVE node=nearlink status=invalid alertId=forged-localized hops=0
+✔ packet verdicts and acknowledgements expose localization states without diagnostic sentences (3.0987ms)
+✔ a forged incoming packet preserves the authentic displayed title and badge (11.369ms)
+✔ an expired incoming packet cannot replace an active verified alert (1.7225ms)
+✔ persisted replay history restores and re-verifies before the first network packet (5.7764ms)
+✔ disk failure leaves the authenticated in-memory alert intact and reports save failure (1.6094ms)
+SAFEMESH_RELAY_RECEIVE node=nearlink status=invalid alertId=krakow-hackyeah-exercise-001 hops=0
+SAFEMESH_RELAY_RECEIVE node=nearlink status=malformed alertId= hops=-1
+✔ forged and malformed packets produce no outgoing radio traffic (9.7449ms)
+SAFEMESH_RELAY_RECEIVE node=nearlink status=accepted alertId=krakow-hackyeah-exercise-001 hops=0
+✔ a genuine arrival forwards its exact signature at hop one while excluding its sender (4.4776ms)
+SAFEMESH_RELAY_RECEIVE node=nearlink status=duplicate alertId=krakow-hackyeah-exercise-001 hops=0
+SAFEMESH_RELAY_RECEIVE node=nearlink status=accepted alertId=krakow-hackyeah-exercise-001 hops=0
+✔ concurrent arrivals forward once and busy remains set until persistence finishes (5.2492ms)
+SAFEMESH_RELAY_RECEIVE node=nearlink status=accepted alertId=krakow-hackyeah-exercise-001 hops=0
+✔ fire-and-forget receive/send failures are handled without losing verified content (3.6727ms)
+✔ exact expiry clears the displayed alert and prevents any further relay (1.3979ms)
+SAFEMESH_NATIVE_DIAGNOSTICS PASS [{"id":"0","titleKey":"relay_event_a","detailKey":"relay_detail_a","status":"accepted","good":true},{"id":"1","titleKey":"relay_event_b","detailKey":"relay_detail_b","status":"accepted","good":true},{"id":"2","titleKey":"relay_event_c","detailKey":"relay_detail_c","status":"accepted","good":true},{"id":"3","titleKey":"relay_event_duplicate","detailKey":"relay_detail_duplicate","status":"duplicate","good":true},{"id":"4","titleKey":"relay_event_tampered","detailKey":"relay_detail_tampered","status":"invalid","good":true},{"id":"5","titleKey":"relay_event_expired","detailKey":"relay_detail_expired","status":"expired","good":true}]
+✔ native-diagnostic workflow exposes stable localization keys and verdicts for all six checks (817.9264ms)
+✔ unsupported emulator neither imports NearLink Kit nor fabricates peers (5.1453ms)
+✔ discovery requires a nonempty valid exact name filter (2.0483ms)
+✔ peer is counted only after an SDK connection callback (3.0922ms)
+✔ MTU-sized writes and arbitrary 7-byte reads preserve UTF-8 packets (10.9562ms)
+✔ coalesced frames are decoded as separate messages (4.6272ms)
+✔ oversized payloads, malformed headers and invalid UTF-8 are rejected (1.8553ms)
+✔ stop releases listeners, clears channel count and rejects further writes (2.0844ms)
+✔ stopping during a permission request prevents port creation and advertising after consent arrives (10.4783ms)
+✔ concurrent starts share one request and a late advertisement is stopped after cancellation (3.5307ms)
+✔ confirmed connections clear deadlines and a late connect cannot survive stop (4.0871ms)
+✔ stop interrupts a multi-chunk send without claiming a completed local write (2.1259ms)
+✔ intermediate connection states retain the pending request until confirmation or timeout (1.6235ms)
+ℹ tests 44
+ℹ suites 0
+ℹ pass 44
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1777.2943

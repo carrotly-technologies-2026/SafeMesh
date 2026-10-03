@@ -1,0 +1,36 @@
+{
+    "video":  "dist/SafeMesh-1.3.0-demo.mp4",
+    "sha256":  "0dc977d772005e28658ebb9712ca2faa1854ea0e51b82a672a697646a22e9d26",
+    "device":  "127.0.0.1:5555",
+    "emulatorPid":  17032,
+    "capture":  "Native Emulator.exe window only; no desktop capture or composited frames",
+    "codec":  "h264",
+    "dimensions":  "478x1030",
+    "fps":  15,
+    "durationSeconds":  90,
+    "frames":  1350,
+    "lateFrames":  0,
+    "reviewedSampleSeconds":  [
+                                  2,
+                                  12,
+                                  75
+                              ],
+    "reviewedViews":  [
+                          "PL Home with verified signed alert",
+                          "Native offline map",
+                          "EN Home with verified signed alert and dark theme"
+                      ],
+    "recordedNavigation":  [
+                               "Home PL",
+                               "Map",
+                               "Point list",
+                               "Point detail",
+                               "Back",
+                               "Guide accordion 0",
+                               "Guide accordion 1",
+                               "Settings English",
+                               "Settings Dark",
+                               "Home EN dark"
+                           ],
+    "handoff":  "A restored to Polish, light theme, Home. Transport role A and signed fixture unchanged."
+}
