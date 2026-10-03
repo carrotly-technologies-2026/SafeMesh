@@ -14,21 +14,30 @@ const now = Date.now();
 const lifetime = 72 * 60 * 60 * 1000;
 
 function canonical(payload) {
-  return JSON.stringify([
-    'SafeMesh.Alert.v1', payload.keyId, payload.alertId,
+  const fields = [
+    payload.version === 2 ? 'SafeMesh.Alert.v2' : 'SafeMesh.Alert.v1', payload.keyId, payload.alertId,
     String(payload.revision), String(payload.issuedAt), String(payload.expiresAt),
     payload.severity, payload.area, payload.title, payload.body,
     JSON.stringify(payload.shelterIds), payload.drill ? '1' : '0', String(payload.maxHops)
-  ]);
+  ];
+  if (payload.version === 2) {
+    fields.push(payload.language, JSON.stringify((payload.translations ?? [])
+      .map(item => [item.language, item.area, item.title, item.body])));
+  }
+  return JSON.stringify(fields);
 }
 
 const payload = {
-  version: 1, keyId, alertId: 'krakow-hackyeah-exercise-001', revision: 1,
+  version: 2, keyId, alertId: 'krakow-hackyeah-exercise-001', revision: 1,
   issuedAt: now - 60_000, expiresAt: now - 60_000 + lifetime,
-  severity: 'warning', area: 'Kraków · centrum',
-  title: 'Network outage exercise',
-  body: 'EXERCISE ONLY. Mobile service is unavailable in this simulated scenario. Keep the app open to relay this signed drill. The offline map lists PSP protective points; check access and follow official instructions.',
-  shelterIds: [], drill: true, maxHops: 8
+  severity: 'warning', area: 'Kraków centrum',
+  title: 'Przerwa w łączności',
+  body: 'To ćwiczenie — do aplikacji dotarła podpisana wiadomość. Pozostaw aplikację otwartą, aby przekazać ją dalej; punkty ochronne PSP znajdziesz na mapie offline, a ich dostępność trzeba sprawdzić.',
+  shelterIds: [], drill: true, maxHops: 8, language: 'pl',
+  translations: [{
+    language: 'en', area: 'Kraków centre', title: 'Connection outage',
+    body: 'This is an exercise: a signed message has reached the app. Keep the app open to relay it; the offline map lists PSP protective points, whose current access needs checking.'
+  }]
 };
 function envelope(body) {
   const signature = sign('sha256', Buffer.from(canonical(body)), privateKey).toString('base64');

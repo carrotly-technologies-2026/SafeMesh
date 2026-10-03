@@ -2,55 +2,55 @@
   "color": [
     {
       "name": "start_window_background",
-      "value": "#101C18"
+      "value": "#101715"
     },
     {
       "name": "ink",
-      "value": "#E4F2E9"
+      "value": "#E9F1EC"
     },
     {
       "name": "muted",
-      "value": "#B9CCC0"
+      "value": "#ACBDB3"
     },
     {
       "name": "paper",
-      "value": "#101C18"
+      "value": "#101715"
     },
     {
       "name": "surface",
-      "value": "#1D2B24"
+      "value": "#19221F"
     },
     {
       "name": "soft",
-      "value": "#293D2E"
+      "value": "#243B30"
     },
     {
       "name": "accent",
-      "value": "#D8F58A"
+      "value": "#98D9B4"
     },
     {
       "name": "action_bg",
-      "value": "#D8F58A"
+      "value": "#98D9B4"
     },
     {
       "name": "action_fg",
-      "value": "#163325"
+      "value": "#10281D"
     },
     {
       "name": "warning_bg",
-      "value": "#3C3122"
+      "value": "#382D1C"
     },
     {
       "name": "warning_fg",
-      "value": "#F2D4A0"
+      "value": "#F1C986"
     },
     {
       "name": "border",
-      "value": "#536A5B"
+      "value": "#3D4D45"
     },
     {
       "name": "success",
-      "value": "#A4E5B6"
+      "value": "#98D9B4"
     },
     {
       "name": "danger",
@@ -86,11 +86,11 @@
     },
     {
       "name": "map_selected",
-      "value": "#D8F58A"
+      "value": "#98D9B4"
     },
     {
       "name": "map_plus",
-      "value": "#163325"
+      "value": "#10281D"
     },
     {
       "name": "map_origin",

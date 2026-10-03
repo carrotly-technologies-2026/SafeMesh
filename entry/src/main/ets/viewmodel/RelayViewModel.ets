@@ -10,11 +10,12 @@ import { AlertViewModel } from './AlertViewModel';
 
 export class RelayEvent {
   id: string;
-  title: string;
-  detail: string;
+  titleKey: string;
+  detailKey: string;
+  status: string;
   good: boolean;
-  constructor(id: string, title: string, detail: string, good: boolean) {
-    this.id = id; this.title = title; this.detail = detail; this.good = good;
+  constructor(id: string, titleKey: string, detailKey: string, status: string, good: boolean) {
+    this.id = id; this.titleKey = titleKey; this.detailKey = detailKey; this.status = status; this.good = good;
   }
 }
 
@@ -35,10 +36,12 @@ export class RelayViewModel {
   peerCount: number = 0;
   peers: PeerViewModel[] = [];
   peerName: string = '';
-  testStatus: string = 'Run the drill to verify a real signature on this device.';
+  testState: string = 'idle';
+  testFailureState: string = 'none';
   acceptedCount: number = 0;
   rejectedCount: number = 0;
-  lastPacketStatus: string = 'No radio packet received';
+  lastPacketState: string = 'none';
+  lifecycleState: string = 'idle';
   deliveryStatus: string = 'idle';
   pendingCount: number = 0;
   acknowledgedCount: number = 0;
@@ -54,6 +57,11 @@ export class RelayViewModel {
   private stopped: boolean = false;
   private generation: number = 0;
   private transportGeneration: number = 0;
+  private inForeground: boolean = true;
+  private connectionActive: boolean = false;
+  private resumeOnForeground: boolean = false;
+  private lifecycleGeneration: number = 0;
+  private pendingSuspend: Promise<void> | undefined = undefined;
 
   constructor(alertVM: AlertViewModel) {
     this.alertVM = alertVM;
@@ -74,6 +82,11 @@ export class RelayViewModel {
         this.hardwareState = status.state.replace('-', '_');
         this.hardwareSupported = status.supported;
         this.peerCount = status.connectedPeers;
+        if (['lab_error', 'lab_disconnected', 'error', 'stopped', 'unsupported', 'off', 'permission_denied']
+          .includes(this.hardwareState)) {
+          this.connectionActive = false;
+          if (this.inForeground) { this.lifecycleState = 'idle'; }
+        }
       },
       onPeer: (peer: NearLinkPeer): void => {
         if (transportGeneration !== this.transportGeneration || this.stopped) { return; }
@@ -98,13 +111,25 @@ export class RelayViewModel {
         if (transportGeneration !== this.transportGeneration || this.stopped) { return; }
         this.receive(address, packet).catch((error: Error): void => {
           if (transportGeneration !== this.transportGeneration || this.stopped) { return; }
-          this.lastPacketStatus = 'Packet processing failed: ' + error.message;
+          this.lastPacketState = 'processing_failed';
+          console.error('SAFEMESH_RELAY_ERROR operation=receive');
         });
       },
       onError: (operation: string, code: number, message: string): void => {
         if (transportGeneration !== this.transportGeneration || this.stopped) { return; }
         this.hardwareStatus = operation + ': ' + message + ' (' + code + ')';
         this.hardwareState = mode === 'emulator' ? 'lab_error' : 'error';
+        // Invalid individual packets do not close a ready lab socket. The
+        // adapter emits terminal onStatus first for fatal protocol failures.
+        // NearLink discovery/write errors likewise leave its listener active.
+        const packetRejected: boolean = this.connectionActive && code === 401 &&
+          (operation === 'send' || operation === 'receive');
+        const disconnected: boolean = mode === 'emulator' ? !packetRejected :
+          (operation === 'start' || operation === 'probe' || operation === 'stop');
+        if (disconnected) {
+          this.connectionActive = false;
+          if (this.inForeground) { this.lifecycleState = 'idle'; }
+        }
       }
     };
     return mode === 'emulator' ? new EmulatorTransport(callbacks, node) : new NearLinkTransport(callbacks);
@@ -112,8 +137,35 @@ export class RelayViewModel {
 
   setContext(context: common.UIAbilityContext): void { this.context = context; }
 
+  /** Active foreground transport, independent of queue/operation diagnostic labels. */
+  get isConnected(): boolean { return this.connectionActive && !this.stopped && this.inForeground; }
+
+  /** Suspension stops sockets/timers; only a previously active user connection can resume. */
+  async suspend(): Promise<void> {
+    if (!this.inForeground) { await this.pendingSuspend; return; }
+    this.inForeground = false;
+    this.resumeOnForeground = this.connectionActive;
+    this.lifecycleState = this.resumeOnForeground ? 'paused' : 'idle';
+    const pending: Promise<void> = this.stopTransport();
+    this.pendingSuspend = pending;
+    try { await pending; } finally {
+      if (this.pendingSuspend === pending) { this.pendingSuspend = undefined; }
+    }
+  }
+
+  /** No work on first appearance; resumes only the transport/role suspended above. */
+  async foreground(): Promise<void> {
+    this.inForeground = true;
+    const generation: number = this.lifecycleGeneration;
+    await this.pendingSuspend;
+    if (!this.inForeground || generation !== this.lifecycleGeneration || !this.resumeOnForeground) { return; }
+    this.resumeOnForeground = false;
+    await this.startSelectedTransport(this.transportMode, this.emulatorNode);
+  }
+
   /** Hardware checks explicitly leave the emulator link and its per-session delivery counters. */
   async probe(): Promise<void> {
+    if (!this.inForeground) { return; }
     let transport: RelayTransport | undefined = this.transport;
     if (this.transportMode !== 'nearlink' || this.stopped) {
       transport = await this.selectTransport('nearlink', this.emulatorNode);
@@ -150,14 +202,14 @@ export class RelayViewModel {
     this.hardwareState = mode === 'emulator' ? 'lab_connecting' : 'not_checked';
     this.hardwareStatus = mode === 'emulator' ? 'Connecting emulator ' + node + ' to the local test link.' :
       'Hardware not checked';
-    this.lastPacketStatus = 'No packet received in this session';
+    this.lastPacketState = 'none';
     this.deliveryStatus = 'idle';
     this.transport = this.createTransport(mode, node);
     return this.transport;
   }
 
   private async startSelectedTransport(mode: string, node: string): Promise<void> {
-    if (this.context === undefined) { return; }
+    if (this.context === undefined || !this.inForeground) { return; }
     const transport: RelayTransport | undefined = await this.selectTransport(mode, node);
     if (transport === undefined || transport !== this.transport || this.stopped) { return; }
     const generation: number = this.generation;
@@ -169,6 +221,8 @@ export class RelayViewModel {
       const started: boolean = await transport.start(this.context);
       if (generation !== this.generation || this.stopped) { await transport.stop(); return; }
       if (started) {
+        this.connectionActive = true;
+        this.lifecycleState = 'active';
         if (mode === 'nearlink' && this.peerName.trim().length > 0) {
           await transport.discover(this.peerName.trim());
         }
@@ -186,8 +240,16 @@ export class RelayViewModel {
     if (!this.stopped) { await this.transport.connect(address); }
   }
   async stop(): Promise<void> {
+    this.lifecycleGeneration++;
+    this.resumeOnForeground = false;
+    this.lifecycleState = 'idle';
+    await this.stopTransport();
+  }
+
+  private async stopTransport(): Promise<void> {
     const transport: RelayTransport = this.transport;
     this.stopped = true;
+    this.connectionActive = false;
     const generation: number = ++this.generation;
     this.transportGeneration++;
     if (this.deliveryTimer >= 0) { clearTimeout(this.deliveryTimer); this.deliveryTimer = -1; }
@@ -212,7 +274,7 @@ export class RelayViewModel {
       const ack: DeliveryAck | undefined = decodeAcknowledgement(packet);
       if (ack !== undefined) {
         const matched: boolean = this.delivery.acknowledge(address, ack);
-        this.lastPacketStatus = matched ? 'Peer acknowledged this queued message' : 'Unmatched acknowledgement ignored';
+        this.lastPacketState = matched ? 'ack_matched' : 'ack_unmatched';
         this.logReceive(matched ? 'ack_matched' : 'ack_unmatched', ack.alertId);
         this.updateDeliveryMetrics();
         return;
@@ -221,13 +283,13 @@ export class RelayViewModel {
       const envelope: SignedAlertEnvelope | undefined = frame === undefined ? decodeEnvelope(packet) : frame.envelope;
       if (envelope === undefined) {
         this.rejectedCount++;
-        this.lastPacketStatus = 'Malformed packet rejected';
+        this.lastPacketState = 'malformed';
         this.logReceive('malformed');
         return;
       }
       const result: RelayResult = await this.alertVM.receive(envelope);
       if (this.stopped || generation !== this.generation) { return; }
-      this.lastPacketStatus = result.status + ': ' + result.detail;
+      this.lastPacketState = result.status;
       this.logReceive(result.status, envelope.payload.alertId, envelope.hops);
       if (result.status === 'accepted' || result.status === 'duplicate') {
         // An ACK is sent only after native signature verification and policy acceptance.
@@ -243,7 +305,7 @@ export class RelayViewModel {
       } else { this.rejectedCount++; }
     } catch (error) {
       if (this.stopped || generation !== this.generation) { return; }
-      this.lastPacketStatus = 'Radio packet processing failed; verified alerts retained';
+      this.lastPacketState = 'processing_failed';
       this.logReceive('processing_failed');
     }
   }
@@ -326,14 +388,15 @@ export class RelayViewModel {
     console.info('SAFEMESH_RELAY_RECEIVE node=' + (this.transportMode === 'emulator' ? this.emulatorNode : 'nearlink') +
       ' status=' + status + ' alertId=' + safeId + ' hops=' + hops);
   }
-  private add(title: string, detail: string, good: boolean): void {
-    this.events = this.events.concat([new RelayEvent(String(this.events.length), title, detail, good)]);
+  private add(key: string, status: string, good: boolean): void {
+    this.events = this.events.concat([new RelayEvent(String(this.events.length),
+      'relay_event_' + key, 'relay_detail_' + key, status, good)]);
   }
 
   async simulate(): Promise<void> {
     if (this.running) { return; }
     const generation: number = this.generation;
-    this.running = true; this.stage = 0; this.events = [];
+    this.running = true; this.stage = 0; this.events = []; this.testState = 'running'; this.testFailureState = 'none';
     try {
       const nodeA: RelayEngine = new RelayEngine();
       const nodeB: RelayEngine = new RelayEngine();
@@ -341,38 +404,48 @@ export class RelayViewModel {
       const signed: SignedAlertEnvelope = createDemoAlert();
       const a: RelayResult = await nodeA.ingest(signed);
       if (generation !== this.generation) { return; }
-      this.add('A · message received', a.status + ' · native ECDSA verification', a.status === 'accepted');
-      if (a.status !== 'accepted') { this.testStatus = a.detail; return; }
+      this.add('a', a.status, a.status === 'accepted');
+      if (a.status !== 'accepted') { this.testState = 'failed'; this.testFailureState = a.status; return; }
       this.stage = 1;
       await new Promise<void>((resolve) => { setTimeout(resolve, 400); });
       if (generation !== this.generation) { return; }
       const ab: SignedAlertEnvelope | undefined = nodeA.nextHop(signed);
-      if (ab === undefined) { return; }
+      if (ab === undefined) { this.testState = 'failed'; this.testFailureState = 'expired'; return; }
       const b: RelayResult = await nodeB.ingest(ab);
-      this.add('B · verified and stored', b.status + ' · hop 1 · no internet', b.status === 'accepted');
+      if (generation !== this.generation) { return; }
+      this.add('b', b.status, b.status === 'accepted');
       this.stage = 2;
       await new Promise<void>((resolve) => { setTimeout(resolve, 400); });
       if (generation !== this.generation) { return; }
       const bc: SignedAlertEnvelope | undefined = nodeB.nextHop(ab);
-      if (bc === undefined) { return; }
+      if (bc === undefined) { this.testState = 'failed'; this.testFailureState = 'expired'; return; }
       const c: RelayResult = await nodeC.ingest(bc);
-      this.add('C · warning delivered', c.status + ' · hop 2 · same authority signature', c.status === 'accepted');
+      if (generation !== this.generation) { return; }
+      this.add('c', c.status, c.status === 'accepted');
       this.stage = 3;
       const replay: RelayResult = await nodeC.ingest(bc);
-      this.add('Duplicate suppressed', replay.status + ' · packet is not forwarded again', replay.status === 'duplicate');
+      if (generation !== this.generation) { return; }
+      this.add('duplicate', replay.status, replay.status === 'duplicate');
       const tampered: RelayResult = await new RelayEngine().ingest(createTamperedAlert());
-      this.add('Forged text rejected', tampered.status + ' · signature no longer matches', tampered.status === 'invalid');
+      if (generation !== this.generation) { return; }
+      this.add('tampered', tampered.status, tampered.status === 'invalid');
       const expired: RelayResult = await new RelayEngine().ingest(createExpiredAlert());
-      this.add('Expired warning rejected', expired.status + ' · stale alerts do not propagate', expired.status === 'expired');
+      if (generation !== this.generation) { return; }
+      this.add('expired', expired.status, expired.status === 'expired');
       const passed: boolean = this.events.every((event: RelayEvent) => event.good);
       if (generation !== this.generation) { return; }
-      this.testStatus = passed ? '6 / 6 checks passed on this device' : 'A check failed · see the results below';
+      this.testState = passed ? 'passed' : 'failed';
       console.info('SAFEMESH_NATIVE_DIAGNOSTICS ' + (passed ? 'PASS' : 'FAIL') + ' ' + JSON.stringify(this.events));
       await this.alertVM.loadDrill();
     } catch (error) {
-      this.testStatus = 'Verification error: ' + String(error);
-      this.add('Verification could not complete', String(error), false);
+      if (generation !== this.generation) { return; }
+      this.testState = 'error';
+      this.testFailureState = 'processing_failed';
+      this.add('error', 'processing_failed', false);
       console.error('SAFEMESH_NATIVE_DIAGNOSTICS FAIL ' + String(error));
-    } finally { this.running = false; }
+    } finally {
+      this.running = false;
+      if (this.testState === 'running') { this.testState = 'idle'; }
+    }
   }
 }

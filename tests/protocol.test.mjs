@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { createPublicKey, verify } from 'node:crypto';
+import { createPublicKey, generateKeyPairSync, sign, verify } from 'node:crypto';
 import { createRequire } from 'node:module';
 import { readFileSync, existsSync } from 'node:fs';
 import { dirname, resolve, join } from 'node:path';
@@ -101,6 +101,82 @@ test('real P-256 signed fixture verifies; every security-relevant field is signe
   assert.equal((await new protocol.RelayEngine().ingest(alert, testNow)).status, 'invalid');
 });
 
+test('v2 authenticates the original language and every alternate string, including alternate removal', async () => {
+  assert.equal(fresh().payload.version, 2);
+  assert.equal(fresh().payload.language, 'pl');
+  assert.equal(fresh().payload.translations[0].language, 'en');
+  for (const field of ['area', 'title', 'body']) {
+    const alert = fresh(); alert.payload.translations[0][field] += ' changed';
+    assert.equal((await new protocol.RelayEngine().ingest(alert, testNow)).status, 'invalid', field);
+  }
+  const removed = fresh(); delete removed.payload.translations;
+  assert.equal((await new protocol.RelayEngine().ingest(removed, testNow)).status, 'invalid');
+  const swapped = fresh();
+  swapped.payload.language = 'en'; swapped.payload.translations[0].language = 'pl';
+  assert.equal((await new protocol.RelayEngine().ingest(swapped, testNow)).status, 'invalid');
+  const downgraded = fresh();
+  downgraded.payload.version = 1; delete downgraded.payload.language; delete downgraded.payload.translations;
+  assert.equal((await new protocol.RelayEngine().ingest(downgraded, testNow)).status, 'invalid');
+});
+
+test('malformed, duplicate, unsupported and oversized translations fail before verification', async () => {
+  let verificationCalls = 0;
+  const engine = new protocol.RelayEngine({ async verify() { verificationCalls++; return true; } });
+  const alternate = fresh().payload.translations[0];
+  for (const translations of [null, 'en', {}, [null], [false], ['en'], [[]],
+    [{ ...alternate, language: 'de' }], [{ ...alternate, language: 'pl' }],
+    [{ ...alternate, body: '' }], [{ ...alternate, body: false }],
+    [{ ...alternate, title: 'x'.repeat(161) }], [alternate, alternate]]) {
+    const alert = fresh(); alert.payload.translations = translations;
+    assert.equal((await engine.ingest(alert, testNow)).status, 'invalid');
+    assert.equal(protocol.decodeEnvelope(JSON.stringify(alert)), undefined);
+  }
+  for (const language of [null, '', 'de', 'EN', 0, undefined]) {
+    const alert = fresh(); alert.payload.language = language;
+    assert.equal((await engine.ingest(alert, testNow)).status, 'invalid');
+  }
+  const oversized = fresh();
+  oversized.payload.body = '🐈'.repeat(600);
+  oversized.payload.translations[0].body = '🐈'.repeat(600);
+  assert.equal((await engine.ingest(oversized, testNow)).status, 'invalid');
+  assert.equal(verificationCalls, 0);
+});
+
+test('v1 canonical bytes and real signature verification remain compatible; unsigned language metadata is rejected', async () => {
+  const { privateKey, publicKey } = generateKeyPairSync('ec', { namedCurve: 'prime256v1' });
+  const payload = {
+    version: 1, keyId: fixtures.DEMO_KEY_ID, alertId: 'legacy-v1', revision: 1,
+    issuedAt: testNow - 1000, expiresAt: testNow + 1000, severity: 'info',
+    area: 'Legacy area', title: 'Original title', body: 'Original signed content',
+    shelterIds: ['point-1'], drill: true, maxHops: 8
+  };
+  // Frozen v1 field positions, independent of the implementation's v2 encoder.
+  const originalBytes = JSON.stringify(['SafeMesh.Alert.v1', fixtures.DEMO_KEY_ID, 'legacy-v1',
+    '1', String(testNow - 1000), String(testNow + 1000), 'info', 'Legacy area',
+    'Original title', 'Original signed content', '["point-1"]', '1', '8']);
+  assert.equal(protocol.canonicalPayload(payload), originalBytes);
+  const alert = { payload, signature: sign('sha256', Buffer.from(originalBytes), privateKey).toString('base64'), hops: 0 };
+  const verifier = { async verify(value, signature) {
+    return verify('sha256', Buffer.from(protocol.canonicalPayload(value)), publicKey, Buffer.from(signature, 'base64'));
+  } };
+  assert.equal((await new protocol.RelayEngine(verifier).ingest(alert, testNow)).status, 'accepted');
+  assert.deepEqual(protocol.decodeEnvelope(protocol.encodeEnvelope(alert)), alert);
+  for (const metadata of [{ language: 'en' }, { translations: [] }, { translations: fresh().payload.translations }]) {
+    const injected = structuredClone(alert); Object.assign(injected.payload, metadata);
+    assert.equal((await new protocol.RelayEngine(verifier).ingest(injected, testNow)).status, 'invalid');
+    assert.equal(protocol.decodeEnvelope(JSON.stringify(injected)), undefined);
+  }
+});
+
+test('version 2 allows a source-only signed alert without inventing a translation', async () => {
+  const sourceOnly = fresh(); delete sourceOnly.payload.translations;
+  const engine = new protocol.RelayEngine({ async verify() { return true; } });
+  assert.equal((await engine.ingest(sourceOnly, testNow)).status, 'accepted');
+  assert.equal(engine.accepted(testNow)[0].payload.translations, undefined);
+  const emptyList = structuredClone(sourceOnly); emptyList.payload.translations = [];
+  assert.equal(protocol.canonicalPayload(emptyList.payload), protocol.canonicalPayload(sourceOnly.payload));
+});
+
 test('forgery cannot poison replay state; duplicate and concurrent replay suppressed', async () => {
   const relay = new protocol.RelayEngine();
   assert.equal((await relay.ingest(fixtures.createTamperedAlert(), testNow)).status, 'invalid');
@@ -155,11 +231,15 @@ test('caller mutation cannot modify the authenticated cache or an in-flight cand
   const alert = fresh();
   const pending = relay.ingest(alert, testNow);
   alert.payload.body = 'changed during verification';
+  alert.payload.translations[0].body = 'changed alternate during verification';
   const result = await pending;
   assert.equal(result.status, 'accepted');
   result.envelope.payload.body = 'changed result';
   relay.accepted(testNow)[0].payload.body = 'changed copy';
+  result.envelope.payload.translations[0].body = 'changed result alternate';
+  relay.accepted(testNow)[0].payload.translations.push({ language: 'pl', area: 'x', title: 'x', body: 'x' });
   assert.equal(relay.accepted(testNow)[0].payload.body, fresh().payload.body);
+  assert.deepEqual(relay.accepted(testNow)[0].payload.translations, fresh().payload.translations);
 });
 
 test('bounded decoder rejects malformed JSON and primitive shape attacks', () => {

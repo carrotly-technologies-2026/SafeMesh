@@ -59,6 +59,24 @@ export struct OfflineMap {
     this.canvas.fillText(label, x, y);
   }
 
+  private pointMarker(point: SafePointViewModel, selected: boolean): void {
+    const px: number = this.x(point.lon); const py: number = this.y(point.lat);
+    if (px < 0 || px > this.widthValue || py < 0 || py > this.heightValue) { return; }
+    this.canvas.beginPath(); this.canvas.arc(px, py, selected ? 11 : 5, 0, Math.PI * 2);
+    this.canvas.fillStyle = selected ? this.color('map_selected', '#164D40') : this.color('map_point', '#FFFFFF');
+    this.canvas.fill();
+    this.canvas.strokeStyle = selected ? this.color('map_point', '#FFFFFF') : this.color('map_selected', '#164D40');
+    this.canvas.lineWidth = selected ? 2 : 1.5; this.canvas.stroke();
+    if (selected) {
+      // Geometric mark uses the Canvas vp coordinate space, not physical text px.
+      this.canvas.beginPath();
+      this.canvas.moveTo(px - 4, py); this.canvas.lineTo(px + 4, py);
+      this.canvas.moveTo(px, py - 4); this.canvas.lineTo(px, py + 4);
+      this.canvas.strokeStyle = this.color('map_plus', '#D9FF82');
+      this.canvas.lineWidth = 2; this.canvas.stroke();
+    }
+  }
+
   draw(): void {
     if (!this.canvasReady || this.widthValue <= 0 || this.heightValue <= 0) { return; }
     this.canvas.fillStyle = this.color('map_outside', '#F1F2EE');
@@ -105,26 +123,27 @@ export struct OfflineMap {
     this.canvas.strokeStyle = this.color('border', '#CBD5C7');
     this.canvas.lineWidth = 1;
     this.canvas.strokeRect(left, top, mapWidth, mapHeight);
-    this.vm.points.forEach((point: SafePointViewModel) => {
-      const selected: boolean = point.id === this.vm.selectedId;
-      const px: number = this.x(point.lon); const py: number = this.y(point.lat);
-      if (px < 0 || px > this.widthValue || py < 0 || py > this.heightValue) { return; }
-      this.canvas.beginPath(); this.canvas.arc(px, py, selected ? 12 : 5.5, 0, Math.PI * 2);
-      this.canvas.fillStyle = selected ? this.color('map_selected', '#164D40') : this.color('map_point', '#FFFFFF'); this.canvas.fill();
-      this.canvas.strokeStyle = this.color('map_selected', '#164D40'); this.canvas.lineWidth = 1.5; this.canvas.stroke();
-      if (selected) {
-        this.canvas.fillStyle = this.color('map_plus', '#D9FF82'); this.canvas.font = 'bold 15px sans-serif';
-        this.canvas.fillText('+', px - 4.5, py + 5);
-      }
-    });
     const ox: number = this.x(this.vm.originLon); const oy: number = this.y(this.vm.originLat);
-    this.canvas.beginPath(); this.canvas.arc(ox, oy, 10, 0, Math.PI * 2);
-    this.canvas.fillStyle = this.color('map_origin', '#345FC6') + '33'; this.canvas.fill();
+    this.canvas.beginPath(); this.canvas.arc(ox, oy, 15, 0, Math.PI * 2);
+    this.canvas.fillStyle = this.color('map_origin', '#345FC6');
+    this.canvas.globalAlpha = 0.18; this.canvas.fill(); this.canvas.globalAlpha = 1;
     this.canvas.beginPath(); this.canvas.arc(ox, oy, 4, 0, Math.PI * 2);
     this.canvas.fillStyle = this.color('map_origin', '#345FC6'); this.canvas.fill();
+    this.vm.points.forEach((point: SafePointViewModel) => {
+      if (point.id !== this.vm.selectedId) { this.pointMarker(point, false); }
+    });
+    // A dense cluster or the nearby origin must never paint over the selection.
+    const selected: SafePointViewModel = this.vm.selected();
+    if (selected.id.length > 0) { this.pointMarker(selected, true); }
   }
 
   pick(x: number, y: number): void {
+    const selected: SafePointViewModel = this.vm.selected();
+    const selectedX: number = this.x(selected.lon); const selectedY: number = this.y(selected.lat);
+    if (selected.id.length > 0 && selectedX >= 0 && selectedX <= this.widthValue &&
+      selectedY >= 0 && selectedY <= this.heightValue && Math.hypot(selectedX - x, selectedY - y) <= 11) {
+      this.onSelect(selected.id); return;
+    }
     let closestId: string = '';
     let distance: number = 28;
     for (const point of this.vm.points) {

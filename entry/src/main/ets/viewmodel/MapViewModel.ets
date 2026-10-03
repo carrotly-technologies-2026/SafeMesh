@@ -35,7 +35,10 @@ export class SafePointViewModel {
   lat: number = 0;
   lon: number = 0;
   availability: string = '';
+  availabilityKey: string = 'availability_unknown';
   description: string = '';
+  source: string = '';
+  sourceDate: string = '';
   distance: number = 0;
   distanceLabel: string = '';
 }
@@ -70,7 +73,8 @@ export class MapViewModel {
       const item = new SafePointViewModel();
       item.id = point.id; item.name = point.name; item.address = point.address;
       item.lat = point.lat; item.lon = point.lon;
-      item.availability = point.availability; item.description = point.description;
+      item.availability = point.availability; item.availabilityKey = this.accessKey(point.availability);
+      item.description = point.description; item.source = point.source; item.sourceDate = point.sourceDate;
       item.distance = this.distance(point.lat, point.lon);
       item.distanceLabel = item.distance < 1000 ? Math.round(item.distance) + ' m' :
         (item.distance / 1000).toFixed(1) + ' km';
@@ -99,11 +103,48 @@ export class MapViewModel {
     return this.points.find((point: SafePointViewModel) => point.id === this.selectedId) ?? new SafePointViewModel();
   }
 
-  select(id: string): void {
+  saved(): SafePointViewModel | undefined {
+    return this.points.find((point: SafePointViewModel) => point.id === this.savedId);
+  }
+
+  distanceText(point: SafePointViewModel, language: string): string {
+    if (!Number.isFinite(point.distance) || point.distance < 0) { return '—'; }
+    if (point.distance < 1000) { return Math.round(point.distance) + ' m'; }
+    const value: string = (point.distance / 1000).toFixed(1);
+    return (language === 'pl' ? value.replace('.', ',') : value) + ' km';
+  }
+
+  searchPoints(query: string): SafePointViewModel[] {
+    const normalized: string = this.searchText(query);
+    if (normalized.length === 0) { return this.points; }
+    const terms: string[] = normalized.split(/\s+/);
+    return this.points.filter((point: SafePointViewModel) => {
+      const text: string = this.searchText(point.address);
+      return terms.every((term: string) => text.includes(term));
+    });
+  }
+
+  private searchText(value: string): string {
+    // Polish addresses remain source text; keyboard accents are optional in search.
+    return value.trim().toLowerCase().replace(/ą/g, 'a').replace(/ć/g, 'c').replace(/ę/g, 'e')
+      .replace(/ł/g, 'l').replace(/ń/g, 'n').replace(/ó/g, 'o').replace(/ś/g, 's')
+      .replace(/ź/g, 'z').replace(/ż/g, 'z');
+  }
+
+  private accessKey(value: string): string {
+    if (value === 'Na żądanie') { return 'availability_request'; }
+    if (value === 'Całodobowa') { return 'availability_all_day'; }
+    if (value === 'Określone godziny') { return 'availability_hours'; }
+    // A new source category must not leak untranslated text or imply live access.
+    return 'availability_unknown';
+  }
+
+  select(id: string): boolean {
     const point: SafePointViewModel | undefined = this.points.find((item: SafePointViewModel) => item.id === id);
-    if (point === undefined) { return; }
+    if (point === undefined) { return false; }
     this.selectedId = id;
     this.centerLat = point.lat; this.centerLon = point.lon;
+    return true;
   }
 
   async restoreSaved(store: LocalStore): Promise<void> {
@@ -140,9 +181,7 @@ export class MapViewModel {
   }
 
   openSaved(): boolean {
-    if (!this.points.some((point: SafePointViewModel) => point.id === this.savedId)) { return false; }
-    this.select(this.savedId);
-    return true;
+    return this.select(this.savedId);
   }
 
   async locate(context: common.UIAbilityContext): Promise<boolean> {
@@ -189,7 +228,8 @@ export class MapViewModel {
       const point: SafePointViewModel = new SafePointViewModel();
       point.id = previous.id; point.name = previous.name; point.address = previous.address;
       point.lat = previous.lat; point.lon = previous.lon;
-      point.availability = previous.availability; point.description = previous.description;
+      point.availability = previous.availability; point.availabilityKey = previous.availabilityKey;
+      point.description = previous.description; point.source = previous.source; point.sourceDate = previous.sourceDate;
       point.distance = this.distance(point.lat, point.lon);
       point.distanceLabel = point.distance < 1000 ? Math.round(point.distance) + ' m' :
         (point.distance / 1000).toFixed(1) + ' km';

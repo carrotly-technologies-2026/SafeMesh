@@ -4,15 +4,22 @@ import { LocalStore } from '../model/LocalStore';
 
 @Observed
 export class AlertViewModel {
-  title: string = 'Ready when it matters.';
-  body: string = 'Verified warnings and your local map, kept on your phone.';
-  area: string = 'Kraków · central district';
+  title: string = '';
+  body: string = '';
+  area: string = '';
   verification: string = 'No alert loaded';
+  verificationState: string = 'none';
   received: boolean = false;
   busy: boolean = false;
   expiry: string = '';
   issueTime: string = '';
+  issuedAt: number = 0;
+  expiresAt: number = 0;
+  currentIdentity: string = '';
+  contentLanguage: string = 'und';
+  languageFallback: boolean = false;
   lastReceiveStatus: string = 'No packet received';
+  lastReceiveState: string = 'none';
   persistenceStatus: string = 'No saved alert';
   persistenceState: string = 'none';
   private engine: RelayEngine = new RelayEngine();
@@ -23,8 +30,18 @@ export class AlertViewModel {
   private restored: boolean = false;
   private persistence: Promise<void> = Promise.resolve();
   private expiryTimer: number = -1;
+  private language: string = 'pl';
+  private active: boolean = true;
 
   constructor(store: LocalStore) { this.store = store; }
+
+  /** Select only issuer-signed content; never translate or mutate the stored payload. */
+  setLanguage(language: string): void {
+    if (language !== 'pl' && language !== 'en') { return; }
+    this.language = language;
+    this.refreshExpiry();
+    this.displayContent();
+  }
 
   async restore(): Promise<void> {
     if (this.restoreTask === undefined) { this.restoreTask = this.restoreStored(); }
@@ -68,12 +85,14 @@ export class AlertViewModel {
       this.refreshExpiry();
       const result: RelayResult = await this.engine.ingest(envelope);
       this.lastReceiveStatus = result.status + ': ' + result.detail;
+      this.lastReceiveState = result.status;
       if (result.status === 'accepted' || result.status === 'duplicate') { this.selectCurrent(); }
       if (result.status === 'accepted') { await this.persist(); }
       // Rejected input cannot overwrite the verification badge of authentic content.
       return result;
     } catch (error) {
       this.lastReceiveStatus = 'Packet processing could not complete';
+      this.lastReceiveState = 'processing_failed';
       return { status: 'invalid', detail: 'Packet processing failed. Existing verified content retained.' };
     } finally {
       this.pending--;
@@ -100,23 +119,22 @@ export class AlertViewModel {
 
   refreshExpiry(): void {
     if (this.packet !== undefined && Date.now() >= this.packet.payload.expiresAt) {
-      this.packet = undefined;
-      this.received = false;
-      this.verification = 'Expired · not relayed';
-      this.title = 'No current verified alert';
-      this.body = 'The cached exercise alert has expired. The offline map remains available.';
-      this.expiry = '';
-      this.issueTime = '';
-      this.clearExpiryTimer();
+      // Selection prunes expiry and may reveal an older, still-current alert.
+      // It never calls refreshExpiry, so this also works from the timer callback.
+      this.selectCurrent();
     }
   }
 
-  /** Call when the owning page is permanently disposed. Forwarding still checks expiry. */
-  dispose(): void { this.clearExpiryTimer(); }
+  /** Stop UI timers while hidden/disposed; a late restore cannot restart them. */
+  dispose(): void { this.active = false; this.clearExpiryTimer(); }
+
+  /** Foreground refresh also handles expiry that happened while timers were paused. */
+  resume(): void { this.active = true; this.selectCurrent(); }
 
   private selectCurrent(): void {
-    this.refreshExpiry();
-    const alerts: SignedAlertEnvelope[] = this.engine.accepted();
+    const now: number = Date.now();
+    const expired: boolean = this.packet !== undefined && this.packet.payload.expiresAt <= now;
+    const alerts: SignedAlertEnvelope[] = this.engine.accepted(now);
     let latest: SignedAlertEnvelope | undefined = undefined;
     for (const alert of alerts) {
       if (latest === undefined || alert.payload.issuedAt > latest.payload.issuedAt ||
@@ -124,16 +142,63 @@ export class AlertViewModel {
         latest = alert;
       }
     }
-    if (latest === undefined) { return; }
+    if (latest === undefined) {
+      this.packet = undefined;
+      this.received = false;
+      this.title = '';
+      this.body = '';
+      this.area = '';
+      this.expiry = '';
+      this.issueTime = '';
+      this.issuedAt = 0;
+      this.expiresAt = 0;
+      this.currentIdentity = '';
+      this.contentLanguage = 'und';
+      this.languageFallback = false;
+      if (expired || this.verificationState === 'expired') {
+        this.verification = 'Expired · not relayed';
+        this.verificationState = 'expired';
+      } else {
+        this.verification = 'No alert loaded';
+        this.verificationState = 'none';
+      }
+      this.clearExpiryTimer();
+      return;
+    }
     this.packet = latest;
-    this.title = latest.payload.title;
-    this.body = latest.payload.body;
-    this.area = latest.payload.area;
+    this.displayContent();
+    this.issuedAt = latest.payload.issuedAt;
+    this.expiresAt = latest.payload.expiresAt;
+    this.currentIdentity = JSON.stringify([
+      latest.payload.keyId, latest.payload.alertId, String(latest.payload.revision), String(latest.payload.issuedAt)
+    ]);
     this.issueTime = new Date(latest.payload.issuedAt).toISOString().slice(0, 16).replace('T', ' ') + ' UTC';
     this.expiry = new Date(latest.payload.expiresAt).toISOString().slice(0, 16).replace('T', ' ') + ' UTC';
     this.received = true;
     this.verification = 'Signature verified · demo authority';
+    this.verificationState = 'verified';
     this.scheduleExpiry();
+  }
+
+  private displayContent(): void {
+    const packet: SignedAlertEnvelope | undefined = this.packet;
+    if (packet === undefined) { return; }
+    this.title = packet.payload.title;
+    this.body = packet.payload.body;
+    this.area = packet.payload.area;
+    this.contentLanguage = packet.payload.language === undefined ? 'und' : packet.payload.language;
+    this.languageFallback = this.contentLanguage !== this.language;
+    if (packet.payload.version !== 2 || packet.payload.translations === undefined) { return; }
+    for (const translation of packet.payload.translations) {
+      if (translation.language === this.language) {
+        this.title = translation.title;
+        this.body = translation.body;
+        this.area = translation.area;
+        this.contentLanguage = translation.language;
+        this.languageFallback = false;
+        return;
+      }
+    }
   }
 
   private async persist(): Promise<void> {
@@ -156,7 +221,7 @@ export class AlertViewModel {
 
   private scheduleExpiry(): void {
     this.clearExpiryTimer();
-    if (this.packet === undefined) { return; }
+    if (!this.active || this.packet === undefined) { return; }
     const delay: number = Math.max(1, Math.min(60000, this.packet.payload.expiresAt - Date.now()));
     this.expiryTimer = setTimeout((): void => {
       this.expiryTimer = -1;

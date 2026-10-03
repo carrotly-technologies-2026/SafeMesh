@@ -21,6 +21,20 @@ if (-not (Get-Command devecocli.cmd -ErrorAction SilentlyContinue)) {
 
 Push-Location -LiteralPath $projectRoot
 try {
+    $appMetadata = Get-Content -LiteralPath (Join-Path $projectRoot 'AppScope/app.json5') -Raw -Encoding UTF8
+    # Strip JSON5 comments while preserving quoted strings before reading the version.
+    $appMetadata = [regex]::Replace($appMetadata, '(?s)/\*.*?\*/|//[^\r\n]*|"(?:\\.|[^"\\])*"|''(?:\\.|[^''\\])*''', {
+        param($match)
+        if ($match.Value.StartsWith('//') -or $match.Value.StartsWith('/*')) { return ' ' }
+        return $match.Value
+    })
+    $versionMatches = [regex]::Matches($appMetadata, '(?:"versionName"|''versionName''|\bversionName)\s*:\s*["''](?<version>[^"'']+)["'']')
+    if ($versionMatches.Count -ne 1) { throw 'AppScope/app.json5 must define exactly one versionName.' }
+    $appVersion = $versionMatches[0].Groups['version'].Value
+    if ($appVersion -notmatch '^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(?:-(?:0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*)(?:\.(?:0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*))*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$') {
+        throw 'AppScope/app.json5 versionName must be a valid semantic version for artifact filenames.'
+    }
+    Write-Output "Building SafeMesh $appVersion for the emulator."
     if ($RefreshDrill) {
         & node scripts/generate-demo-alerts.mjs
         if ($LASTEXITCODE -ne 0) { throw 'Exercise fixture generation failed.' }
@@ -38,10 +52,14 @@ try {
     }
     $dist = Join-Path $projectRoot 'dist'
     New-Item -ItemType Directory -Path $dist -Force | Out-Null
-    $destination = Join-Path $dist 'SafeMesh-demo.hap'
+    $hapName = "SafeMesh-$appVersion.hap"
+    $destination = Join-Path $dist $hapName
     Copy-Item -LiteralPath $hap -Destination $destination -Force
     $digest = (Get-FileHash -LiteralPath $destination -Algorithm SHA256).Hash.ToLowerInvariant()
-    "$digest  SafeMesh-demo.hap" | Set-Content -LiteralPath (Join-Path $dist 'SHA256SUMS.txt') -Encoding ascii
+    # This helper's versioned checksum covers only the HAP. Release bundles may
+    # maintain a separate manifest containing video/source ZIP checksums too.
+    $checksumPath = Join-Path $dist "SafeMesh-$appVersion.sha256.txt"
+    "$digest  $hapName" | Set-Content -LiteralPath $checksumPath -Encoding ascii
 
     if (-not $NoRun) {
         $ErrorActionPreference = 'Continue'
@@ -51,6 +69,7 @@ try {
         if ($runExit -ne 0) { throw "Emulator deployment failed ($runExit)." }
     }
     Write-Output "Ready: $destination"
+    Write-Output "HAP-only SHA256 manifest: $checksumPath"
 } finally {
     Pop-Location
 }

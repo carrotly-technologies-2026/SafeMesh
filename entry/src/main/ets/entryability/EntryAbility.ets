@@ -20,6 +20,7 @@ import { window } from '@kit.ArkUI';
 const DOMAIN = 0x0000;
 
 export default class EntryAbility extends UIAbility {
+  private mainWindow: window.Window | undefined = undefined;
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     try {
       // Follow system light/dark mode; Polish is the initial language for this Kraków demo.
@@ -42,7 +43,23 @@ export default class EntryAbility extends UIAbility {
       String(AppStorage.get<number>('safeMeshFontScale') ?? 1), String(config.colorMode ?? this.context.config.colorMode));
   }
 
-  onConfigurationUpdate(config: Configuration): void { this.publishConfiguration(config); }
+  onConfigurationUpdate(config: Configuration): void {
+    this.publishConfiguration(config);
+    this.updateSystemBars();
+  }
+
+  private updateSystemBars(): void {
+    if (this.mainWindow === undefined) { return; }
+    const dark: boolean = AppStorage.get<boolean>('safeMeshDark') ?? false;
+    this.mainWindow.setWindowSystemBarProperties({
+      statusBarColor: dark ? '#101715' : '#F5F6F7',
+      statusBarContentColor: dark ? '#E9F1EC' : '#192923',
+      navigationBarColor: dark ? '#19221F' : '#FFFFFF',
+      navigationBarContentColor: dark ? '#E9F1EC' : '#192923'
+    }).catch(() => {
+      hilog.warn(DOMAIN, 'SafeMeshUI', 'System bar appearance could not be updated.');
+    });
+  }
 
   onDestroy(): void {
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onDestroy');
@@ -51,6 +68,13 @@ export default class EntryAbility extends UIAbility {
   onWindowStageCreate(windowStage: window.WindowStage): void {
     // Main window is created, set main page for this ability
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
+
+    windowStage.getMainWindow().then((mainWindow: window.Window) => {
+      this.mainWindow = mainWindow;
+      this.updateSystemBars();
+    }).catch(() => {
+      hilog.warn(DOMAIN, 'SafeMeshUI', 'Main window appearance is unavailable.');
+    });
 
     windowStage.loadContent('pages/Index', (err) => {
       if (err.code) {
@@ -62,6 +86,7 @@ export default class EntryAbility extends UIAbility {
   }
 
   onWindowStageDestroy(): void {
+    this.mainWindow = undefined;
     // Main window is destroyed, release UI related resources
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageDestroy');
   }

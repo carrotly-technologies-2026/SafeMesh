@@ -2,11 +2,11 @@
   "string": [
     {
       "name": "module_desc",
-      "value": "Signed offline alerts and protective locations"
+      "value": "Offline alerts and protective points"
     },
     {
       "name": "EntryAbility_desc",
-      "value": "SafeMesh offline preparedness demo"
+      "value": "SafeMesh exercise app"
     },
     {
       "name": "EntryAbility_label",
@@ -26,7 +26,7 @@
     },
     {
       "name": "exercise_notice",
-      "value": "Hackathon prototype. This is not an official warning."
+      "value": "Exercise app · not an official alert"
     },
     {
       "name": "offline_ready",
@@ -62,7 +62,7 @@
     },
     {
       "name": "settings",
-      "value": "Settings and accessibility"
+      "value": "Settings"
     },
     {
       "name": "theme_system",
@@ -70,11 +70,11 @@
     },
     {
       "name": "ready_title",
-      "value": "Prepare before an alert"
+      "value": "Messages appear here"
     },
     {
       "name": "ready_body",
-      "value": "No active signed message. The protective-point map and guide are stored on this phone."
+      "value": "The map and guide are stored on this phone."
     },
     {
       "name": "verified_exercise",
@@ -86,11 +86,11 @@
     },
     {
       "name": "signature_verified",
-      "value": "Signature verified · exercise authority"
+      "value": "Signature verified · exercise sender"
     },
     {
       "name": "signed_original",
-      "value": "Original signed message"
+      "value": "Original signed text"
     },
     {
       "name": "valid_until",
@@ -98,7 +98,7 @@
     },
     {
       "name": "receive_drill",
-      "value": "Receive a signed drill"
+      "value": "Load exercise message"
     },
     {
       "name": "verifying",
@@ -106,7 +106,7 @@
     },
     {
       "name": "see_relay",
-      "value": "See how messages travel"
+      "value": "Open relay"
     },
     {
       "name": "new_alert",
@@ -118,7 +118,7 @@
     },
     {
       "name": "verify_failed",
-      "value": "The drill could not be verified. Check the demonstration package expiry."
+      "value": "The exercise could not be verified. Its validity may have expired."
     },
     {
       "name": "init_failed",
@@ -126,7 +126,7 @@
     },
     {
       "name": "offline_area",
-      "value": "Your offline area"
+      "value": "Offline area"
     },
     {
       "name": "central_krakow",
@@ -138,27 +138,27 @@
     },
     {
       "name": "bundled_points",
-      "value": "Selected PSP locations stored on this phone"
+      "value": "Selected points from the PSP dataset"
     },
     {
       "name": "explore",
-      "value": "Explore map"
+      "value": "Open map"
     },
     {
       "name": "community",
-      "value": "Information can travel further"
+      "value": "Message relay"
     },
     {
       "name": "community_body",
-      "value": "See a signed message pass between three simulated phones."
+      "value": "Test delivery between three emulators."
     },
     {
       "name": "find_point",
-      "value": "Find a protective point"
+      "value": "Protective points"
     },
     {
       "name": "map_description",
-      "value": "Offline map of central Kraków. Every point is also available in the list below."
+      "value": "Central Kraków, stored offline. Points are also available as a list."
     },
     {
       "name": "zoom_in",
@@ -170,7 +170,7 @@
     },
     {
       "name": "recenter",
-      "value": "Recenter map"
+      "value": "Recenter"
     },
     {
       "name": "selected_point",
@@ -182,15 +182,15 @@
     },
     {
       "name": "access_notice",
-      "value": "Access is not confirmed live. A PSP point is not a guarantee of a bomb-resistant shelter."
+      "value": "Access has not been checked live. A listed point is not a confirmed bomb shelter."
     },
     {
       "name": "save_point",
-      "value": "Save this point"
+      "value": "Save point"
     },
     {
       "name": "saved_point",
-      "value": "Point saved on this phone"
+      "value": "Saved on this phone"
     },
     {
       "name": "saving",
@@ -198,7 +198,7 @@
     },
     {
       "name": "save_failed",
-      "value": "Could not save this point. Your previous saved point is unchanged."
+      "value": "Could not save the point. Try again."
     },
     {
       "name": "saved_load_failed",
@@ -210,11 +210,11 @@
     },
     {
       "name": "search_points",
-      "value": "Search the 40 point addresses"
+      "value": "Search addresses"
     },
     {
       "name": "all_points",
-      "value": "All points in this pack"
+      "value": "Points in this area"
     },
     {
       "name": "no_results",
@@ -226,15 +226,15 @@
     },
     {
       "name": "distance_notice",
-      "value": "Distances are straight-line, without route guidance. This pack contains a selection, not a complete list."
+      "value": "Straight-line distances. No route guidance. This list covers selected points only."
     },
     {
       "name": "demo_origin",
-      "value": "Reference point: Rynek Główny (demo). This is not your location."
+      "value": "Reference: Rynek Główny (demo), not your location."
     },
     {
       "name": "device_origin",
-      "value": "Reference point: one-time phone location fix."
+      "value": "Reference: last location fix"
     },
     {
       "name": "use_location",
@@ -246,31 +246,31 @@
     },
     {
       "name": "reset_origin",
-      "value": "Return to demo origin"
+      "value": "Use demo reference"
     },
     {
       "name": "location_ready",
-      "value": "Location updated. Distances are measured from your phone."
+      "value": "Location updated. Distances use this measurement."
     },
     {
       "name": "location_permission_denied",
-      "value": "Location permission was not granted. The previous reference point is retained."
+      "value": "Location access denied. The reference point is unchanged."
     },
     {
       "name": "location_disabled",
-      "value": "Phone location is disabled. Enable it in settings to try again."
+      "value": "Location is off. Enable it in phone settings."
     },
     {
       "name": "location_unavailable",
-      "value": "Could not obtain a location fix. The previous reference point is retained."
+      "value": "Location unavailable. The reference point is unchanged."
     },
     {
       "name": "location_outside_pack",
-      "value": "You are outside the Kraków map pack. This map is not shown as your current location."
+      "value": "The location is outside this map. The reference point is unchanged."
     },
     {
       "name": "location_poor_accuracy",
-      "value": "The location fix is too imprecise. The previous reference point is retained."
+      "value": "Location is too imprecise. The reference point is unchanged."
     },
     {
       "name": "accuracy",
@@ -278,23 +278,23 @@
     },
     {
       "name": "pack_date",
-      "value": "PSP data publication"
+      "value": "Point data"
     },
     {
       "name": "relay_title",
-      "value": "A network of nearby phones"
+      "value": "Relay"
     },
     {
       "name": "relay_intro",
-      "value": "Verify the signature. Keep the content. Pass it on."
+      "value": "Connect test devices to exchange signed messages."
     },
     {
       "name": "simulation",
-      "value": "3-phone simulation"
+      "value": "Local verification test"
     },
     {
       "name": "no_radio",
-      "value": "This drill uses no radio transmission."
+      "value": "This test runs on one device without radio transmission."
     },
     {
       "name": "node_a",
@@ -310,19 +310,19 @@
     },
     {
       "name": "run_drill",
-      "value": "Run the signed relay drill"
+      "value": "Run verification test"
     },
     {
       "name": "drill_running",
-      "value": "Verifying and relaying…"
+      "value": "Testing…"
     },
     {
       "name": "diagnostics",
-      "value": "Technical result"
+      "value": "Diagnostics"
     },
     {
       "name": "technical_note",
-      "value": "Technical diagnostics and the signed message keep their original language."
+      "value": "Details of the verification test."
     },
     {
       "name": "connected",
@@ -334,7 +334,7 @@
     },
     {
       "name": "nearlink_notice",
-      "value": "NearLink delivery requires compatible physical phones. Keep the app open. The emulator verifies logic, not radio."
+      "value": "Radio delivery needs compatible physical phones. NearLink has not been tested on physical devices."
     },
     {
       "name": "peer_name",
@@ -342,7 +342,7 @@
     },
     {
       "name": "start_relay",
-      "value": "Start NearLink and discover"
+      "value": "Start NearLink"
     },
     {
       "name": "connect",
@@ -354,7 +354,7 @@
     },
     {
       "name": "share_alert",
-      "value": "Share verified alert"
+      "value": "Send message"
     },
     {
       "name": "stop_relay",
@@ -362,55 +362,55 @@
     },
     {
       "name": "guide_title",
-      "value": "Preparation gives you time"
+      "value": "Offline guide"
     },
     {
       "name": "guide_intro",
-      "value": "A short offline reminder based on Poland’s public safety guide. Follow current instructions from the authorities."
+      "value": "Based on Poland’s public safety guide. Follow current instructions from the authorities."
     },
     {
       "name": "guide1_title",
-      "value": "Know your nearby options"
+      "value": "Check nearby places"
     },
     {
       "name": "guide1_body",
-      "value": "Explore protective points before an emergency. Check the entrance and access conditions. A map marker cannot confirm that a place is open or safe to reach."
+      "value": "Check the entrance and access before an emergency. A map point does not confirm that a place is open or safe to reach."
     },
     {
       "name": "guide2_title",
-      "value": "Keep essentials ready"
+      "value": "Prepare essentials"
     },
     {
       "name": "guide2_body",
-      "value": "Prepare an evacuation bag and a household plan in advance. Include what you personally need. Keep your phone and power bank charged."
+      "value": "Prepare an evacuation bag and a household plan. Account for personal needs. Charge your phone and power bank."
     },
     {
       "name": "guide3_title",
-      "value": "Follow verified instructions"
+      "value": "Read official alerts"
     },
     {
       "name": "guide3_body",
-      "value": "Read official alerts carefully. If evacuation is ordered, follow designated directions. Check whether neighbours know about the alert and tell loved ones your plan."
+      "value": "Follow evacuation instructions when issued. Check that neighbours know about the alert and tell loved ones your plan."
     },
     {
       "name": "guide4_title",
-      "value": "Help information travel"
+      "value": "Relay messages"
     },
     {
       "name": "guide4_body",
-      "value": "On compatible phones, keep SafeMesh open. Relaying cannot overcome jamming, a lack of nearby devices, or a compromised signing key."
+      "value": "Keep SafeMesh on screen during the test. Delivery requires a connected neighbouring device."
     },
     {
       "name": "trust_title",
-      "value": "What “verified” means"
+      "value": "Message verification"
     },
     {
       "name": "trust_body",
-      "value": "This prototype verifies a pinned ECDSA P-256 exercise key. It is not connected to RCB. A real service requires an authorised issuer, secure key custody, rotation and revocation."
+      "value": "The signature is checked against the SafeMesh exercise key. This app does not receive official RCB alerts."
     },
     {
       "name": "trust_limits",
-      "value": "Expired and repeated packets are suppressed. Hop counts limit honest devices; malicious relays can reset them. The phone clock must be accurate."
+      "value": "Verification needs an accurate clock. A relay limit does not prevent a malicious device from changing the hop count."
     },
     {
       "name": "sources",
@@ -426,7 +426,7 @@
     },
     {
       "name": "external_links",
-      "value": "Links open in your browser and require connectivity. The map and guide remain available offline."
+      "value": "Source links need internet. The map and guide work offline."
     },
     {
       "name": "dismiss",
@@ -442,15 +442,15 @@
     },
     {
       "name": "availability_all_day",
-      "value": "24 hours"
+      "value": "24-hour access"
     },
     {
       "name": "availability_hours",
-      "value": "Specified hours"
+      "value": "Set hours"
     },
     {
       "name": "queue_metrics",
-      "value": "Live NearLink queue"
+      "value": "Delivery queue"
     },
     {
       "name": "queue_pending",
@@ -458,7 +458,7 @@
     },
     {
       "name": "queue_acked",
-      "value": "Acknowledged by app"
+      "value": "Received by app"
     },
     {
       "name": "queue_retry",
@@ -470,7 +470,7 @@
     },
     {
       "name": "queue_note",
-      "value": "An acknowledgement means the app on the other phone received the packet, not that a person read it or that their identity is verified."
+      "value": "A receipt confirms app delivery, not that a person read the message or who they are."
     },
     {
       "name": "persistence_none",
@@ -478,7 +478,7 @@
     },
     {
       "name": "persistence_reverified",
-      "value": "Saved signatures have been re-verified."
+      "value": "Saved message verified again."
     },
     {
       "name": "persistence_load_failed",
@@ -486,19 +486,19 @@
     },
     {
       "name": "persistence_saved",
-      "value": "Alert saved on this phone."
+      "value": "Saved on this phone."
     },
     {
       "name": "persistence_save_failed",
-      "value": "Signature verified. Saving failed — the alert remains only in app memory."
+      "value": "Verified, but not saved. The message is only in app memory."
     },
     {
       "name": "hardware_not_checked",
-      "value": "NearLink support has not been checked yet."
+      "value": "NearLink not checked."
     },
     {
       "name": "hardware_unsupported",
-      "value": "NearLink radio is unavailable on this device. The emulator drill uses simulation."
+      "value": "NearLink is unavailable on this device."
     },
     {
       "name": "hardware_off",
@@ -506,51 +506,51 @@
     },
     {
       "name": "hardware_available",
-      "value": "NearLink support detected. Radio delivery requires another compatible phone."
+      "value": "NearLink support detected. Connect a compatible phone."
     },
     {
       "name": "hardware_ready",
-      "value": "NearLink is ready. You can discover another phone by its exact name."
+      "value": "NearLink ready. Search by the other phone’s name."
     },
     {
       "name": "hardware_permission_denied",
-      "value": "NearLink access was not granted. Allow nearby-device access to relay alerts."
+      "value": "NearLink access denied. Check nearby-device permissions."
     },
     {
       "name": "hardware_discovering",
-      "value": "Looking for the phone. Select a discovered device to connect."
+      "value": "Searching for the phone…"
     },
     {
       "name": "hardware_stopped",
-      "value": "NearLink relay stopped. Saved alerts remain available offline."
+      "value": "Relay stopped. Saved messages remain available."
     },
     {
       "name": "hardware_error",
-      "value": "The NearLink operation failed. Check permission, radio settings and device support."
+      "value": "NearLink failed. Check permissions and radio settings."
     },
     {
       "name": "hardware_restore_failed",
-      "value": "Relay paused: saved alert state could not be read."
+      "value": "Relay paused: saved messages could not be read."
     },
     {
       "name": "hardware_cleanup_failed",
-      "value": "Some radio operations could not be stopped. Restart the app before trying again."
+      "value": "Could not stop all operations. Restart the app."
     },
     {
       "name": "hardware_load_alert",
-      "value": "Receive a valid signed exercise message first."
+      "value": "Load a valid exercise message first."
     },
     {
       "name": "hardware_queued",
-      "value": "Messages are queued. Delivery requires an acknowledgement from the other phone’s app."
+      "value": "Messages queued. Waiting for app receipts."
     },
     {
       "name": "hardware_waiting_peer",
-      "value": "Messages saved. Waiting for a connected NearLink phone."
+      "value": "Waiting for a connected device."
     },
     {
       "name": "hardware_queue_error",
-      "value": "The relay queue was paused because of an error."
+      "value": "Delivery paused because of an error."
     },
     {
       "name": "settings_tab",
@@ -558,7 +558,7 @@
     },
     {
       "name": "settings_intro",
-      "value": "Make the app your own. Choices are saved on this phone."
+      "value": "Saved on this phone."
     },
     {
       "name": "theme_label",
@@ -566,7 +566,7 @@
     },
     {
       "name": "theme_auto",
-      "value": "System (automatic)"
+      "value": "System"
     },
     {
       "name": "theme_light",
@@ -578,7 +578,7 @@
     },
     {
       "name": "theme_auto_hint",
-      "value": "System theme follows your phone settings. Light and dark apply only to SafeMesh."
+      "value": "System follows the phone’s appearance."
     },
     {
       "name": "language_label",
@@ -586,19 +586,19 @@
     },
     {
       "name": "text_size_hint",
-      "value": "Change text size in your phone settings. SafeMesh follows it up to twice the normal size."
+      "value": "Text size follows phone settings, up to 2×."
     },
     {
       "name": "settings_saved",
-      "value": "Setting saved on this phone."
+      "value": "Setting saved."
     },
     {
       "name": "settings_save_failed",
-      "value": "The change applies to this session. It could not be saved for the next launch."
+      "value": "Changed for this session only. Could not save the setting."
     },
     {
       "name": "settings_apply_failed",
-      "value": "The setting could not be applied. Please try again."
+      "value": "Could not apply the setting. Try again."
     },
     {
       "name": "open_settings",
@@ -610,67 +610,67 @@
     },
     {
       "name": "lab_title",
-      "value": "Three-emulator lab"
+      "value": "Three-emulator test"
     },
     {
       "name": "lab_explanation",
-      "value": "Three separate apps exchange packets through a local mock transport. Each emulator verifies signatures, stores alerts and forwards messages. This is not NearLink radio transmission."
+      "value": "Apps A, B and C connect through a local test server, without NearLink radio. Keep the app on screen to relay messages."
     },
     {
       "name": "lab_node",
-      "value": "Test node identity"
+      "value": "Device role"
     },
     {
       "name": "lab_connect",
-      "value": "Connect node"
+      "value": "Connect"
     },
     {
       "name": "lab_connecting",
-      "value": "Connecting node"
+      "value": "Connecting"
     },
     {
       "name": "lab_active",
-      "value": "Active test node:"
+      "value": "Connected as:"
     },
     {
       "name": "lab_peers",
-      "value": "Connected test neighbours"
+      "value": "Connected neighbours"
     },
     {
       "name": "lab_send_drill",
-      "value": "Load and send signed exercise"
+      "value": "Load and send exercise"
     },
     {
       "name": "lab_disconnect",
-      "value": "Disconnect test node"
+      "value": "Disconnect"
     },
     {
       "name": "lab_received",
-      "value": "Alerts accepted from other emulators"
+      "value": "Messages received"
     },
     {
       "name": "lab_rejected",
-      "value": "Rejected packets"
+      "value": "Packets rejected"
     },
     {
       "name": "lab_return_radio",
-      "value": "End lab and check NearLink"
+      "value": "Check NearLink instead"
     },
     {
       "name": "lab_topology",
-      "value": "Default: A ↔ B ↔ C, with no A ↔ C link. The server only carries packets: it never signs, acknowledges or stores alerts. Keep the app in the foreground."
+      "value": "Default links: A ↔ B ↔ C. The server passes packets only; each app verifies, stores and acknowledges messages."
     },
     {
       "name": "lab_open",
-      "value": "Open multi-emulator test"
+      "value": "Emulator connection test"
     },
     {
       "name": "lab_hide",
-      "value": "Collapse lab panel"
+      "value": "Close test controls"
     },
     {
       "name": "lab_banner",
-      "value": "MOCK TRANSPORT · Node"
+      "value": "EMULATOR TEST · Node"
     },
     {
       "name": "lab_disconnected_peer",
@@ -678,19 +678,323 @@
     },
     {
       "name": "hardware_lab_connecting",
-      "value": "Connecting to the local test server…"
+      "value": "Connecting to the test server…"
     },
     {
       "name": "hardware_lab_ready",
-      "value": "Local test transport connected. This is not NearLink radio."
+      "value": "Connected to the test server."
     },
     {
       "name": "hardware_lab_disconnected",
-      "value": "Test transport disconnected. Signed alerts remain on this device."
+      "value": "Disconnected. Saved messages remain available."
     },
     {
       "name": "hardware_lab_error",
-      "value": "Could not connect to the lab. Check the local server and HDC port mapping."
+      "value": "Connection failed. Check that the test server is running."
+    },
+    {
+      "name": "availability_unknown",
+      "value": "Access unconfirmed"
+    },
+    {
+      "name": "packet_none",
+      "value": "No packet received"
+    },
+    {
+      "name": "packet_ack_matched",
+      "value": "Receipt confirmed"
+    },
+    {
+      "name": "packet_ack_unmatched",
+      "value": "Unmatched receipt ignored"
+    },
+    {
+      "name": "packet_malformed",
+      "value": "Malformed packet rejected"
+    },
+    {
+      "name": "packet_accepted",
+      "value": "Message accepted"
+    },
+    {
+      "name": "packet_duplicate",
+      "value": "Duplicate skipped"
+    },
+    {
+      "name": "packet_invalid",
+      "value": "Invalid signature rejected"
+    },
+    {
+      "name": "packet_untrusted",
+      "value": "Unknown sender key rejected"
+    },
+    {
+      "name": "packet_hop_limit",
+      "value": "Relay limit reached"
+    },
+    {
+      "name": "packet_expired",
+      "value": "Expired message rejected"
+    },
+    {
+      "name": "packet_future",
+      "value": "Future-dated message rejected"
+    },
+    {
+      "name": "packet_busy",
+      "value": "Verifier busy"
+    },
+    {
+      "name": "packet_capacity",
+      "value": "Message limit reached"
+    },
+    {
+      "name": "packet_processing_failed",
+      "value": "Packet processing failed"
+    },
+    {
+      "name": "test_idle",
+      "value": "Ready to test"
+    },
+    {
+      "name": "test_running",
+      "value": "Test running…"
+    },
+    {
+      "name": "test_passed",
+      "value": "All checks passed"
+    },
+    {
+      "name": "test_failed",
+      "value": "A check failed"
+    },
+    {
+      "name": "test_error",
+      "value": "Could not complete the test"
+    },
+    {
+      "name": "relay_event_a",
+      "value": "Receipt at A"
+    },
+    {
+      "name": "relay_detail_a",
+      "value": "The first device checks the original message signature."
+    },
+    {
+      "name": "relay_event_b",
+      "value": "Relay A → B"
+    },
+    {
+      "name": "relay_detail_b",
+      "value": "The second device verifies the message received from A."
+    },
+    {
+      "name": "relay_event_c",
+      "value": "Relay B → C"
+    },
+    {
+      "name": "relay_detail_c",
+      "value": "The third device verifies the message forwarded by B."
+    },
+    {
+      "name": "relay_event_duplicate",
+      "value": "Repeated message"
+    },
+    {
+      "name": "relay_detail_duplicate",
+      "value": "The same message reaches C again."
+    },
+    {
+      "name": "relay_event_tampered",
+      "value": "Changed content"
+    },
+    {
+      "name": "relay_detail_tampered",
+      "value": "A message with modified content is submitted for verification."
+    },
+    {
+      "name": "relay_event_expired",
+      "value": "Expired message"
+    },
+    {
+      "name": "relay_detail_expired",
+      "value": "A message past its expiry time is submitted for verification."
+    },
+    {
+      "name": "relay_event_error",
+      "value": "Test interrupted"
+    },
+    {
+      "name": "relay_detail_error",
+      "value": "One of the verification steps could not finish."
+    },
+    {
+      "name": "home_alerts",
+      "value": "Messages"
+    },
+    {
+      "name": "your_place",
+      "value": "Saved place"
+    },
+    {
+      "name": "choose_place",
+      "value": "Choose a protective point"
+    },
+    {
+      "name": "choose_place_hint",
+      "value": "Find an address on the offline map."
+    },
+    {
+      "name": "saved_on_phone",
+      "value": "Saved on this phone"
+    },
+    {
+      "name": "saved_short",
+      "value": "Saved"
+    },
+    {
+      "name": "connection_active",
+      "value": "Connected"
+    },
+    {
+      "name": "connection_connecting",
+      "value": "Connecting…"
+    },
+    {
+      "name": "connection_off",
+      "value": "Not connected"
+    },
+    {
+      "name": "connection_paused",
+      "value": "Paused"
+    },
+    {
+      "name": "connection_home_hint",
+      "value": "Connect devices to exchange exercise messages."
+    },
+    {
+      "name": "nearby_devices",
+      "value": "nearby devices"
+    },
+    {
+      "name": "point_list",
+      "value": "List"
+    },
+    {
+      "name": "nearest_points",
+      "value": "Nearest points"
+    },
+    {
+      "name": "offline_short",
+      "value": "Offline"
+    },
+    {
+      "name": "access_label",
+      "value": "Access according to the source"
+    },
+    {
+      "name": "straight_line",
+      "value": "straight line"
+    },
+    {
+      "name": "show_on_map",
+      "value": "Show on map"
+    },
+    {
+      "name": "point_scope",
+      "value": "This map contains 40 selected PSP points in central Kraków, not every point in the area."
+    },
+    {
+      "name": "node_label",
+      "value": "Device"
+    },
+    {
+      "name": "neighbors",
+      "value": "Neighbours"
+    },
+    {
+      "name": "neighbor_connected",
+      "value": "Connection active"
+    },
+    {
+      "name": "waiting_neighbors",
+      "value": "Waiting for another device to connect."
+    },
+    {
+      "name": "emulator_transport",
+      "value": "Emulator test · local connection, no NearLink radio"
+    },
+    {
+      "name": "foreground_notice",
+      "value": "Relaying pauses when you leave the app. On return, it tries to restore the connection."
+    },
+    {
+      "name": "diagnostics_title",
+      "value": "Tests and diagnostics"
+    },
+    {
+      "name": "diagnostics_hint",
+      "value": "Exercise messages and verification results"
+    },
+    {
+      "name": "diagnostics_intro",
+      "value": "These tests use exercise messages. They do not send official alerts."
+    },
+    {
+      "name": "guide_offline",
+      "value": "Saved on this phone. No internet needed."
+    },
+    {
+      "name": "expand",
+      "value": "Expand"
+    },
+    {
+      "name": "collapse",
+      "value": "Collapse"
+    },
+    {
+      "name": "about_app",
+      "value": "About SafeMesh"
+    },
+    {
+      "name": "about_body",
+      "value": "An exercise prototype for signed alerts and offline protective points. It is not an official warning service."
+    },
+    {
+      "name": "source_osm",
+      "value": "OpenStreetMap · map data and licence"
+    },
+    {
+      "name": "map_attribution",
+      "value": "© OpenStreetMap contributors (ODbL) · KG PSP (CC BY 4.0)"
+    },
+    {
+      "name": "exercise_actions",
+      "value": "Exercise message"
+    },
+    {
+      "name": "delivery_details",
+      "value": "Delivery results"
+    },
+    {
+      "name": "physical_radio",
+      "value": "NearLink radio"
+    },
+    {
+      "name": "original_language_pl",
+      "value": "Original message in Polish"
+    },
+    {
+      "name": "original_language_en",
+      "value": "Original message in English"
+    },
+    {
+      "name": "original_language_und",
+      "value": "Original text · language unspecified"
+    },
+    {
+      "name": "connect_devices",
+      "value": "Connect devices"
     }
   ]
 }
