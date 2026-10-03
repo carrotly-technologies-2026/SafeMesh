@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "checkedAtUtc": "2026-10-03T22:26:06.076Z",
+  "kind": "replay-of-captured-native-emulator-evidence",
+  "scope": "Two custom signed exercises: authority A → citizen B → citizen C through a loopback WebSocket lab.",
+  "passed": true,
+  "counts": {
+    "passed": 17,
+    "failed": 0,
+    "total": 17
+  },
+  "checks": [
+    {
+      "id": "signed_custom_messages",
+      "description": "Two distinct custom v2 exercises verify against the actual app public pin.",
+      "passed": true,
+      "observations": {
+        "alertIds": [
+          "authority-eca37358bc903343c461d2526d00f434",
+          "authority-848aa13a930ee34429911ec68d38661d"
+        ],
+        "publicKeySha256": "28a007edbe7e9cf5cf0805c38d4ebdfffff05dc1fc5522b31d7e4caf69208d55"
+      }
+    },
+    {
+      "id": "b_map_arrival_and_unread",
+      "description": "B shows arrival banners while on Map and unread counts 1 then 2.",
+      "passed": true
+    },
+    {
+      "id": "b_first_content",
+      "description": "B displays the first exact signed text, valid badge, source A and hop 1.",
+      "passed": true
+    },
+    {
+      "id": "b_second_content",
+      "description": "B displays the second exact signed text, valid badge, source A and hop 1.",
+      "passed": true
+    },
+    {
+      "id": "b_native_accept_and_duplicate",
+      "description": "B native logs record both accepted IDs at hop 1 and the first duplicate.",
+      "passed": true
+    },
+    {
+      "id": "lost_ack_retry",
+      "description": "The first A→B delivery repeats after one dropped B→A ACK, then receives an ACK.",
+      "passed": true,
+      "observations": {
+        "dataAttempts": 2,
+        "droppedAcks": 1,
+        "forwardedAcks": 1
+      }
+    },
+    {
+      "id": "b_read_transitions",
+      "description": "Reading each B message changes unread 2→1→0 without removing either message.",
+      "passed": true
+    },
+    {
+      "id": "b_restart_durability",
+      "description": "B retains both read messages after a documented process restart while the issuer is offline.",
+      "passed": true,
+      "observations": {
+        "oldPid": "23026",
+        "newPid": "25827"
+      }
+    },
+    {
+      "id": "c_isolated_issuer_offline",
+      "description": "C remains empty after both messages were issued and the issuer app/service stopped.",
+      "passed": true
+    },
+    {
+      "id": "bc_only_delivery",
+      "description": "With A absent, only B–C is linked and both packets and ACKs traverse it; A→C stays zero.",
+      "passed": true
+    },
+    {
+      "id": "c_two_unread",
+      "description": "C receives two separate unread inbox rows and an arrival banner.",
+      "passed": true
+    },
+    {
+      "id": "c_first_content",
+      "description": "C displays the first exact signed text, valid badge, source B and hop 2.",
+      "passed": true
+    },
+    {
+      "id": "c_second_content",
+      "description": "C displays the second exact signed text, valid badge, source B and hop 2.",
+      "passed": true
+    },
+    {
+      "id": "c_read_transitions",
+      "description": "After opening both messages, C retains both rows with no unread count or banner.",
+      "passed": true
+    },
+    {
+      "id": "c_native_verdicts",
+      "description": "C native logs contain exactly two accepted hop-2 messages, a duplicate and a rejected tamper.",
+      "passed": true
+    },
+    {
+      "id": "duplicate_ack_without_new_unread",
+      "description": "A genuine duplicate produces exactly one ACK without a new row, unread mark or banner.",
+      "passed": true
+    },
+    {
+      "id": "tamper_rejected_without_ack",
+      "description": "Changed signed content fails crypto, receives no ACK/forward and preserves the read inbox.",
+      "passed": true
+    }
+  ],
+  "evidenceSha256": {
+    "artifacts/logs/authority-v14-b-all-read.json": "64ea3a0888443f536a7f0a440dd1050bed677278cf8c67d142e5bb49d79c85b0",
+    "artifacts/logs/authority-v14-b-first-banner.json": "44c476c5026688fb1ed0732c8bacb8a2977130259da187068a92b96c070bed8d",
+    "artifacts/logs/authority-v14-b-first-detail-pl.json": "49e247f2b015961027b17518dd5912873b23b4e32e7bd3a17f1d4e4d1a012c39",
+    "artifacts/logs/authority-v14-b-first-unread.json": "783c7745ac5d0284b32cbd612aa55a42707c6728f0ac5d813e1b9832079db3db",
+    "artifacts/logs/authority-v14-b-native-before-restart.log": "10bba2f8813080c044e26fa187a339bb1853efbdcaa935d8f097e707e2c05cdb",
+    "artifacts/logs/authority-v14-b-one-unread.json": "c478f79f79805fe666f9d9e48d9a5d298c659f5e0ac051ba7a7f1b2efe395f68",
+    "artifacts/logs/authority-v14-b-restart.json": "674e009a67136b303d9e9354d47913f35431c55101515d5c96558818e4e625b6",
+    "artifacts/logs/authority-v14-b-restored.json": "f78ff0a6e6ee77ad518ea8e1249787b297cdaf2f8cbc2e43342700b89ef54386",
+    "artifacts/logs/authority-v14-b-second-banner.json": "0fc1dc02a8a8cfabad8dbe217bb5aa34b869da793d40e03e0b0955a40e7eb425",
+    "artifacts/logs/authority-v14-b-second-detail-pl.json": "47b3fecfa62cf8f20252cfe25d2f7d4c0bdb2e60ff940ea8e8ecebfa4d3d41cd",
+    "artifacts/logs/authority-v14-b-two-unread.json": "d0607df07e0cbfe8b80c6b09692ac852e7744edf52a002b8d4df5fa6f924b44a",
+    "artifacts/logs/authority-v14-c-after-duplicate.json": "8f3375af4966a7bc249079ed3c1c8cd839c7bba08a3d32bad75da6aa466aa878",
+    "artifacts/logs/authority-v14-c-after-tampered.json": "8f3375af4966a7bc249079ed3c1c8cd839c7bba08a3d32bad75da6aa466aa878",
+    "artifacts/logs/authority-v14-c-all-read.json": "8f3375af4966a7bc249079ed3c1c8cd839c7bba08a3d32bad75da6aa466aa878",
+    "artifacts/logs/authority-v14-c-first-detail.json": "2649331c4987ae382c984667ef0781727a440ab92b353bdaa0d57b96fc194864",
+    "artifacts/logs/authority-v14-c-isolated-two-issued.json": "520bf80cc9a0d78afeecf6cafdaaf3bfc03d7edd125c2168188a9589380f410e",
+    "artifacts/logs/authority-v14-c-isolated.json": "520bf80cc9a0d78afeecf6cafdaaf3bfc03d7edd125c2168188a9589380f410e",
+    "artifacts/logs/authority-v14-c-native.log": "1029071da5b11646e2226b821ba21d4a9339ecec7b76c2c14ccf081ed7d65ebe",
+    "artifacts/logs/authority-v14-c-second-detail-after-tampered.json": "6a4521c97a44f0564eeff8c664c50404de01f49cd11e7e1d31b668f994f89d76",
+    "artifacts/logs/authority-v14-c-second-detail.json": "6a4521c97a44f0564eeff8c664c50404de01f49cd11e7e1d31b668f994f89d76",
+    "artifacts/logs/authority-v14-c-two-unread.json": "c7fba85ff29025b08806a3167b08d0ce85260ccd8bd16c822823e69342536298",
+    "artifacts/logs/authority-v14-duplicate-packet.json": "0d57d6f318f21c7e464b5be9c3c77757ef61574cc47f9859cde0a1e14f632043",
+    "artifacts/logs/authority-v14-hub-after-duplicate.json": "0a7fd794780c8989680b2e01145e46063b6ea2c76da0555e71bbacc6bcbb4f37",
+    "artifacts/logs/authority-v14-hub-after-tampered.json": "e79e161a54c8fc9942587f90a926e9511275a73ffafd8f3a01c4065ec2520676",
+    "artifacts/logs/authority-v14-hub-before-duplicate.json": "fe7c0c2b08df4ec0a11612772487fa5bfb0ccb103e6850a5506dd2a45d707235",
+    "artifacts/logs/authority-v14-hub-before-tampered.json": "0a7fd794780c8989680b2e01145e46063b6ea2c76da0555e71bbacc6bcbb4f37",
+    "artifacts/logs/authority-v14-hub-delivered.json": "fe7c0c2b08df4ec0a11612772487fa5bfb0ccb103e6850a5506dd2a45d707235",
+    "artifacts/logs/authority-v14-hub-first.json": "5c90f054c473094ec5ba2c918aa4da525cfc04fe9a95623dc647f7315d592149",
+    "artifacts/logs/authority-v14-issued-alerts.json": "96fe5122246354e77ee313c28de024d3135403bf856d3756eabfa1663319cf95",
+    "artifacts/logs/authority-v14-issuer-offline.json": "1b06435eb55d30778c5c366881491fa8527abe84fbcbe85bbcda116ef2044651",
+    "artifacts/logs/authority-v14-tampered-packet.json": "d3fd7b657affd28b2eafcfc444e91c5471b620921f790c2bd7e08c20c033c5ef",
+    "entry/src/main/ets/model/DemoTrust.ets": "69ac28243e6627efaad3bdfac910eb676f611d15ceb38cbc57d3f8e342e7133d",
+    "entry/src/main/resources/pl/element/string.json": "903c8ab41baf260efb29414aaab332679a9894aeda8065bbce5505a88393e06a"
+  },
+  "limitations": [
+    "This script replays saved UI trees, native logs and hub counters; it does not operate devices or repeat the live scenario.",
+    "UI receipt peer and hop count are local metadata, not a cryptographically authenticated route.",
+    "ACK records receiving-app receipt, not human reading. Reading is checked separately through captured inbox UI.",
+    "The cryptographic check uses the current app public pin and the backend canonical implementation. No private credentials are read.",
+    "This is exercise-authority and emulator transport evidence, not official emergency-authority or physical-radio validation."
+  ]
+}

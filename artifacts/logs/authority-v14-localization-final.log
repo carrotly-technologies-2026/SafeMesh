@@ -1,0 +1,12 @@
+✔ base and English resources agree, all locales have complete unique nonempty UTF-8 keys (3.6086ms)
+✔ packet verdicts, test events and map access states have localized labels rather than raw enum values (0.2497ms)
+✔ every literal UI string key resolves in all languages (5.994ms)
+✔ Polish copy has no old English diagnostic or exercise-body text and preserves essential limits (0.317ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 95.3319

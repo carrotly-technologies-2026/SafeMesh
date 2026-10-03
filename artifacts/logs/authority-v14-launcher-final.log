@@ -1,0 +1,44 @@
+SafeMesh local exercise authority launcher. Logs: C:\Users\user\SafeMesh\.cache\demo-authority\launcher-20261004-002312-000
+[prepare-authority]
+[mesh-build-deploy]
+SafeMesh: three emulator apps over a local test link (not physical NearLink).
+Logs: C:\Users\user\SafeMesh\.cache\mesh-lab\20261004-002320-636
+[emulator-list]
+[device-list]
+Reusing the existing verified loopback hub; its current test controls are preserved.
+[ports-A]
+[run-A]
+Node A: installed and launched on HackYeahPhone [127.0.0.1:5555].
+[ports-B]
+[run-B]
+Node B: installed and launched on SafeMeshB [127.0.0.1:5557].
+[ports-C]
+[run-C]
+Node C: installed and launched on SafeMeshC [127.0.0.1:5559].
+
+Node Name          Serial         RemotePort
+---- ----          ------         ----------
+A    HackYeahPhone 127.0.0.1:5555       8765
+B    SafeMeshB     127.0.0.1:5557       8766
+C    SafeMeshC     127.0.0.1:5559       8767
+
+
+
+Hub links: A-B, B-C
+On each emulator: open Relay / Lacznosc, choose the emulator test link, then select its A/B/C role.
+For custom signed exercises, use scripts/start-authority-demo.ps1 and authorize the console on A with its separate operator token.
+Connect the matching A/B/C roles and keep apps in the foreground. Publish an exercise from the authority console on A; recipients B/C verify and forward automatically.
+The hub stays running on 127.0.0.1:8765. This launcher does not click UI controls or clear app data.
+MESH_LAB_READY=1 | Logs: C:\Users\user\SafeMesh\.cache\mesh-lab\20261004-002320-636
+
+[verify-devices]
+[inspect-authority-ports-HackYeahPhone]
+[inspect-authority-ports-SafeMeshB]
+[inspect-authority-ports-SafeMeshC]
+Reusing the verified local exercise authority.
+[issuer-ports]
+A: open the authority console and authorize it with the separately provisioned operator token.
+Operator token file (its contents are not printed): C:\Users\user\SafeMesh\.cache\demo-authority\session-token.txt
+Connect A, B and C with their corresponding roles and keep the apps in the foreground. Create an exercise alert on A; B/C verify and forward automatically.
+Only named emulator A [127.0.0.1:5555] has issuer port 8768. The private signing key remains on this computer.
+AUTHORITY_DEMO_READY=1 | Logs: C:\Users\user\SafeMesh\.cache\demo-authority\launcher-20261004-002312-000

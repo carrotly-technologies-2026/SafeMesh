@@ -10,7 +10,7 @@ Three separate HarmonyOS emulator apps exchange packets through an explicitly la
 
 **Demo only:** SafeMesh is not connected to RCB or an official warning issuer. Bundled and custom alerts are signed exercises. Mapped PSP protective points are reference records; current access, condition and protection are not verified by the app.
 
-**v1.4 status:** implementation and validation are in progress; final native results and release packaging have not yet been recorded here. The [v1.3 validation report](artifacts/research/ui-v13-validation.md), its screenshots and video are historical evidence for v1.3, not proof of the new publisher/inbox flow. The [multi-emulator lab report](artifacts/research/mesh-lab.md) preserves v1.2 evidence; the [readiness audit](artifacts/READINESS_AUDIT.md) records earlier checkpoints.
+**v1.4 validated:** **167 host tests**, **21 ArkTS files / zero errors**, **zero Code Linter issues**, a successful build and all three emulator smoke checks passed. [17/17 assertions over captured native evidence](artifacts/logs/authority-v14-assertions.json) confirm two custom alerts, ACK-loss recovery, B's saved inbox after restart, and forwarding to C at hop 2 while A and the issuer service are offline. See the [v1.4 validation report](artifacts/research/authority-v14-validation.md) for exact evidence, UI checks and limitations. The [v1.3 report and video](artifacts/research/ui-v13-validation.md) and [v1.2 lab report](artifacts/research/mesh-lab.md) remain historical evidence for those revisions.
 
 ## What you can demonstrate
 
@@ -74,13 +74,13 @@ Use `-Device <serial>` for another target or `-NoRun` to build/package only. If 
 
 ### Install the packaged demo
 
-Planned v1.4 release files are `dist/SafeMesh-1.4.0.hap`, `dist/SafeMesh-1.4.0-source.zip` and `dist/SafeMesh-1.4.0.sha256.txt`. Final packaging and native validation are pending; their names are not a release-success claim. The HAP build output is a debug **unsigned emulator package**, `entry/build/default/outputs/default/entry-default-unsigned.hap`.
+The validated [v1.4 HAP](dist/SafeMesh-1.4.0.hap) is a debug **unsigned emulator package**, built as `entry/build/default/outputs/default/entry-default-unsigned.hap`. Its SHA-256 is `dd7ca2cd80ee741ca5f1570d2dbe1135084b6cca0ef838f473cfd1c22cd16e5e`. The matching [source ZIP](dist/SafeMesh-1.4.0-source.zip), [SHA-256 manifest](dist/SafeMesh-1.4.0.sha256.txt) and [exact-package credential-scan report](dist/SafeMesh-1.4.0-package-scan.json) accompany it. No v1.4 video is included.
 
 The historical v1.3 release remains available as [HAP](dist/SafeMesh-1.3.0.hap), [source ZIP](dist/SafeMesh-1.3.0-source.zip), [demo video](dist/SafeMesh-1.3.0-demo.mp4) and [SHA-256 manifest](dist/SafeMesh-1.3.0.sha256.txt). It does not contain the v1.4 publisher console or inbox.
 
 Historical packages remain separate: [v1.2 HAP](dist/SafeMesh-mesh-lab-1.2.0.hap) and [checksum](dist/SafeMesh-mesh-lab-1.2.0.sha256.txt); `SafeMesh-demo.hap`, video and source ZIP preserve v1.1. Neither historical package contains the v1.3 screens or bilingual fixture.
 
-After building and packaging v1.4, install and launch the artifact using the SDK's HDC tool:
+Install and launch the v1.4 artifact using the SDK's HDC tool:
 
 ```powershell
 $hdc = Join-Path $env:DEVECO_CLI_STUDIO_PATH 'sdk\default\openharmony\toolchains\hdc.exe'
@@ -99,9 +99,11 @@ $env:DEVECO_CLI_STUDIO_PATH = 'C:\Users\user\DevEcoStudio'
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-authority-demo.ps1
 ```
 
-The launcher prepares or reuses the persistent local exercise key, ensures the app pins its public key, starts or verifies the loopback authority service at `127.0.0.1:8768`, then delegates the shared build and three-app deployment to `start-mesh-lab.ps1`. It configures A's reverse port for the authority service. The mesh helper discovers actual device serials, starts the named instances and loopback hub, checks reverse ports and installs the same HAP on all three. No internet service is required during the prepared demo.
+The launcher prepares or reuses the persistent local exercise key, ensures the app pins its public key and delegates the shared build and three-app deployment to `start-mesh-lab.ps1`. It starts or verifies the loopback authority service at `127.0.0.1:8768` and configures its reverse port only for the named emulator A. The mesh helper discovers actual device serials, starts the named instances and loopback hub, checks reverse ports and installs the same HAP on all three. No internet service is required during the prepared demo.
 
 Use `-EmulatorA`, `-EmulatorB` and `-EmulatorC` for other instance names and `-DeviceTimeoutSeconds` to change the default 180-second startup wait. `-SkipBuild` can reuse a build only when its authority-key proof matches; a newly adopted or mismatching public key forces a rebuild. The launcher does not create/download emulators, accept licences, uninstall apps or erase their data. Authority logs are in `.cache/demo-authority/launcher-<timestamp>/`, its PID in `.cache/demo-authority/server.pid`, and mesh logs in `.cache/mesh-lab/`.
+
+The [recorded Windows launcher run](artifacts/logs/authority-v14-launcher-final.log) passed with three uniquely resolved devices, visible A–B/B–C topology, reuse of the verified issuer and `-SkipBuild` backed by a matching build receipt. Its earlier full-build fallback also preserved the validated HAP hash. Reused hub topology and loss controls remain visible; inspect them before each demonstration.
 
 1. In **Relay / Łączność**, choose A/B/C on the corresponding emulator and select **Connect / Połącz**. Keep each app in the foreground. Connection role and publisher authorization are separate.
 2. On A, open the Settings gear → **Tests and diagnostics / Testy i diagnostyka** → **Exercise authority / Nadawca ćwiczeń**. Obtain the activation code from the local operator's `.cache/demo-authority/session-token.txt`, enter it in the masked field and sign in. Do not include that file or its contents in screenshots, logs, Git or release archives.
@@ -113,7 +115,7 @@ The activation code is a local demo bearer token, not production government iden
 
 The visible emulator-transport label distinguishes this mode from NearLink radio. The hub routes only configured A–B/B–C edges, never a direct A–C link, and does not store or acknowledge alerts. Leaving the app foreground pauses its link and timers. Returning resumes only a previously active connection; an explicit Disconnect stays disconnected. After a fresh process launch, use Connect again.
 
-The historical [v1.3 native report](artifacts/research/ui-v13-validation.md#three-process-delivery-on-the-final-hap) records isolating C, dropping B's first ACK, restarting B with its saved alert, bringing C into range and injecting tampered/expired/duplicate packets. In that run, **B accepted hop 1**, **C later accepted hop 2 with A offline**, and rejected packets received no ACK. Those results predate the v1.4 custom-publisher workflow. The separate [v1.2 lab report](artifacts/research/mesh-lab.md) preserves the earlier run.
+The [v1.4 native report](artifacts/research/authority-v14-validation.md) records two custom messages from the authenticated A console. **B accepted both at hop 1**, recovered a deliberately lost ACK and retained the read inbox after a real process restart. With A and the issuer service stopped and only B–C linked, **C accepted both at hop 2**. A genuine duplicate received an ACK without another unread item; tampered content received no ACK and did not replace verified text. The [v1.3 native report](artifacts/research/ui-v13-validation.md#three-process-delivery-on-the-final-hap) and [v1.2 lab report](artifacts/research/mesh-lab.md) preserve the earlier fixture-based runs.
 
 For fixture-only transport development, `scripts/start-mesh-lab.ps1` remains available. To refresh an expired bundled fixture after the authority and public pin are prepared, rebuild and redeploy **all three apps together**:
 
@@ -189,7 +191,7 @@ The helper discovers every `tests/*.test.mjs` suite, runs host tests, ArkTS chec
 
 Tests discover the TypeScript compiler inside DevEco Studio through `DEVECO_CLI_STUDIO_PATH`; see [NearLink evidence](artifacts/research/nearlink.md) for fallback locations. Protocol/integration/storage tests also accept `ARKTS_TYPESCRIPT_PATH`. The map suite uses Node 24's type-erasure support. Host fixture time is controlled inside the relevant tests; the native app uses the actual device clock.
 
-**Version 1.4:** final combined check counts, native publisher/inbox results and release checksums are pending. The commands and suite descriptions above identify the intended validation path, not a completed final native run.
+**Version 1.4:** **167 host tests passed**, **21 ArkTS files / zero errors** with **36 separate permission, exception and deprecated-API advisories**, **zero Code Linter issues**, and a successful HAP build in the [combined log](artifacts/logs/authority-v14-final-checks-build.log). All three native [emulator deployments](artifacts/logs/authority-v14-final-deploy.log) reported **Smoke: PASS**; [17/17 checks over captured native evidence](artifacts/logs/authority-v14-assertions.json) passed. The [v1.4 report](artifacts/research/authority-v14-validation.md) records custom publication, inbox/read state, ACK recovery, restarted-B forwarding with the issuer offline, duplicate/tamper rejection, PL/EN display and the actual **1.45× Huge** system text preset.
 
 **Historical version 1.3 checks:** **130 host tests passed**, **19 ArkTS files / zero errors** with 34 separate permission, exception and deprecated-API advisories, **zero Code Linter issues**, and a successful HAP build. See the [final check/build log](artifacts/logs/ui-v13-final-checks-build.log). All three emulator deployments passed smoke checks; [13/13 assertions over native evidence](artifacts/logs/ui-v13-native-results.json) passed. UI validation covered PL/EN, light/dark/system appearance, saved-point restoration and the real **1.45× Huge** system text preset. These results do not establish the v1.4 publisher/inbox behavior.
 
@@ -278,9 +280,10 @@ tests/                           Host tests of application sources
 artifacts/research/              Primary-source evidence and limitations
 artifacts/logs/                   Build and validation records
 artifacts/screenshots/            Native emulator captures
-dist/SafeMesh-1.4.0.hap           Planned v1.4 emulator package
-dist/SafeMesh-1.4.0-source.zip    Planned v1.4 source archive
-dist/SafeMesh-1.4.0.sha256.txt    Planned v1.4 checksum manifest
+dist/SafeMesh-1.4.0.hap           Validated v1.4 emulator package
+dist/SafeMesh-1.4.0-source.zip    v1.4 source archive
+dist/SafeMesh-1.4.0.sha256.txt    v1.4 checksum manifest
+dist/SafeMesh-1.4.0-package-scan.json Exact-package credential scan
 dist/SafeMesh-1.3.0.hap           Historical v1.3 emulator package
 dist/SafeMesh-1.3.0-source.zip    Historical v1.3 source archive
 dist/SafeMesh-1.3.0-demo.mp4      Historical v1.3 native UI demonstration
@@ -292,7 +295,7 @@ dist/SafeMesh-demo.mp4            Historical v1.1 single-emulator demonstration
 
 ## Validation scope
 
-The current target is API 24 emulators. Final native v1.4 validation is pending; the publisher, inbox and unread flow must be checked on the new HAP. Historical v1.3 checks cover signed A → B → C delivery, ACK loss, B restoration, bilingual display and foreground recovery for that revision. The local hub is an intentional transport mock. Physical NearLink, radio range, battery behavior and background delivery are outside the demonstrated scope.
+The current target is API 24 emulators. Native v1.4 checks cover two custom signed alerts, recipient inbox/unread behavior, exact text display, ACK loss, B restoration after process restart, and B → C delivery while the issuer is unavailable. The captured-evidence checker passes 17/17 assertions. The local hub is an intentional transport mock. Physical NearLink, radio range, battery behavior and background delivery are outside the demonstrated scope; neither these checks nor the historical v1.3 video establish production readiness.
 
 A deployable warning service also needs an authorized issuer, audited key custody/rotation/revocation, a trusted-time policy, fresh protective-point access information and operational review. Signatures cannot prevent jamming, message dropping or compromised authority keys. No range, guaranteed delivery or certified shelter safety is claimed by this hackathon build.
 

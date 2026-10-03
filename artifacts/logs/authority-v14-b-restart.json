@@ -1,0 +1,8 @@
+{
+    "utc":  "2026-10-03T22:14:08.7192678Z",
+    "oldPid":  "23026",
+    "newPid":  "25827",
+    "different":  true,
+    "issuerOffline":  true,
+    "method":  "devecocli run --skip-build, same HAP, no uninstall"
+}
