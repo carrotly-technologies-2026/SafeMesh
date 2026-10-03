@@ -21,8 +21,12 @@ const data = new Function(eraseTypes(read('entry/src/main/ets/model/OfflineMapDa
 const pack = JSON.parse(read('entry/src/main/resources/rawfile/map-pack.json'));
 const modelSource = read('entry/src/main/ets/viewmodel/MapViewModel.ets')
   .replace(/import[\s\S]*?;\s*/g, '').replace('@Observed', '');
-const { MapViewModel, MapShape, MapVertex } = new Function(...dataNames,
-  eraseTypes(modelSource) + '\nreturn { MapViewModel, MapShape, MapVertex };')(...dataNames.map(name => data[name]));
+class LocationMock {
+  static next = Promise.resolve({ status: 'unavailable' });
+  locate() { return LocationMock.next; }
+}
+const { MapViewModel, MapShape, MapVertex } = new Function(...dataNames, 'DeviceLocation',
+  eraseTypes(modelSource) + '\nreturn { MapViewModel, MapShape, MapVertex };')(...dataNames.map(name => data[name]), LocationMock);
 
 class CanvasMock {
   calls = { stroke: 0, lineTo: 0, moveTo: 0, fill: 0, fillRect: 0, clip: 0 };
@@ -42,6 +46,7 @@ class CanvasMock {
   fill() { this.calls.fill++; }
   stroke() { this.calls.stroke++; }
   fillText() {}
+  measureText(text) { return { width: text.length * 6.5 }; }
   arc() {}
 }
 class SettingsMock {}
@@ -186,4 +191,96 @@ test('marker picking reports a visible source ID and leaves empty locations unse
   picked = '';
   view.pick(-1000, -1000);
   assert.equal(picked, '');
+});
+
+test('save badge changes only after durable success, keeps the original requested point during selection changes', async () => {
+  const model = new MapViewModel();
+  const previousId = model.points[3].id;
+  model.savedId = previousId;
+  const requestedId = model.selectedId;
+  let finish;
+  const pending = new Promise(resolve => { finish = resolve; });
+  const calls = [];
+  const saving = model.saveSelected({ write: async (key, value) => { calls.push([key, value]); await pending; } });
+  assert.equal(model.saveBusy, true);
+  assert.equal(model.savedId, previousId);
+  assert.equal(await model.saveSelected({ write: async () => assert.fail('Double save must not write') }), false);
+  model.select(model.points[5].id);
+  finish();
+  assert.equal(await saving, true);
+  assert.deepEqual(calls, [['saved_point', requestedId]]);
+  assert.equal(model.savedId, requestedId);
+  assert.equal(model.saveBusy, false);
+  const result = await model.saveSelected({ write: async () => { throw new Error('disk full'); } });
+  assert.equal(result, false);
+  assert.equal(model.savedId, requestedId);
+  assert.equal(model.saveError, 'save_failed');
+  assert.equal(model.saveBusy, false);
+  assert.equal(model.openSaved(), true);
+  assert.equal(model.selectedId, requestedId);
+});
+
+test('saved-point restore ignores unknown IDs, handles errors and cannot overwrite a concurrent newer save', async () => {
+  const model = new MapViewModel();
+  await model.restoreSaved({ read: async () => 'untrusted-unknown-point' });
+  assert.equal(model.savedId, '');
+  assert.equal(model.openSaved(), false);
+  await model.restoreSaved({ read: async () => { throw new Error('unreadable'); } });
+  assert.equal(model.saveError, 'load_failed');
+  let finish;
+  const previousId = model.points[4].id;
+  const restoring = model.restoreSaved({ read: () => new Promise(resolve => { finish = resolve; }) });
+  assert.equal(await model.saveSelected({ write: async () => {} }), true);
+  const savedId = model.savedId;
+  finish(previousId);
+  await restoring;
+  assert.equal(model.savedId, savedId);
+  model.selectedId = 'not-a-point';
+  assert.equal(await model.saveSelected({ write: async () => assert.fail('Unknown point must not persist') }), false);
+  assert.equal(model.saveError, 'invalid_point');
+});
+
+test('device origin only accepts a usable fix in the downloaded area and reorders real distances', async () => {
+  const model = new MapViewModel();
+  const original = [model.originLat, model.originLon];
+  for (const position of [
+    { status: 'permission_denied' },
+    { status: 'disabled' },
+    { status: 'ready', latitude: 50.061, longitude: 19.936, accuracy: 3000 },
+    { status: 'ready', latitude: 52.23, longitude: 21.01, accuracy: 10 }
+  ]) {
+    LocationMock.next = Promise.resolve(position);
+    assert.equal(await model.locate({}), false);
+    assert.deepEqual([model.originLat, model.originLon], original);
+    assert.equal(model.originIsDevice, false);
+    assert.equal(model.locationBusy, false);
+  }
+  assert.equal(model.locationStatus, 'outside_pack');
+  const point = model.points[10];
+  LocationMock.next = Promise.resolve({ status: 'ready', latitude: point.lat, longitude: point.lon, accuracy: 12 });
+  assert.equal(await model.locate({}), true);
+  assert.equal(model.originIsDevice, true);
+  assert.equal(model.locationAccuracy, 12);
+  assert.equal(model.points[0].id, point.id);
+  assert.equal(model.points[0].distance, 0);
+  assert.equal(model.centerLat, point.lat);
+  model.resetOrigin();
+  assert.deepEqual([model.originLat, model.originLon], original);
+  assert.equal(model.originIsDevice, false);
+  assert.equal(model.locationStatus, 'demo');
+});
+
+test('a late location response cannot replace a user-selected reset to the demo origin', async () => {
+  const model = new MapViewModel();
+  let finish;
+  LocationMock.next = new Promise(resolve => { finish = resolve; });
+  const pending = model.locate({});
+  assert.equal(model.locationBusy, true);
+  assert.equal(await model.locate({}), false);
+  model.resetOrigin();
+  finish({ status: 'ready', latitude: 50.065, longitude: 19.940, accuracy: 8 });
+  assert.equal(await pending, false);
+  assert.equal(model.locationStatus, 'demo');
+  assert.equal(model.originIsDevice, false);
+  assert.equal(model.locationBusy, false);
 });

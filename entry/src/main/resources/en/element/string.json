@@ -1,0 +1,612 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "Signed offline alerts and protective locations"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "SafeMesh offline preparedness demo"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "SafeMesh"
+    },
+    {
+      "name": "nearlink_reason",
+      "value": "Connect to nearby SafeMesh phones to exchange signed exercise messages without internet."
+    },
+    {
+      "name": "location_reason",
+      "value": "Use your position once to sort nearby protective points. Your location is not saved or shared."
+    },
+    {
+      "name": "exercise",
+      "value": "EXERCISE"
+    },
+    {
+      "name": "exercise_notice",
+      "value": "Hackathon prototype. This is not an official warning."
+    },
+    {
+      "name": "offline_ready",
+      "value": "Map and guide available offline"
+    },
+    {
+      "name": "home",
+      "value": "Home"
+    },
+    {
+      "name": "map",
+      "value": "Map"
+    },
+    {
+      "name": "relay",
+      "value": "Relay"
+    },
+    {
+      "name": "guide",
+      "value": "Guide"
+    },
+    {
+      "name": "language",
+      "value": "Switch language to Polish"
+    },
+    {
+      "name": "language_saved",
+      "value": "Application language changed."
+    },
+    {
+      "name": "language_failed",
+      "value": "Language changed for this session. The setting could not be saved."
+    },
+    {
+      "name": "settings",
+      "value": "Settings and accessibility"
+    },
+    {
+      "name": "theme_system",
+      "value": "Appearance and text size follow your phone settings."
+    },
+    {
+      "name": "ready_title",
+      "value": "Prepare before an alert"
+    },
+    {
+      "name": "ready_body",
+      "value": "No active signed message. The protective-point map and guide are stored on this phone."
+    },
+    {
+      "name": "verified_exercise",
+      "value": "Signed exercise"
+    },
+    {
+      "name": "no_alert",
+      "value": "No current alert"
+    },
+    {
+      "name": "signature_verified",
+      "value": "Signature verified · exercise authority"
+    },
+    {
+      "name": "signed_original",
+      "value": "Original signed message"
+    },
+    {
+      "name": "valid_until",
+      "value": "Valid until"
+    },
+    {
+      "name": "receive_drill",
+      "value": "Receive a signed drill"
+    },
+    {
+      "name": "verifying",
+      "value": "Verifying signature…"
+    },
+    {
+      "name": "see_relay",
+      "value": "See how messages travel"
+    },
+    {
+      "name": "new_alert",
+      "value": "Verified exercise message received."
+    },
+    {
+      "name": "alert_expired",
+      "value": "The message expired. The offline map remains available."
+    },
+    {
+      "name": "verify_failed",
+      "value": "The drill could not be verified. Check the demonstration package expiry."
+    },
+    {
+      "name": "init_failed",
+      "value": "Some saved data could not be loaded. The offline map is available."
+    },
+    {
+      "name": "offline_area",
+      "value": "Your offline area"
+    },
+    {
+      "name": "central_krakow",
+      "value": "Central Kraków"
+    },
+    {
+      "name": "point_count",
+      "value": "protective points"
+    },
+    {
+      "name": "bundled_points",
+      "value": "Selected PSP locations stored on this phone"
+    },
+    {
+      "name": "explore",
+      "value": "Explore map"
+    },
+    {
+      "name": "community",
+      "value": "Information can travel further"
+    },
+    {
+      "name": "community_body",
+      "value": "See a signed message pass between three simulated phones."
+    },
+    {
+      "name": "find_point",
+      "value": "Find a protective point"
+    },
+    {
+      "name": "map_description",
+      "value": "Offline map of central Kraków. Every point is also available in the list below."
+    },
+    {
+      "name": "zoom_in",
+      "value": "Zoom in"
+    },
+    {
+      "name": "zoom_out",
+      "value": "Zoom out"
+    },
+    {
+      "name": "recenter",
+      "value": "Recenter map"
+    },
+    {
+      "name": "selected_point",
+      "value": "Selected point"
+    },
+    {
+      "name": "point_type",
+      "value": "Protective location"
+    },
+    {
+      "name": "access_notice",
+      "value": "Access is not confirmed live. A PSP point is not a guarantee of a bomb-resistant shelter."
+    },
+    {
+      "name": "save_point",
+      "value": "Save this point"
+    },
+    {
+      "name": "saved_point",
+      "value": "Point saved on this phone"
+    },
+    {
+      "name": "saving",
+      "value": "Saving…"
+    },
+    {
+      "name": "save_failed",
+      "value": "Could not save this point. Your previous saved point is unchanged."
+    },
+    {
+      "name": "saved_load_failed",
+      "value": "Could not read the saved point."
+    },
+    {
+      "name": "open_saved",
+      "value": "Open saved point"
+    },
+    {
+      "name": "search_points",
+      "value": "Search the 40 point addresses"
+    },
+    {
+      "name": "all_points",
+      "value": "All points in this pack"
+    },
+    {
+      "name": "no_results",
+      "value": "No matching addresses."
+    },
+    {
+      "name": "results",
+      "value": "Results"
+    },
+    {
+      "name": "distance_notice",
+      "value": "Distances are straight-line, without route guidance. This pack contains a selection, not a complete list."
+    },
+    {
+      "name": "demo_origin",
+      "value": "Reference point: Rynek Główny (demo). This is not your location."
+    },
+    {
+      "name": "device_origin",
+      "value": "Reference point: one-time phone location fix."
+    },
+    {
+      "name": "use_location",
+      "value": "Use my location"
+    },
+    {
+      "name": "locating",
+      "value": "Getting location…"
+    },
+    {
+      "name": "reset_origin",
+      "value": "Return to demo origin"
+    },
+    {
+      "name": "location_ready",
+      "value": "Location updated. Distances are measured from your phone."
+    },
+    {
+      "name": "location_permission_denied",
+      "value": "Location permission was not granted. The previous reference point is retained."
+    },
+    {
+      "name": "location_disabled",
+      "value": "Phone location is disabled. Enable it in settings to try again."
+    },
+    {
+      "name": "location_unavailable",
+      "value": "Could not obtain a location fix. The previous reference point is retained."
+    },
+    {
+      "name": "location_outside_pack",
+      "value": "You are outside the Kraków map pack. This map is not shown as your current location."
+    },
+    {
+      "name": "location_poor_accuracy",
+      "value": "The location fix is too imprecise. The previous reference point is retained."
+    },
+    {
+      "name": "accuracy",
+      "value": "Location accuracy"
+    },
+    {
+      "name": "pack_date",
+      "value": "PSP data publication"
+    },
+    {
+      "name": "relay_title",
+      "value": "A network of nearby phones"
+    },
+    {
+      "name": "relay_intro",
+      "value": "Verify the signature. Keep the content. Pass it on."
+    },
+    {
+      "name": "simulation",
+      "value": "3-phone simulation"
+    },
+    {
+      "name": "no_radio",
+      "value": "This drill uses no radio transmission."
+    },
+    {
+      "name": "node_a",
+      "value": "Receiver"
+    },
+    {
+      "name": "node_b",
+      "value": "Relay"
+    },
+    {
+      "name": "node_c",
+      "value": "Neighbour"
+    },
+    {
+      "name": "run_drill",
+      "value": "Run the signed relay drill"
+    },
+    {
+      "name": "drill_running",
+      "value": "Verifying and relaying…"
+    },
+    {
+      "name": "diagnostics",
+      "value": "Technical result"
+    },
+    {
+      "name": "technical_note",
+      "value": "Technical diagnostics and the signed message keep their original language."
+    },
+    {
+      "name": "connected",
+      "value": "connected devices"
+    },
+    {
+      "name": "check_hardware",
+      "value": "Check NearLink support"
+    },
+    {
+      "name": "nearlink_notice",
+      "value": "NearLink delivery requires compatible physical phones. Keep the app open. The emulator verifies logic, not radio."
+    },
+    {
+      "name": "peer_name",
+      "value": "Exact nearby phone name"
+    },
+    {
+      "name": "start_relay",
+      "value": "Start NearLink and discover"
+    },
+    {
+      "name": "connect",
+      "value": "Connect"
+    },
+    {
+      "name": "connected_short",
+      "value": "Connected"
+    },
+    {
+      "name": "share_alert",
+      "value": "Share verified alert"
+    },
+    {
+      "name": "stop_relay",
+      "value": "Stop NearLink"
+    },
+    {
+      "name": "guide_title",
+      "value": "Preparation gives you time"
+    },
+    {
+      "name": "guide_intro",
+      "value": "A short offline reminder based on Poland’s public safety guide. Follow current instructions from the authorities."
+    },
+    {
+      "name": "guide1_title",
+      "value": "Know your nearby options"
+    },
+    {
+      "name": "guide1_body",
+      "value": "Explore protective points before an emergency. Check the entrance and access conditions. A map marker cannot confirm that a place is open or safe to reach."
+    },
+    {
+      "name": "guide2_title",
+      "value": "Keep essentials ready"
+    },
+    {
+      "name": "guide2_body",
+      "value": "Prepare an evacuation bag and a household plan in advance. Include what you personally need. Keep your phone and power bank charged."
+    },
+    {
+      "name": "guide3_title",
+      "value": "Follow verified instructions"
+    },
+    {
+      "name": "guide3_body",
+      "value": "Read official alerts carefully. If evacuation is ordered, follow designated directions. Check whether neighbours know about the alert and tell loved ones your plan."
+    },
+    {
+      "name": "guide4_title",
+      "value": "Help information travel"
+    },
+    {
+      "name": "guide4_body",
+      "value": "On compatible phones, keep SafeMesh open. Relaying cannot overcome jamming, a lack of nearby devices, or a compromised signing key."
+    },
+    {
+      "name": "trust_title",
+      "value": "What “verified” means"
+    },
+    {
+      "name": "trust_body",
+      "value": "This prototype verifies a pinned ECDSA P-256 exercise key. It is not connected to RCB. A real service requires an authorised issuer, secure key custody, rotation and revocation."
+    },
+    {
+      "name": "trust_limits",
+      "value": "Expired and repeated packets are suppressed. Hop counts limit honest devices; malicious relays can reset them. The phone clock must be accurate."
+    },
+    {
+      "name": "sources",
+      "value": "Sources and licences"
+    },
+    {
+      "name": "source_psp",
+      "value": "KG PSP · protective-point dataset"
+    },
+    {
+      "name": "source_safety",
+      "value": "Poland’s public safety guide"
+    },
+    {
+      "name": "external_links",
+      "value": "Links open in your browser and require connectivity. The map and guide remain available offline."
+    },
+    {
+      "name": "dismiss",
+      "value": "Dismiss message"
+    },
+    {
+      "name": "back_points",
+      "value": "Back to point list"
+    },
+    {
+      "name": "availability_request",
+      "value": "On request"
+    },
+    {
+      "name": "availability_all_day",
+      "value": "24 hours"
+    },
+    {
+      "name": "availability_hours",
+      "value": "Specified hours"
+    },
+    {
+      "name": "queue_metrics",
+      "value": "Live NearLink queue"
+    },
+    {
+      "name": "queue_pending",
+      "value": "Pending"
+    },
+    {
+      "name": "queue_acked",
+      "value": "Acknowledged by app"
+    },
+    {
+      "name": "queue_retry",
+      "value": "Retries"
+    },
+    {
+      "name": "queue_failed",
+      "value": "Failed"
+    },
+    {
+      "name": "queue_note",
+      "value": "An acknowledgement means the app on the other phone received the packet, not that a person read it or that their identity is verified."
+    },
+    {
+      "name": "persistence_none",
+      "value": "No current saved alert."
+    },
+    {
+      "name": "persistence_reverified",
+      "value": "Saved signatures have been re-verified."
+    },
+    {
+      "name": "persistence_load_failed",
+      "value": "Saved alerts could not be loaded."
+    },
+    {
+      "name": "persistence_saved",
+      "value": "Alert saved on this phone."
+    },
+    {
+      "name": "persistence_save_failed",
+      "value": "Signature verified. Saving failed — the alert remains only in app memory."
+    },
+    {
+      "name": "hardware_not_checked",
+      "value": "NearLink support has not been checked yet."
+    },
+    {
+      "name": "hardware_unsupported",
+      "value": "NearLink radio is unavailable on this device. The emulator drill uses simulation."
+    },
+    {
+      "name": "hardware_off",
+      "value": "Enable NearLink in phone settings, then start relaying."
+    },
+    {
+      "name": "hardware_available",
+      "value": "NearLink support detected. Radio delivery requires another compatible phone."
+    },
+    {
+      "name": "hardware_ready",
+      "value": "NearLink is ready. You can discover another phone by its exact name."
+    },
+    {
+      "name": "hardware_permission_denied",
+      "value": "NearLink access was not granted. Allow nearby-device access to relay alerts."
+    },
+    {
+      "name": "hardware_discovering",
+      "value": "Looking for the phone. Select a discovered device to connect."
+    },
+    {
+      "name": "hardware_stopped",
+      "value": "NearLink relay stopped. Saved alerts remain available offline."
+    },
+    {
+      "name": "hardware_error",
+      "value": "The NearLink operation failed. Check permission, radio settings and device support."
+    },
+    {
+      "name": "hardware_restore_failed",
+      "value": "Relay paused: saved alert state could not be read."
+    },
+    {
+      "name": "hardware_cleanup_failed",
+      "value": "Some radio operations could not be stopped. Restart the app before trying again."
+    },
+    {
+      "name": "hardware_load_alert",
+      "value": "Receive a valid signed exercise message first."
+    },
+    {
+      "name": "hardware_queued",
+      "value": "Messages are queued. Delivery requires an acknowledgement from the other phone’s app."
+    },
+    {
+      "name": "hardware_waiting_peer",
+      "value": "Messages saved. Waiting for a connected NearLink phone."
+    },
+    {
+      "name": "hardware_queue_error",
+      "value": "The relay queue was paused because of an error."
+    },
+    {
+      "name": "settings_tab",
+      "value": "Settings"
+    },
+    {
+      "name": "settings_intro",
+      "value": "Make the app your own. Choices are saved on this phone."
+    },
+    {
+      "name": "theme_label",
+      "value": "Appearance"
+    },
+    {
+      "name": "theme_auto",
+      "value": "System (automatic)"
+    },
+    {
+      "name": "theme_light",
+      "value": "Light"
+    },
+    {
+      "name": "theme_dark",
+      "value": "Dark"
+    },
+    {
+      "name": "theme_auto_hint",
+      "value": "System theme follows your phone settings. Light and dark apply only to SafeMesh."
+    },
+    {
+      "name": "language_label",
+      "value": "App language"
+    },
+    {
+      "name": "text_size_hint",
+      "value": "Change text size in your phone settings. SafeMesh follows it up to twice the normal size."
+    },
+    {
+      "name": "settings_saved",
+      "value": "Setting saved on this phone."
+    },
+    {
+      "name": "settings_save_failed",
+      "value": "The change applies to this session. It could not be saved for the next launch."
+    },
+    {
+      "name": "settings_apply_failed",
+      "value": "The setting could not be applied. Please try again."
+    },
+    {
+      "name": "open_settings",
+      "value": "Open settings"
+    },
+    {
+      "name": "back_settings",
+      "value": "Back to the previous tab"
+    }
+  ]
+}

@@ -1,5 +1,8 @@
 import { MAP_AREAS, MAP_STREETS, MAP_RIVERS, SAFE_POINTS, MAP_SOURCE_DATE,
-  MAP_ATTRIBUTION, MAP_PACK_BYTES } from '../model/OfflineMapData';
+  MAP_ATTRIBUTION, MAP_PACK_BYTES, MAP_BOUNDS } from '../model/OfflineMapData';
+import { LocalStore } from '../model/LocalStore';
+import { common } from '@kit.AbilityKit';
+import { DeviceLocation, DevicePosition } from '../model/DeviceLocation';
 
 export class MapVertex {
   lat: number;
@@ -45,6 +48,14 @@ export class MapViewModel {
   rivers: MapShape[] = [];
   selectedId: string = '';
   savedId: string = '';
+  saveBusy: boolean = false;
+  saveError: string = '';
+  locationBusy: boolean = false;
+  locationStatus: string = 'demo';
+  locationAccuracy: number = 0;
+  originIsDevice: boolean = false;
+  private saveRevision: number = 0;
+  private locationRevision: number = 0;
   zoom: number = 1;
   centerLat: number = 50.0614;
   centerLon: number = 19.9372;
@@ -93,6 +104,97 @@ export class MapViewModel {
     if (point === undefined) { return; }
     this.selectedId = id;
     this.centerLat = point.lat; this.centerLon = point.lon;
+  }
+
+  async restoreSaved(store: LocalStore): Promise<void> {
+    const revision: number = this.saveRevision;
+    try {
+      const id: string = await store.read('saved_point');
+      if (revision !== this.saveRevision) { return; }
+      this.savedId = this.points.some((point: SafePointViewModel) => point.id === id) ? id : '';
+      this.saveError = '';
+    } catch (error) {
+      if (revision === this.saveRevision) { this.saveError = 'load_failed'; }
+    }
+  }
+
+  async saveSelected(store: LocalStore): Promise<boolean> {
+    if (this.saveBusy) { return false; }
+    const id: string = this.selectedId;
+    if (!this.points.some((point: SafePointViewModel) => point.id === id)) {
+      this.saveError = 'invalid_point';
+      return false;
+    }
+    this.saveRevision++;
+    this.saveBusy = true;
+    this.saveError = '';
+    try {
+      await store.write('saved_point', id);
+      // A badge describes durable state, never an optimistic failed write.
+      this.savedId = id;
+      return true;
+    } catch (error) {
+      this.saveError = 'save_failed';
+      return false;
+    } finally { this.saveBusy = false; }
+  }
+
+  openSaved(): boolean {
+    if (!this.points.some((point: SafePointViewModel) => point.id === this.savedId)) { return false; }
+    this.select(this.savedId);
+    return true;
+  }
+
+  async locate(context: common.UIAbilityContext): Promise<boolean> {
+    if (this.locationBusy) { return false; }
+    const revision: number = ++this.locationRevision;
+    this.locationBusy = true;
+    try {
+      const position: DevicePosition = await new DeviceLocation().locate(context);
+      if (revision !== this.locationRevision) { return false; }
+      this.locationStatus = position.status;
+      if (position.status !== 'ready') { return false; }
+      if (position.accuracy > 250) { this.locationStatus = 'poor_accuracy'; return false; }
+      if (position.latitude < MAP_BOUNDS.south || position.latitude > MAP_BOUNDS.north ||
+        position.longitude < MAP_BOUNDS.west || position.longitude > MAP_BOUNDS.east) {
+        this.locationStatus = 'outside_pack';
+        return false;
+      }
+      this.originLat = position.latitude;
+      this.originLon = position.longitude;
+      this.locationAccuracy = position.accuracy;
+      this.originIsDevice = true;
+      this.updateDistances();
+      this.recenter();
+      return true;
+    } catch (error) {
+      if (revision === this.locationRevision) { this.locationStatus = 'unavailable'; }
+      return false;
+    } finally { this.locationBusy = false; }
+  }
+
+  resetOrigin(): void {
+    this.locationRevision++;
+    this.originLat = 50.0614;
+    this.originLon = 19.9372;
+    this.originIsDevice = false;
+    this.locationStatus = 'demo';
+    this.locationAccuracy = 0;
+    this.updateDistances();
+    this.recenter();
+  }
+
+  private updateDistances(): void {
+    this.points = this.points.map((previous: SafePointViewModel) => {
+      const point: SafePointViewModel = new SafePointViewModel();
+      point.id = previous.id; point.name = previous.name; point.address = previous.address;
+      point.lat = previous.lat; point.lon = previous.lon;
+      point.availability = previous.availability; point.description = previous.description;
+      point.distance = this.distance(point.lat, point.lon);
+      point.distanceLabel = point.distance < 1000 ? Math.round(point.distance) + ' m' :
+        (point.distance / 1000).toFixed(1) + ' km';
+      return point;
+    }).sort((a: SafePointViewModel, b: SafePointViewModel) => a.distance - b.distance);
   }
 
   changeZoom(delta: number): void { this.zoom = Math.max(0.65, Math.min(5, this.zoom + delta)); }
