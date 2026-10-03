@@ -1,0 +1,134 @@
+COMMAND: node --test tests/*.test.mjs
+HOST_SUITE_FILES=9
+NODE_VERSION=v24.21.0
+✔ delivery codecs bound packets and never confuse acknowledgements with alerts (6.1583ms)
+✔ all current messages enter a delayed peer queue and each pump is bounded to four writes (12.3108ms)
+✔ only an expected peer, sent token, issuer, alert ID and revision can acknowledge an item (5.2258ms)
+✔ loss uses bounded 2s/4s retries, then reports failure instead of claiming delivery (6.3037ms)
+✔ a lost ACK triggers a duplicate ACK without forwarding the alert twice to the next peer (12.1434ms)
+✔ expiry prunes pending packets and stale acknowledgements cannot revive them (2.0847ms)
+SAFEMESH_RELAY_RECEIVE node=nearlink status=ack_matched alertId=cached-0 hops=-1
+SAFEMESH_RELAY_RECEIVE node=nearlink status=ack_matched alertId=cached-1 hops=-1
+SAFEMESH_RELAY_RECEIVE node=nearlink status=ack_matched alertId=cached-2 hops=-1
+✔ restored ViewModel synchronizes all messages to a late peer and re-syncs on reconnect (32.6318ms)
+SAFEMESH_RELAY_RECEIVE node=nearlink status=invalid alertId=alert-A hops=0
+SAFEMESH_RELAY_RECEIVE node=nearlink status=expired alertId=expired hops=0
+SAFEMESH_RELAY_RECEIVE node=nearlink status=malformed alertId= hops=-1
+SAFEMESH_RELAY_RECEIVE node=nearlink status=accepted alertId=alert-A hops=0
+SAFEMESH_RELAY_RECEIVE node=nearlink status=duplicate alertId=alert-A hops=0
+SAFEMESH_RESTORE_ERROR Error: disk unavailable
+SAFEMESH_RESTORE_ERROR Error: disk unavailable
+✔ VM sends success ACK only for verified current data; duplicates ACK without re-flooding (4.3344ms)
+SAFEMESH_RESTORE_ERROR Error: disk unavailable
+SAFEMESH_RELAY_RECEIVE node=nearlink status=invalid alertId=alert-A hops=0
+SAFEMESH_RELAY_RECEIVE node=nearlink status=accepted alertId=alert-A hops=0
+✔ startup read failure blocks relay and a later successful restoration can recover (3.1863ms)
+✔ stop cancels queued work and late callbacks cannot restart radio transmission (3.3792ms)
+✔ queue bounds retain no more than eight peers and 128 alerts per peer (101.88ms)
+✔ a hung native send has a three-second app deadline and remains pending without a false receipt (1.0579ms)
+✔ stop releases a hung send immediately and handles a later native rejection (4.1389ms)
+✔ stop during restore, native startup or discovery cannot revive foreground radio work (1.8857ms)
+✔ switching emulator roles and back to hardware ignores all callbacks from the retired transport (2.8909ms)
+SAFEMESH_RELAY_RECEIVE node=B status=accepted alertId=three-app-hop hops=1
+SAFEMESH_RELAY_RECEIVE node=A status=ack_matched alertId=three-app-hop hops=-1
+✔ a stopped or superseded emulator startup cannot overwrite or close the replacement link (1.179ms)
+SAFEMESH_RELAY_RECEIVE node=C status=accepted alertId=three-app-hop hops=2
+SAFEMESH_RELAY_RECEIVE node=B status=ack_matched alertId=three-app-hop hops=-1
+✔ three independent app ViewModels relay A to B then to delayed C after A disconnects (4.7864ms)
+SAFEMESH_RELAY_RECEIVE node=B status=expired alertId=expired hops=0
+SAFEMESH_RELAY_RECEIVE node=B status=invalid alertId=forged hops=0
+✔ emulator delivery still rejects forged and expired content without success acknowledgements (1.976ms)
+(node:2392) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ probing the lab neither creates a native socket nor fabricates peers; invalid roles cannot connect (3.1429ms)
+✔ start is shared and readiness requires open plus the server peer handshake (8.8158ms)
+✔ only topology peers are emitted, and removed or unknown senders cannot deliver packets (5.1828ms)
+✔ each fixed emulator role uses its own reverse port and diagnostics exclude packet contents (23.9478ms)
+✔ outgoing and incoming packet limits count UTF-8 bytes, and JSON expansion is bounded separately (34.3421ms)
+✔ malformed, extra-field and invalid peer handshakes fail closed without partially accepting peers (33.0669ms)
+✔ binary frames and packets before a completed handshake cannot bypass the protocol (1.417ms)
+✔ stop cancels an in-flight write, detaches handlers, emits peer losses and ignores late callbacks (3.2543ms)
+✔ stop during a deferred native connect settles start and prevents late connection revival (1.4231ms)
+✔ handshake and send deadlines settle callers; cleanup remains bounded if native close never resolves (4.4017ms)
+✔ hub rejection, failed native connect and close events report truthful disconnected state (2.6303ms)
+✔ a forged incoming packet preserves the authentic displayed title and badge (13.0782ms)
+✔ an expired incoming packet cannot replace an active verified alert (1.4059ms)
+✔ persisted replay history restores and re-verifies before the first network packet (7.2356ms)
+✔ disk failure leaves the authenticated in-memory alert intact and reports save failure (1.2612ms)
+SAFEMESH_RELAY_RECEIVE node=nearlink status=invalid alertId=krakow-hackyeah-exercise-001 hops=0
+SAFEMESH_RELAY_RECEIVE node=nearlink status=malformed alertId= hops=-1
+✔ forged and malformed packets produce no outgoing radio traffic (24.7783ms)
+SAFEMESH_RELAY_RECEIVE node=nearlink status=accepted alertId=krakow-hackyeah-exercise-001 hops=0
+✔ a genuine arrival forwards its exact signature at hop one while excluding its sender (4.8578ms)
+SAFEMESH_RELAY_RECEIVE node=nearlink status=duplicate alertId=krakow-hackyeah-exercise-001 hops=0
+SAFEMESH_RELAY_RECEIVE node=nearlink status=accepted alertId=krakow-hackyeah-exercise-001 hops=0
+✔ concurrent arrivals forward once and busy remains set until persistence finishes (4.3539ms)
+SAFEMESH_RELAY_RECEIVE node=nearlink status=accepted alertId=krakow-hackyeah-exercise-001 hops=0
+✔ fire-and-forget receive/send failures are handled without losing verified content (3.4376ms)
+✔ exact expiry clears the displayed alert and prevents any further relay (1.2143ms)
+(node:2072) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ foreground location requests permissions only when supported and respects denial or disabled services (2.2753ms)
+✔ one-shot location uses a bounded request, permits approximate-only consent and returns provider accuracy (1.3847ms)
+✔ invalid locations and provider failures never become successful fixes (0.8235ms)
+(node:4132) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ compiled reference data preserves JSON source records, licensing and finite pack bounds (5.7614ms)
+✔ all source geometry and cached shape bounds are finite, complete and consistent (16.5805ms)
+✔ straight-line distance uses metres, stays finite at antipodes and orders real points (2.4309ms)
+✔ unknown selected IDs cannot mutate any model state or move the map to 0,0 (23.3624ms)
+✔ valid selection centers an existing source point; recenter retains origin and sensible zoom (3.1631ms)
+✔ native map coordinate methods align east/north and use near-isotropic local distance (21.5703ms)
+✔ map waits for native readiness and batches actual geometry within a small stroke budget (18.4227ms)
+✔ marker picking reports a visible source ID and leaves empty locations unselected (2.5045ms)
+✔ save badge changes only after durable success, keeps the original requested point during selection changes (5.557ms)
+✔ saved-point restore ignores unknown IDs, handles errors and cannot overwrite a concurrent newer save (1.9391ms)
+✔ device origin only accepts a usable fix in the downloaded area and reorders real distances (5.0567ms)
+✔ a late location response cannot replace a user-selected reset to the demo origin (1.0063ms)
+✔ real WebSocket peers enforce A-B-C topology and forward unchanged opaque packets without alert logs (147.9926ms)
+✔ topology controls update neighbors, offline sends have no hub backlog, and disconnect releases role (71.7017ms)
+✔ duplicate roles, invalid hello and fourth connections cannot replace real peers (42.5532ms)
+✔ explicit drop fixtures count data/ACK loss and never synthesize acknowledgements (16.8561ms)
+✔ fault injection is explicit, counted and opaque; invalid control is atomic (52.8834ms)
+✔ UTF-8 packet limits and hello deadline close only the offending client (141.3837ms)
+✔ HTTP control requires local Host, same origin and JSON; body and topology are bounded (34.507ms)
+✔ HDC WebSocket aliases 8765/8766/8767 accept matching origins without permitting HTTP administration (18.3973ms)
+✔ WebSocket aliases reject unrelated ports/origins and diagnostics exclude secrets and query strings (44.8653ms)
+✔ HarmonyOS API24 portless loopback Origin works only for matching WebSocket Host, never HTTP admin (13.1073ms)
+✔ RFC6455 masked fragmented text and interleaved ping work across TCP chunk boundaries (26.4205ms)
+✔ RFC6455 rejects unmasked, binary, reserved-bit, malformed control and invalid UTF-8 frames (60.1966ms)
+✔ RFC6455 oversized frame declaration and cumulative fragment size fail without unbounded allocation (12.1352ms)
+✔ RFC6455 empty-fragment floods have a bounded fragment count (16.503ms)
+✔ unsupported emulator neither imports NearLink Kit nor fabricates peers (6.7467ms)
+✔ discovery requires a nonempty valid exact name filter (4.6085ms)
+✔ peer is counted only after an SDK connection callback (2.8117ms)
+✔ MTU-sized writes and arbitrary 7-byte reads preserve UTF-8 packets (33.2408ms)
+✔ coalesced frames are decoded as separate messages (13.5394ms)
+✔ oversized payloads, malformed headers and invalid UTF-8 are rejected (3.0337ms)
+✔ stop releases listeners, clears channel count and rejects further writes (14.3221ms)
+✔ empty persisted alerts and empty wire frames are rejected with the native empty-encoder behavior (3.6148ms)
+✔ real P-256 signed fixture verifies; every security-relevant field is signed (17.1941ms)
+✔ forgery cannot poison replay state; duplicate and concurrent replay suppressed (2.0088ms)
+✔ demo authority can never authorize a live alert or unknown key (0.4404ms)
+✔ expired, future, malformed, oversized and hop-exhausted messages handled (1.5109ms)
+✔ three peers relay exact signed content offline and refuse loops (8.8844ms)
+✔ caller mutation cannot modify the authenticated cache or an in-flight candidate (1.1826ms)
+✔ bounded decoder rejects malformed JSON and primitive shape attacks (0.9877ms)
+✔ persistence re-verifies; forged entries not restored and replays still refused (2.8503ms)
+✔ bounded cache fails closed; older revisions cannot replace newer alerts (4.6761ms)
+✔ actual LocalStore round-trips a maximum-size snapshot and respects every native string bound (402.8147ms)
+✔ the prior generation remains the head until all replacement chunks have flushed (44.4833ms)
+✔ failed staging put or flush preserves a complete prior generation after restart (124.3027ms)
+✔ failed head publication rolls back memory; any durable generation is complete (169.6747ms)
+✔ uninitialized operations reject and operations during initialization await readiness (46.4665ms)
+✔ serialized concurrent reads and writes cannot mix generations (28.0565ms)
+✔ legacy values and empty values work; corrupt or oversized values fail closed (27.6833ms)
+ℹ tests 91
+ℹ suites 0
+ℹ pass 91
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1471.1805
+EXIT_CODE=0

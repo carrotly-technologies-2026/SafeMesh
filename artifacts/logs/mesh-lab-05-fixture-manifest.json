@@ -1,0 +1,15 @@
+{
+  "output": "C:\\Users\\user\\SafeMesh\\.cache\\mesh-lab\\fixtures",
+  "generatedAt": "2026-10-03T18:21:40.514Z",
+  "demoIssuedAt": "2026-10-03T17:45:51.662Z",
+  "demoExpiresAt": "2026-10-06T17:45:51.662Z",
+  "expiredFixtureExpiresAt": "2026-10-03T16:46:51.662Z",
+  "expiredFixtureIsExpired": true,
+  "sourceSha256": "61587593bf6b18e3cbe50cba3e0f5f8f1081e7dd3310e64768e304d26bc70a63",
+  "files": [
+    "duplicate.json",
+    "tampered.json",
+    "expired.json"
+  ],
+  "note": "Existing signatures preserved; only tampered.body and unsigned hops differ. No signing or refresh."
+}

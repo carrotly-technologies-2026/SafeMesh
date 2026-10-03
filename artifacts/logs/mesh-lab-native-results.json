@@ -1,0 +1,83 @@
+{
+  "recordedAt": "2026-10-03T18:27:02.593Z",
+  "package": "org.safemesh.alerts",
+  "version": "1.2.0",
+  "transport": "Local WebSocket link through HDC, not physical NearLink",
+  "nativeLogTimezone": "UTC+08:00",
+  "hostTimezone": "Europe/Warsaw (UTC+02:00)",
+  "hapSha256": "ab65c38028633dc6a87c882b133fd1224ca90a3575c1dada2520b90d68e6b9d8",
+  "procedure": "Live UI and SDK log checks, with assertions against the saved native evidence. B stale HDC socket was explicitly disconnected after reinstall before reconnect.",
+  "results": [
+    {
+      "name": "Three independent native clients registered; initial topology AB only",
+      "result": "PASS",
+      "evidence": [
+        "mesh-lab-01-connected-state.json"
+      ]
+    },
+    {
+      "name": "Lost ACK causes one retry; B accepts once and recognizes the duplicate",
+      "result": "PASS",
+      "evidence": [
+        "mesh-lab-02-lost-ack-state.json",
+        "mesh-lab-02-b-receive.log",
+        "mesh-lab-02-a-retry-metrics.json"
+      ]
+    },
+    {
+      "name": "Isolated C has no alert and no packet route",
+      "result": "PASS",
+      "evidence": [
+        "mesh-lab-02-c-isolated-home.json"
+      ]
+    },
+    {
+      "name": "After B app process restart, saved signatures are reverified with A disconnected",
+      "result": "PASS",
+      "evidence": [
+        "mesh-lab-03-b-restored-isolated-state.json",
+        "mesh-lab-03-b-restored-home.json",
+        "mesh-lab-04-process-proof.json"
+      ]
+    },
+    {
+      "name": "B forwards its restored alert to C over BC; C verifies hop 2 without A",
+      "result": "PASS",
+      "evidence": [
+        "mesh-lab-04-b-to-c-state.json",
+        "mesh-lab-04-c-receive.log",
+        "mesh-lab-04-c-verified-home.json"
+      ]
+    },
+    {
+      "name": "Tampered and expired packets are rejected without ACK or forwarding",
+      "result": "PASS",
+      "evidence": [
+        "mesh-lab-05-before-invalid-state.json",
+        "mesh-lab-05-after-invalid-state.json",
+        "mesh-lab-05-b-rejected.log"
+      ]
+    },
+    {
+      "name": "Valid saved alert remains unchanged after both invalid injections",
+      "result": "PASS",
+      "evidence": [
+        "mesh-lab-05-b-original-retained.json"
+      ]
+    },
+    {
+      "name": "Explicit duplicate is ACKed again without forwarding to C",
+      "result": "PASS",
+      "evidence": [
+        "mesh-lab-06-duplicate-state.json",
+        "mesh-lab-06-b-duplicate.log"
+      ]
+    }
+  ],
+  "limitations": [
+    "API 24 emulator only",
+    "Foreground application relay",
+    "Exercise authority only",
+    "No physical radio, range, battery or background-delivery measurements"
+  ]
+}

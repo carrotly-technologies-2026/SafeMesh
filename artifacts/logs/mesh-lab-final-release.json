@@ -1,0 +1,41 @@
+{
+    "recordedAtUtc":  "2026-10-03T18:38:51.1456788Z",
+    "sourceCommit":  "f634791067ea2d33257929fddb21c6bc59762495",
+    "version":  "1.2.0",
+    "hapSha256":  "5372d8d19d3ef8dfaba215b93966015afbbdedb440bd127e557b945ff1746cfe",
+    "hostTestsPassed":  96,
+    "arktsFiles":  19,
+    "arktsErrors":  0,
+    "arktsAdvisories":  29,
+    "lintIssues":  0,
+    "connected":  [
+                      "A",
+                      "B",
+                      "C"
+                  ],
+    "processes":  [
+                      {
+                          "role":  "A",
+                          "device":  "127.0.0.1:5555",
+                          "pid":  "21698"
+                      },
+                      {
+                          "role":  "B",
+                          "device":  "127.0.0.1:5557",
+                          "pid":  "12300"
+                      },
+                      {
+                          "role":  "C",
+                          "device":  "127.0.0.1:5559",
+                          "pid":  "10982"
+                      }
+                  ],
+    "nativeChecks":  [
+                         "all three installed and launched",
+                         "cached signatures reverified after relaunch",
+                         "A-B and B-C packets acknowledged",
+                         "duplicate-role error remains visible",
+                         "role B reconnect clears diagnostic and restores two neighbors"
+                     ],
+    "scope":  "API24 foreground emulator apps over a local WebSocket mock; physical NearLink unverified"
+}
