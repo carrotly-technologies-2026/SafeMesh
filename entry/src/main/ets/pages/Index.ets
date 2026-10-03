@@ -1,14 +1,21 @@
-import { common } from '@kit.AbilityKit';
+import { common, ConfigurationConstant } from '@kit.AbilityKit';
+import { accessibility } from '@kit.AccessibilityKit';
 import { LocalStore } from '../model/LocalStore';
 import { AlertViewModel } from '../viewmodel/AlertViewModel';
 import { MapViewModel, SafePointViewModel } from '../viewmodel/MapViewModel';
 import { RelayViewModel, RelayEvent, PeerViewModel } from '../viewmodel/RelayViewModel';
 import { OfflineMap } from '../views/OfflineMap';
+import { UiCopy } from '../views/UiCopy';
 
-const INK: string = '#183E35';
-const MUTED: string = '#65776C';
-const LIME: string = '#D8F58A';
-const PAPER: string = '#F4F6F0';
+const INK: Resource = $r('app.color.ink');
+const MUTED: Resource = $r('app.color.muted');
+const PAPER: Resource = $r('app.color.paper');
+const SURFACE: Resource = $r('app.color.surface');
+const SOFT: Resource = $r('app.color.soft');
+const ACTION_BG: Resource = $r('app.color.action_bg');
+const ACTION_FG: Resource = $r('app.color.action_fg');
+const WARNING_BG: Resource = $r('app.color.warning_bg');
+const WARNING_FG: Resource = $r('app.color.warning_fg');
 
 @Entry
 @Component
@@ -16,323 +23,564 @@ struct Index {
   @State tab: number = 0;
   @State mapRevision: number = 0;
   @State notice: string = '';
+  @State language: string = 'pl';
+  @State themePreference: string = 'system';
+  @State settingsBusy: boolean = true;
+  @State query: string = '';
+  @State viewportWidth: number = 360;
+  @State viewportHeight: number = 760;
+  @StorageLink('safeMeshDark') dark: boolean = false;
+  @StorageLink('safeMeshFontScale') fontScale: number = 1;
+  @StorageLink('safeMeshThemeRevision') themeRevision: number = 0;
   private store: LocalStore = new LocalStore();
-  @State alerts: AlertViewModel = new AlertViewModel(this.store);
+  private copy: UiCopy = new UiCopy();
+  @State @Watch('onAlertChanged') alerts: AlertViewModel = new AlertViewModel(this.store);
   @State map: MapViewModel = new MapViewModel();
-  @State relay: RelayViewModel = new RelayViewModel(this.alerts);
+  @State @Watch('onRelayChanged') relay: RelayViewModel = new RelayViewModel(this.alerts);
   private expiryTimer: number = -1;
   private pageScroll: Scroller = new Scroller();
+  private lastAnnouncedAlert: string = '';
+  private lastAnnouncedRelay: string = '';
+  private previousTab: number = 0;
 
   aboutToAppear(): void {
-    this.initialize();
+    const context: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
+    this.copy.initialize(context);
+    this.initialize(context);
     this.expiryTimer = setInterval(() => { this.alerts.refreshExpiry(); }, 10000);
   }
+
+  onPageHide(): void { this.relay.stop(); }
+
+  onBackPress(): boolean {
+    if (this.tab !== 4) { return false; }
+    this.closeSettings();
+    return true;
+  }
+
   aboutToDisappear(): void {
     if (this.expiryTimer !== -1) { clearInterval(this.expiryTimer); }
     this.alerts.dispose();
     this.relay.stop();
   }
-  async initialize(): Promise<void> {
+
+  private t(key: string): string { return this.copy.text(key, this.language); }
+
+  private async initialize(context: common.UIAbilityContext): Promise<void> {
     try {
-      const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
       await this.store.init(context);
-      this.map.savedId = await this.store.read('saved_point');
+      const savedLanguage: string = await this.store.read('ui_language');
+      this.language = savedLanguage === 'en' ? 'en' : 'pl';
+      context.getApplicationContext().setLanguage(this.language);
+      const savedTheme: string = await this.store.read('ui_theme');
+      this.themePreference = savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : 'system';
+      this.applyTheme(this.themePreference);
+      await this.map.restoreSaved(this.store);
       this.relay.setContext(context);
       await this.alerts.restore();
       await this.relay.probe();
-    } catch (error) { this.notice = 'Local setup: ' + String(error); }
+    } catch (error) { this.notice = this.t('init_failed'); }
+    finally { this.settingsBusy = false; }
   }
-  async loadDrill(): Promise<void> {
-    try { await this.alerts.loadDrill(); }
-    catch (error) { this.notice = 'Could not verify drill: ' + String(error); }
+
+  private async chooseLanguage(language: string): Promise<void> {
+    if (this.settingsBusy) { return; }
+    this.settingsBusy = true;
+    this.notice = '';
+    let applied: boolean = false;
+    try {
+      const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+      context.getApplicationContext().setLanguage(language);
+      this.language = language;
+      applied = true;
+      await this.store.write('ui_language', language);
+      this.announce(this.t('language_saved'));
+    } catch (error) { this.notice = this.t(applied ? 'language_failed' : 'settings_apply_failed'); }
+    finally { this.settingsBusy = false; }
   }
-  selectPoint(id: string): void { this.map.select(id); this.mapRevision++; }
-  selectTab(index: number): void {
+
+  private applyTheme(theme: string): void {
+    const mode: ConfigurationConstant.ColorMode = theme === 'light' ? ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT :
+      theme === 'dark' ? ConfigurationConstant.ColorMode.COLOR_MODE_DARK : ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET;
+    const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+    context.getApplicationContext().setColorMode(mode);
+    this.mapRevision++;
+  }
+
+  private async chooseTheme(theme: string): Promise<void> {
+    if (this.settingsBusy) { return; }
+    this.settingsBusy = true;
+    this.notice = '';
+    let applied: boolean = false;
+    try {
+      this.applyTheme(theme);
+      this.themePreference = theme;
+      applied = true;
+      await this.store.write('ui_theme', theme);
+      this.announce(this.t('settings_saved'));
+    } catch (error) { this.notice = this.t(applied ? 'settings_save_failed' : 'settings_apply_failed'); }
+    finally { this.settingsBusy = false; }
+  }
+
+  private announce(message: string): void {
+    const event: accessibility.EventInfo = {
+      type: 'announceForAccessibility',
+      bundleName: 'org.safemesh.alerts',
+      triggerAction: 'common',
+      textAnnouncedForAccessibility: message
+    };
+    accessibility.sendAccessibilityEvent(event).catch(() => {});
+  }
+
+  private onAlertChanged(): void {
+    const identity: string = this.alerts.received ? this.alerts.title + this.alerts.issueTime : '';
+    if (identity !== this.lastAnnouncedAlert) {
+      const previous: string = this.lastAnnouncedAlert;
+      this.lastAnnouncedAlert = identity;
+      if (identity.length > 0) { this.announce(this.t('new_alert') + ' ' + this.alerts.title); }
+      else if (previous.length > 0) { this.announce(this.t('alert_expired')); }
+    }
+  }
+
+  private async loadDrill(): Promise<void> {
+    try {
+      await this.alerts.loadDrill();
+      if (!this.alerts.received) { this.notice = this.t('verify_failed'); this.announce(this.notice); }
+    } catch (error) { this.notice = this.t('verify_failed'); }
+  }
+
+  private onRelayChanged(): void {
+    if (!this.relay.running && this.relay.events.length > 0 && this.relay.testStatus !== this.lastAnnouncedRelay) {
+      this.lastAnnouncedRelay = this.relay.testStatus;
+      this.announce(this.t('diagnostics') + ': ' + this.relay.testStatus);
+    }
+  }
+
+  private selectPoint(id: string): void {
+    this.map.select(id);
+    this.mapRevision++;
+    this.announce(this.t('selected_point') + ': ' + this.map.selected().address);
+  }
+
+  private selectTab(index: number): void {
     this.pageScroll.scrollTo({ xOffset: 0, yOffset: 0 });
     this.tab = index;
     this.notice = '';
   }
-  async savePoint(): Promise<void> {
-    this.map.savedId = this.map.selectedId;
-    try { await this.store.write('saved_point', this.map.savedId); this.notice = 'Point saved on this phone.'; }
-    catch (error) { this.notice = 'Could not save: ' + String(error); }
+
+  private openSettings(): void {
+    if (this.tab === 4) { return; }
+    this.previousTab = this.tab;
+    this.selectTab(4);
+  }
+
+  private closeSettings(): void {
+    this.selectTab(this.previousTab);
+  }
+
+  private async savePoint(): Promise<void> {
+    const saved: boolean = await this.map.saveSelected(this.store);
+    this.notice = this.t(saved ? 'saved_point' : 'save_failed');
+    this.announce(this.notice);
+  }
+
+  private async useLocation(): Promise<void> {
+    const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+    await this.map.locate(context);
+    this.mapRevision++;
+    this.announce(this.locationMessage());
+  }
+
+  private locationMessage(): string {
+    return this.t(this.map.locationStatus === 'demo' ? 'demo_origin' : 'location_' + this.map.locationStatus);
+  }
+
+  private filteredPoints(): SafePointViewModel[] {
+    const query: string = this.query.trim().toLocaleLowerCase();
+    return this.map.points.filter((point: SafePointViewModel) =>
+      query.length === 0 || point.address.toLocaleLowerCase().includes(query));
+  }
+
+  private availability(value: string): string {
+    if (value === 'Na żądanie') { return this.t('availability_request'); }
+    if (value === 'Całodobowa') { return this.t('availability_all_day'); }
+    if (value === 'Określone godziny') { return this.t('availability_hours'); }
+    return value;
   }
 
   @Builder
-  header() {
-    Row({ space: 9 }) {
-      Text('S').fontSize(21).fontWeight(FontWeight.Bold).fontColor(LIME)
-        .width(34).height(34).textAlign(TextAlign.Center).backgroundColor(INK).borderRadius(11)
-      Text('safemesh').fontSize(23).fontWeight(FontWeight.Bold).fontColor(INK).letterSpacing(-0.8)
-      Blank()
-      Text('●  OFFLINE READY').fontSize(9).fontWeight(FontWeight.Bold).fontColor(INK)
-        .backgroundColor('#E3EDD8').padding({ left: 10, right: 10, top: 8, bottom: 8 }).borderRadius(20)
-    }.width('100%').padding({ left: 22, right: 22, top: 14, bottom: 13 })
+  private action(label: () => string, id: string, action: () => void, enabled: () => boolean = () => true, primary: boolean = true) {
+    Button({ type: ButtonType.Normal }) {
+      Text(label()).fontSize(16).fontWeight(FontWeight.Medium)
+        .fontColor(primary ? ACTION_FG : INK).textAlign(TextAlign.Center).width('100%')
+    }.id(id).width('100%').constraintSize({ minHeight: 48 }).padding(14)
+      .backgroundColor(primary ? ACTION_BG : SOFT).borderRadius(16)
+      .enabled(enabled()).opacity(enabled() ? 1 : 0.6).onClick(action)
+      .accessibilityText(label())
   }
+
   @Builder
-  drillBanner() {
-    Row({ space: 7 }) {
-      Text('EXERCISE').fontSize(9).fontWeight(FontWeight.Bold).fontColor('#795D2C')
-      Text('Hackathon prototype · not an official warning').fontSize(10).fontColor('#795D2C')
-    }.width('100%').justifyContent(FlexAlign.Center).padding(8).backgroundColor('#F1EBDD')
-  }
-  @Builder
-  sectionTitle(kicker: string, title: string) {
-    Column({ space: 6 }) {
-      Text(kicker).fontSize(10).letterSpacing(1.5).fontWeight(FontWeight.Bold).fontColor(MUTED)
-      Text(title).fontSize(28).fontWeight(FontWeight.Bold).fontColor(INK).letterSpacing(-0.6)
+  private heading(title: () => string, subtitle: () => string) {
+    Column({ space: 8 }) {
+      Text(title()).fontSize(28).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
+      Text(subtitle()).fontSize(16).fontColor(MUTED).width('100%')
     }.width('100%').alignItems(HorizontalAlign.Start)
   }
+
   @Builder
-  primaryButton(label: () => string, id: string, action: () => void) {
-    Button(label()).id(id).width('100%').height(48).fontSize(14).fontWeight(FontWeight.Bold)
-      .fontColor(LIME).backgroundColor(INK).borderRadius(15).onClick(action)
+  private header() {
+    Row({ space: 8 }) {
+      if (this.tab === 4) {
+        Button({ type: ButtonType.Normal }) {
+          SymbolGlyph($r('sys.symbol.arrow_left')).fontSize(24).maxFontScale(1).fontColor([INK])
+            .accessibilityLevel('no')
+        }.id('backSettings').width(48).height(48).backgroundColor(SOFT).borderRadius(24)
+          .accessibilityText(this.t('back_settings')).onClick(() => { this.closeSettings(); })
+        Text(this.t('settings_tab')).fontSize(23).fontWeight(FontWeight.Bold).fontColor(INK).layoutWeight(1)
+      } else {
+        Text('safemesh').fontSize(23).fontWeight(FontWeight.Bold).fontColor(INK).layoutWeight(1)
+        Button({ type: ButtonType.Normal }) {
+          SymbolGlyph($r('sys.symbol.gearshape')).fontSize(24).maxFontScale(1).fontColor([INK])
+            .accessibilityLevel('no')
+        }.id('openSettings').width(48).height(48).backgroundColor(SOFT).borderRadius(24)
+          .accessibilityText(this.t('open_settings')).onClick(() => { this.openSettings(); })
+      }
+    }.width('100%').constraintSize({ maxWidth: 720 }).padding({ left: 20, right: 20, top: 8, bottom: 8 })
   }
 
   @Builder
-  homeView() {
-    Column({ space: 18 }) {
-      Column({ space: 9 }) {
-        Text('A LITTLE PREPARATION. A STRONGER COMMUNITY.').fontSize(9).letterSpacing(1).fontColor(MUTED)
-        Text('Stay informed.\nStay connected.').fontSize(36).lineHeight(41).fontWeight(FontWeight.Bold)
-          .fontColor(INK).letterSpacing(-1.1)
-        Text('When the network stops, care keeps moving.').fontSize(13).fontColor(MUTED)
-      }.width('100%').alignItems(HorizontalAlign.Start)
-      Column({ space: 12 }) {
-        Row() {
-          Text('YOUR OFFLINE AREA').fontSize(10).fontWeight(FontWeight.Bold).letterSpacing(1).fontColor(INK)
-          Blank()
-          Text('✓  ON THIS PHONE').fontSize(9).fontWeight(FontWeight.Bold).fontColor(INK)
-        }.width('100%')
-        Stack({ alignContent: Alignment.BottomStart }) {
-          OfflineMap({ vm: this.map, revision: this.mapRevision, compact: true,
-            onSelect: (id: string) => { this.selectPoint(id); this.selectTab(1); } })
-          Text('Kraków · centrum').fontSize(14).fontWeight(FontWeight.Bold).fontColor(INK)
-            .backgroundColor('#F9FCF3').padding({ left: 12, right: 12, top: 7, bottom: 7 })
-            .borderRadius(9).margin(12)
-        }.height(166).width('100%').borderRadius(16).clip(true)
-        Text(this.map.attribution).fontSize(8).fontColor(MUTED).width('100%')
-        Row() {
-          Column({ space: 3 }) {
-            Text(this.map.points.length + ' protective points').fontSize(15).fontWeight(FontWeight.Bold).fontColor(INK)
-            Text('PSP data · selected area · stored offline').fontSize(10).fontColor(MUTED)
-          }.alignItems(HorizontalAlign.Start)
-          Blank()
-          Button('Explore ↗').id('exploreMap').fontSize(12).fontColor(INK).fontWeight(FontWeight.Bold)
-            .backgroundColor(LIME).height(34).onClick(() => { this.selectTab(1); })
-        }.width('100%')
-      }.padding(16).width('100%').backgroundColor('#E4ECD9').borderRadius(23)
-      Column({ space: 11 }) {
-        Row() {
-          Text(this.alerts.received ? '✓  SIGNED EXERCISE' : '○  VERIFIED ALERTS').fontSize(10)
-            .fontWeight(FontWeight.Bold).fontColor('#896234').letterSpacing(0.8)
-          Blank()
-          Text('DEMO').fontSize(9).fontWeight(FontWeight.Bold).fontColor('#896234')
-        }.width('100%')
-        Text(this.alerts.title).fontSize(20).fontWeight(FontWeight.Bold).fontColor(INK)
-        Text(this.alerts.body).fontSize(12).lineHeight(18).fontColor(MUTED)
-        if (this.alerts.received) {
-          Text(this.alerts.verification).fontSize(10).fontWeight(FontWeight.Medium).fontColor('#246348')
-          Text('Valid until ' + this.alerts.expiry).fontSize(10).fontColor(MUTED)
-          Text(this.alerts.persistenceStatus).fontSize(10).fontColor(MUTED)
+  private drillBanner() {
+    Text(this.t('exercise') + ' · ' + this.t('exercise_notice'))
+      .fontSize(13).fontColor(WARNING_FG).width('100%').padding(14)
+      .backgroundColor(WARNING_BG).borderRadius(14)
+  }
+
+  @Builder
+  private alertCard() {
+    Column({ space: 12 }) {
+      Text(this.t(this.alerts.received ? 'verified_exercise' : 'no_alert'))
+        .fontSize(14).fontWeight(FontWeight.Bold).fontColor(WARNING_FG)
+      Text(this.alerts.received ? this.alerts.title : this.t('ready_title'))
+        .fontSize(25).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
+      if (this.alerts.received) {
+        Text(this.t('signature_verified')).fontSize(14).fontWeight(FontWeight.Medium).fontColor($r('app.color.success'))
+        Text(this.t('signed_original')).fontSize(12).fontColor(MUTED)
+      }
+      Text(this.alerts.received ? this.alerts.body : this.t('ready_body')).fontSize(16).fontColor(INK).width('100%')
+      if (this.alerts.received) {
+        Text(this.t('valid_until') + ': ' + this.alerts.expiry).fontSize(14).fontColor(MUTED)
+        Text(this.t('persistence_' + this.alerts.persistenceState)).fontSize(13).fontColor(MUTED)
+      }
+      this.action(() => this.t(this.alerts.busy ? 'verifying' : this.alerts.received ? 'see_relay' : 'receive_drill'), 'receiveDrill', () => { if (this.alerts.received) { this.selectTab(2); } else { this.loadDrill(); } }, () => !this.alerts.busy)
+    }.width('100%').alignItems(HorizontalAlign.Start).padding(20).backgroundColor(WARNING_BG).borderRadius(24)
+  }
+
+  @Builder
+  private homeView() {
+    Column({ space: 20 }) {
+      this.alertCard()
+      Column({ space: 14 }) {
+        Text(this.t('offline_area')).fontSize(14).fontWeight(FontWeight.Bold).fontColor(MUTED)
+        Text(this.t('central_krakow')).fontSize(24).fontWeight(FontWeight.Bold).fontColor(INK)
+        OfflineMap({ vm: this.map, revision: this.mapRevision + this.themeRevision, dark: this.dark, compact: true,
+          description: this.t('map_description'), onSelect: (id: string) => { this.selectPoint(id); this.selectTab(1); } })
+          .height(this.viewportHeight < 480 ? 140 : 180).borderRadius(16).clip(true)
+        Text(this.map.attribution).fontSize(12).fontColor(MUTED).width('100%')
+        Text(this.map.points.length + ' ' + this.t('point_count')).fontSize(18).fontWeight(FontWeight.Bold).fontColor(INK)
+        Text(this.t('bundled_points')).fontSize(14).fontColor(MUTED)
+        this.action(() => this.t('explore'), 'exploreMap', () => { this.selectTab(1); }, () => true, false)
+        if (this.map.savedId.length > 0) {
+          this.action(() => this.t('open_saved'), 'homeSavedPoint', () => {
+            if (this.map.openSaved()) { this.mapRevision++; this.selectTab(1); }
+          }, () => true, false)
         }
-        this.primaryButton((): string => this.alerts.busy ? 'Verifying…' : this.alerts.received ? 'See how it travels →' : 'Receive a signed drill →',
-          'receiveDrill', () => { if (this.alerts.received) { this.selectTab(2); } else { this.loadDrill(); } })
-      }.width('100%').alignItems(HorizontalAlign.Start).padding(18).backgroundColor('#F4ECDD').borderRadius(22)
-      Row({ space: 12 }) {
-        Text('↗').fontSize(29).fontColor(INK).width(38)
-        Column({ space: 4 }) {
-          Text('One phone can reach the next.').fontSize(14).fontWeight(FontWeight.Bold).fontColor(INK)
-          Text('Explore the relay demo — no mobile network needed.').fontSize(11).lineHeight(16).fontColor(MUTED)
-        }.layoutWeight(1).alignItems(HorizontalAlign.Start)
-      }.width('100%').padding({ left: 5, right: 5, bottom: 8 }).onClick(() => { this.selectTab(2); })
-    }.padding(22).width('100%')
+      }.width('100%').alignItems(HorizontalAlign.Start).padding(20).backgroundColor(SOFT).borderRadius(24)
+      Text(this.t('offline_ready')).fontSize(14).fontColor(MUTED).width('100%')
+      this.heading(() => this.t('community'), () => this.t('community_body'))
+      this.action(() => this.t('see_relay'), 'exploreRelay', () => { this.selectTab(2); }, () => true, false)
+    }.width('100%')
   }
 
   @Builder
-  mapView() {
-    Column({ space: 16 }) {
-      this.sectionTitle('YOUR AREA, ALWAYS WITH YOU', 'Find a protective point')
-      Text('Central Kraków · selected PSP locations').fontSize(12).fontColor(MUTED).width('100%')
-      Stack({ alignContent: Alignment.TopEnd }) {
-        OfflineMap({ vm: this.map, revision: this.mapRevision,
-          onSelect: (id: string) => { this.selectPoint(id); } })
-        Column({ space: 7 }) {
-          Button('+').id('zoomIn').width(36).height(36).padding(0).fontColor(INK).backgroundColor('#FFFFFF').fontSize(22)
-            .onClick(() => { this.map.changeZoom(0.5); this.mapRevision++; })
-          Button('−').id('zoomOut').width(36).height(36).padding(0).fontColor(INK).backgroundColor('#FFFFFF').fontSize(22)
-            .onClick(() => { this.map.changeZoom(-0.5); this.mapRevision++; })
-          Button('◎').id('recenterMap').width(36).height(36).padding(0).fontColor(INK).backgroundColor('#FFFFFF').fontSize(20)
-            .onClick(() => { this.map.recenter(); this.mapRevision++; })
-        }.margin(12)
-      }.height(290).width('100%').borderRadius(22).clip(true)
-      Text(this.map.attribution).fontSize(8).fontColor(MUTED).width('100%')
-      Text('Blue dot: demo origin at Rynek · tap a map point').fontSize(10).fontColor(MUTED).width('100%')
-      Column({ space: 8 }) {
-        Row() {
-          Text('SELECTED POINT').fontSize(10).fontWeight(FontWeight.Bold).fontColor(MUTED)
-          Blank()
-          Text(this.map.selected().distanceLabel).fontSize(12).fontWeight(FontWeight.Bold).fontColor(INK)
-        }.width('100%')
-        Text(this.map.selected().address).fontSize(20).fontWeight(FontWeight.Bold).fontColor(INK)
-        Text('Miejsce ochronne · ' + this.map.selected().availability).fontSize(12).fontColor(MUTED)
-        Text('PSP protective location. Access is not confirmed live. This is not a certified bomb-shelter guarantee.').fontSize(11).lineHeight(16).fontColor(MUTED)
-        this.primaryButton((): string => this.map.savedId === this.map.selectedId ? '✓  Saved on this phone' : 'Save this point', 'savePoint', () => { this.savePoint(); })
-      }.alignItems(HorizontalAlign.Start).padding(18).width('100%').backgroundColor('#FFFFFF').borderRadius(20)
-      Text('NEAR THE DEMO ORIGIN').fontSize(10).letterSpacing(1.3).fontWeight(FontWeight.Bold).fontColor(MUTED).width('100%')
-      ForEach(this.map.points.slice(0, 8), (point: SafePointViewModel) => {
-        Row({ space: 11 }) {
-          Text('+').fontSize(20).fontColor(INK).backgroundColor('#E3EDDA').width(34).height(36)
-            .textAlign(TextAlign.Center).borderRadius(10)
-          Column({ space: 4 }) {
-            Text(point.address).fontSize(13).fontWeight(FontWeight.Bold).fontColor(INK)
-            Text(point.availability).fontSize(10).fontColor(MUTED)
-          }.layoutWeight(1).alignItems(HorizontalAlign.Start)
-          Text(point.distanceLabel).fontSize(12).fontWeight(FontWeight.Bold).fontColor(INK)
-        }.width('100%').padding(12).backgroundColor('#FFFFFF').borderRadius(13)
-          .onClick(() => { this.selectPoint(point.id); })
+  private mapControls() {
+    Row({ space: 8 }) {
+      Button('+').id('zoomIn').constraintSize({ minWidth: 48, minHeight: 48 }).fontSize(24).padding(8)
+        .fontColor(INK).backgroundColor(SURFACE).accessibilityText(this.t('zoom_in'))
+        .onClick(() => { this.map.changeZoom(0.5); this.mapRevision++; })
+      Button('−').id('zoomOut').constraintSize({ minWidth: 48, minHeight: 48 }).fontSize(24).padding(8)
+        .fontColor(INK).backgroundColor(SURFACE).accessibilityText(this.t('zoom_out'))
+        .onClick(() => { this.map.changeZoom(-0.5); this.mapRevision++; })
+      Button({ type: ButtonType.Normal }) {
+        Text(this.t('recenter')).fontSize(14).fontColor(INK).textAlign(TextAlign.Center)
+      }.id('recenterMap').constraintSize({ minHeight: 48 }).layoutWeight(1).padding(12)
+        .backgroundColor(SURFACE).borderRadius(16).accessibilityText(this.t('recenter'))
+        .onClick(() => { this.map.recenter(); this.mapRevision++; })
+    }.width('100%')
+  }
+
+  @Builder
+  private selectedPoint() {
+    Column({ space: 10 }) {
+      Text(this.t('selected_point')).fontSize(14).fontWeight(FontWeight.Bold).fontColor(MUTED)
+      Text(this.map.selected().address).fontSize(23).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
+      Text(this.t('point_type') + ' · ' + this.availability(this.map.selected().availability))
+        .fontSize(16).fontColor(INK).width('100%')
+      Text(this.map.selected().distanceLabel).fontSize(16).fontWeight(FontWeight.Bold).fontColor(INK)
+      Text(this.t('access_notice')).fontSize(14).fontColor(MUTED).width('100%')
+      this.action(() => this.t(this.map.saveBusy ? 'saving' :
+        this.map.savedId === this.map.selectedId ? 'saved_point' : 'save_point'), 'savePoint', () => { this.savePoint(); }, () => !this.map.saveBusy)
+      if (this.map.saveError.length > 0) {
+        Text(this.t(this.map.saveError === 'load_failed' ? 'saved_load_failed' : 'save_failed'))
+          .fontSize(14).fontColor($r('app.color.danger')).width('100%')
+      }
+    }.alignItems(HorizontalAlign.Start).padding(20).width('100%').backgroundColor(SURFACE).borderRadius(24)
+  }
+
+  @Builder
+  private mapView() {
+    Column({ space: 18 }) {
+      this.heading(() => this.t('find_point'), () => this.t('central_krakow'))
+      Text(this.t('map_description')).fontSize(14).fontColor(MUTED).width('100%')
+      Text(this.t(this.map.originIsDevice ? 'device_origin' : 'demo_origin')).fontSize(14).fontColor(MUTED).width('100%')
+      OfflineMap({ vm: this.map, revision: this.mapRevision + this.themeRevision, dark: this.dark, description: this.t('map_description'),
+        onSelect: (id: string) => { this.selectPoint(id); } })
+        .height(this.viewportHeight < 480 ? 200 : 280).width('100%').borderRadius(20).clip(true)
+      this.mapControls()
+      Text(this.map.attribution).fontSize(12).fontColor(MUTED).width('100%')
+      this.action(() => this.t(this.map.locationBusy ? 'locating' : 'use_location'), 'useLocation', () => { this.useLocation(); }, () => !this.map.locationBusy, false)
+      if (this.map.locationStatus !== 'demo') {
+        Text(this.locationMessage()).fontSize(14).fontColor(MUTED).width('100%')
+      }
+      if (this.map.originIsDevice) {
+        Text(this.t('accuracy') + ': ' + Math.round(this.map.locationAccuracy) + ' m').fontSize(14).fontColor(MUTED)
+        this.action(() => this.t('reset_origin'), 'resetOrigin', () => { this.map.resetOrigin(); this.mapRevision++; }, () => true, false)
+      }
+      this.selectedPoint()
+      if (this.map.savedId.length > 0 && this.map.savedId !== this.map.selectedId) {
+        this.action(() => this.t('open_saved'), 'openSavedPoint', () => {
+          if (this.map.openSaved()) { this.mapRevision++; }
+        }, () => true, false)
+      }
+      Text(this.t('distance_notice')).fontSize(14).fontColor(MUTED).width('100%')
+      Text(this.t('all_points')).fontSize(23).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
+      TextInput({ placeholder: this.t('search_points'), text: this.query }).id('searchPoints')
+        .fontSize(16).constraintSize({ minHeight: 52 }).backgroundColor(SURFACE).fontColor(INK)
+        .placeholderColor(MUTED).accessibilityText(this.t('search_points'))
+        .onChange((value: string) => { this.query = value; })
+      Text(this.t('results') + ': ' + this.filteredPoints().length + ' / ' + this.map.points.length)
+        .fontSize(14).fontColor(MUTED).width('100%')
+      ForEach(this.filteredPoints(), (point: SafePointViewModel) => {
+        Button({ type: ButtonType.Normal }) {
+          Column({ space: 6 }) {
+            Text(point.address).fontSize(16).fontWeight(FontWeight.Medium).fontColor(INK).width('100%')
+            Text(this.availability(point.availability) + ' · ' + point.distanceLabel).fontSize(14).fontColor(MUTED).width('100%')
+          }.width('100%').alignItems(HorizontalAlign.Start)
+        }.id('point_' + point.id).width('100%').constraintSize({ minHeight: 64 }).padding(16)
+          .backgroundColor(point.id === this.map.selectedId ? SOFT : SURFACE).borderRadius(16)
+          .accessibilityText(point.address + ', ' + this.availability(point.availability) + ', ' + point.distanceLabel)
+          .accessibilitySelected(point.id === this.map.selectedId)
+          .onClick(() => { this.selectPoint(point.id); this.pageScroll.scrollTo({ xOffset: 0, yOffset: 0 }); })
       }, (point: SafePointViewModel) => point.id)
-      Text('Distances are straight-line from the demo origin, not walking routes. This is a limited extract, not a complete list.').fontSize(10).lineHeight(15).fontColor(MUTED)
-      Text(this.map.attribution + '\nDataset publication: ' + this.map.sourceDate + ' · ' + this.map.packSize + ' bundled').fontSize(9).lineHeight(14).fontColor(MUTED)
-    }.padding(22).width('100%')
+      if (this.filteredPoints().length === 0) {
+        Text(this.t('no_results')).fontSize(16).fontColor(INK).width('100%')
+      }
+      Text(this.t('pack_date') + ': ' + this.map.sourceDate + ' · ' + this.map.packSize)
+        .fontSize(13).fontColor(MUTED).width('100%')
+    }.width('100%')
   }
 
   @Builder
-  nodeBadge(letter: string, label: string, level: number) {
-    Column({ space: 7 }) {
-      Text(letter).fontSize(23).fontWeight(FontWeight.Bold).fontColor(this.relay.stage >= level ? INK : '#93A394')
-        .width(57).height(57).textAlign(TextAlign.Center).borderRadius(29)
-        .backgroundColor(this.relay.stage >= level ? LIME : '#EEF2E9')
-      Text(label).fontSize(10).fontWeight(FontWeight.Medium).fontColor(INK)
+  private nodeBadge(letter: string, label: () => string, level: number) {
+    Column({ space: 8 }) {
+      Text(letter).fontSize(26).fontWeight(FontWeight.Bold).fontColor(INK)
+      Text(label()).fontSize(14).fontColor(INK).textAlign(TextAlign.Center).width('100%')
+    }.layoutWeight(1).padding(12).constraintSize({ minHeight: 84 })
+      .backgroundColor(this.relay.stage >= level ? SOFT : SURFACE).borderRadius(16)
+      .accessibilityGroup(true)
+  }
+
+  @Builder
+  private relayView() {
+    Column({ space: 18 }) {
+      this.heading(() => this.t('relay_title'), () => this.t('relay_intro'))
+      Column({ space: 16 }) {
+        Text(this.t('simulation')).fontSize(20).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
+        Text(this.t('no_radio')).fontSize(14).fontColor(MUTED).width('100%')
+        Row({ space: 8 }) {
+          this.nodeBadge('A', () => this.t('node_a'), 1)
+          this.nodeBadge('B', () => this.t('node_b'), 2)
+          this.nodeBadge('C', () => this.t('node_c'), 3)
+        }.width('100%')
+        this.action(() => this.t(this.relay.running ? 'drill_running' : 'run_drill'), 'runRelay', () => { this.relay.simulate(); }, () => !this.relay.running)
+        Text(this.t('diagnostics')).fontSize(14).fontWeight(FontWeight.Bold).fontColor(MUTED)
+        Text(this.relay.testStatus).id('relayTestStatus').fontSize(16).fontColor(INK).width('100%')
+      }.alignItems(HorizontalAlign.Start).padding(20).width('100%').backgroundColor(SOFT).borderRadius(24)
+      ForEach(this.relay.events, (event: RelayEvent) => {
+        Column({ space: 8 }) {
+          Text((event.good ? '✓ ' : '! ') + event.title).fontSize(16).fontWeight(FontWeight.Medium).fontColor(INK).width('100%')
+          Text(event.detail).fontSize(14).fontColor(MUTED).width('100%')
+        }.padding(16).width('100%').backgroundColor(SURFACE).borderRadius(16).accessibilityGroup(true)
+      }, (event: RelayEvent) => event.id)
+      Column({ space: 14 }) {
+        Text('NearLink').fontSize(24).fontWeight(FontWeight.Bold).fontColor(INK)
+        Text(this.relay.peerCount + ' ' + this.t('connected')).fontSize(14).fontColor(MUTED)
+        Text(this.t('hardware_' + this.relay.hardwareState)).fontSize(16).fontColor(INK).width('100%').id('nearlinkStatus')
+        if (this.relay.hardwareState === 'error' || this.relay.hardwareState === 'queue_error' ||
+          this.relay.hardwareState === 'restore_failed' || this.relay.hardwareState === 'cleanup_failed') {
+          Text(this.t('diagnostics') + ': ' + this.relay.hardwareStatus).fontSize(13).fontColor(MUTED).width('100%')
+        }
+        Text(this.t('nearlink_notice')).fontSize(14).fontColor(MUTED).width('100%')
+        Text(this.t('queue_metrics')).fontSize(16).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
+        Text(this.t('queue_pending') + ': ' + this.relay.pendingCount + '\n' +
+          this.t('queue_acked') + ': ' + this.relay.acknowledgedCount + '\n' +
+          this.t('queue_retry') + ': ' + this.relay.retryCount + '\n' +
+          this.t('queue_failed') + ': ' + this.relay.failedCount).fontSize(14).fontColor(INK).width('100%')
+        Text(this.t('queue_note')).fontSize(13).fontColor(MUTED).width('100%')
+        this.action(() => this.t('check_hardware'), 'checkNearLink', () => { this.relay.probe(); }, () => true, false)
+        if (this.relay.hardwareSupported) {
+          TextInput({ placeholder: this.t('peer_name'), text: this.relay.peerName }).id('peerName')
+            .fontSize(16).constraintSize({ minHeight: 52 }).backgroundColor(SOFT).fontColor(INK).placeholderColor(MUTED)
+            .accessibilityText(this.t('peer_name')).onChange((value: string) => { this.relay.peerName = value; })
+          this.action(() => this.t('start_relay'), 'startHardware', () => { this.relay.startHardware(); })
+          ForEach(this.relay.peers, (peer: PeerViewModel) => {
+            this.action(() => peer.name + ' · ' + this.t(peer.connected ? 'connected_short' : 'connect'), 'peer_' + peer.address, () => { this.relay.connect(peer.address); }, () => !peer.connected, false)
+          }, (peer: PeerViewModel) => peer.address)
+          this.action(() => this.t('share_alert'), 'shareAlert', () => { this.relay.share(); }, () => this.alerts.received)
+          this.action(() => this.t('stop_relay'), 'stopRelay', () => { this.relay.stop(); }, () => true, false)
+        }
+      }.padding(20).width('100%').alignItems(HorizontalAlign.Start).backgroundColor(SURFACE).borderRadius(24)
+      Text(this.t('technical_note')).fontSize(13).fontColor(MUTED).width('100%')
+    }.width('100%')
+  }
+
+  @Builder
+  private guideItem(number: string, title: () => string, detail: () => string) {
+    Column({ space: 10 }) {
+      Text(number + ' · ' + title()).fontSize(19).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
+      Text(detail()).fontSize(16).fontColor(INK).width('100%')
+    }.width('100%').alignItems(HorizontalAlign.Start).padding(20).backgroundColor(SURFACE).borderRadius(20)
+  }
+
+  @Builder
+  private sourceLink(url: string, label: () => string) {
+    Hyperlink(url, label()).color(INK).width('100%')
+      .constraintSize({ minHeight: 48 }).padding({ top: 12, bottom: 12 })
+  }
+
+  @Builder
+  private guideView() {
+    Column({ space: 20 }) {
+      this.heading(() => this.t('guide_title'), () => this.t('guide_intro'))
+      this.guideItem('01', () => this.t('guide1_title'), () => this.t('guide1_body'))
+      this.guideItem('02', () => this.t('guide2_title'), () => this.t('guide2_body'))
+      this.guideItem('03', () => this.t('guide3_title'), () => this.t('guide3_body'))
+      this.guideItem('04', () => this.t('guide4_title'), () => this.t('guide4_body'))
+      Column({ space: 12 }) {
+        Text(this.t('trust_title')).fontSize(23).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
+        Text(this.t('trust_body')).fontSize(16).fontColor(INK).width('100%')
+        Text(this.t('trust_limits')).fontSize(14).fontColor(MUTED).width('100%')
+      }.padding(20).width('100%').alignItems(HorizontalAlign.Start).backgroundColor(SOFT).borderRadius(24)
+      Text(this.t('sources')).fontSize(23).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
+      this.sourceLink('https://www.openstreetmap.org/copyright', () => 'OpenStreetMap contributors · ODbL')
+      this.sourceLink('https://dane.gov.pl/pl/dataset/28058,punkty-schronienia-w-polsce', () => this.t('source_psp'))
+      this.sourceLink('https://creativecommons.org/licenses/by/4.0/', () => 'CC BY 4.0')
+      this.sourceLink('https://www.gov.pl/web/poradnikbezpieczenstwa', () => this.t('source_safety'))
+      Text(this.t('external_links')).fontSize(14).fontColor(MUTED).width('100%')
+    }.width('100%')
+  }
+
+  @Builder
+  private settingsChoice(label: () => string, id: string, selected: () => boolean, action: () => void) {
+    Button({ type: ButtonType.Normal }) {
+      Text((selected() ? '✓  ' : '') + label()).fontSize(16).fontWeight(FontWeight.Medium)
+        .fontColor(INK).width('100%')
+    }.id(id).width('100%').constraintSize({ minHeight: 52 }).padding(16)
+      .backgroundColor(selected() ? SOFT : SURFACE).borderRadius(16)
+      .accessibilityText(label()).accessibilitySelected(selected())
+      .enabled(!this.settingsBusy).onClick(action)
+  }
+
+  @Builder
+  private settingsView() {
+    Column({ space: 18 }) {
+      Text(this.t('settings_intro')).fontSize(16).fontColor(MUTED).width('100%')
+      Text(this.t('theme_label')).fontSize(23).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
+      this.settingsChoice(() => this.t('theme_auto'), 'themeSystem', () => this.themePreference === 'system',
+        () => { this.chooseTheme('system'); })
+      this.settingsChoice(() => this.t('theme_light'), 'themeLight', () => this.themePreference === 'light',
+        () => { this.chooseTheme('light'); })
+      this.settingsChoice(() => this.t('theme_dark'), 'themeDark', () => this.themePreference === 'dark',
+        () => { this.chooseTheme('dark'); })
+      Text(this.t('theme_auto_hint')).fontSize(14).fontColor(MUTED).width('100%')
+      Text(this.t('language_label')).fontSize(23).fontWeight(FontWeight.Bold).fontColor(INK).width('100%')
+      this.settingsChoice(() => 'Polski', 'languagePl', () => this.language === 'pl', () => { this.chooseLanguage('pl'); })
+      this.settingsChoice(() => 'English', 'languageEn', () => this.language === 'en', () => { this.chooseLanguage('en'); })
+      Text(this.t('text_size_hint')).fontSize(14).fontColor(MUTED).width('100%')
+    }.width('100%')
+  }
+
+  @Builder
+  private navItem(index: number, label: () => string, icon: Resource) {
+    Button({ type: ButtonType.Normal }) {
+      Column({ space: 4 }) {
+        SymbolGlyph(icon).fontSize(24).maxFontScale(1).fontColor([INK])
+          .fontWeight(this.tab === index ? FontWeight.Bold : FontWeight.Normal).accessibilityLevel('no')
+        Text(label()).fontSize(this.fontScale >= 1.6 ? 13 : 12).fontWeight(this.tab === index ? FontWeight.Bold : FontWeight.Medium)
+          .fontColor(INK).textAlign(TextAlign.Center).width('100%')
+      }.width('100%')
+    }.layoutWeight(1).constraintSize({ minHeight: 48 }).padding({ left: 2, right: 2, top: 8, bottom: 8 })
+      .borderRadius(16).backgroundColor(this.tab === index ? SOFT : SURFACE)
+      .id('tab' + index).accessibilityText(label()).accessibilitySelected(this.tab === index)
+      .onClick(() => { this.selectTab(index); })
+  }
+
+  @Builder
+  private navigation() {
+    if (this.fontScale >= 1.6 || this.viewportWidth < 340) {
+      Column({ space: 4 }) {
+        Row({ space: 4 }) {
+          this.navItem(0, () => this.t('home'), $r('sys.symbol.house'))
+          this.navItem(1, () => this.t('map'), $r('sys.symbol.map'))
+        }.width('100%')
+        Row({ space: 4 }) {
+          this.navItem(2, () => this.t('relay'), $r('sys.symbol.phone_transmission_phone'))
+          this.navItem(3, () => this.t('guide'), $r('sys.symbol.book'))
+        }.width('100%')
+      }.padding(8).width('100%').backgroundColor(SURFACE)
+    } else {
+      Row({ space: 4 }) {
+        this.navItem(0, () => this.t('home'), $r('sys.symbol.house'))
+        this.navItem(1, () => this.t('map'), $r('sys.symbol.map'))
+        this.navItem(2, () => this.t('relay'), $r('sys.symbol.phone_transmission_phone'))
+        this.navItem(3, () => this.t('guide'), $r('sys.symbol.book'))
+      }.width('100%').padding(8).backgroundColor(SURFACE)
     }
   }
-  @Builder
-  relayView() {
-    Column({ space: 17 }) {
-      this.sectionTitle('A MESSAGE WORTH PASSING ON', 'A network of people')
-      Text('Keep the signature. Pass the message.').fontSize(13).fontColor(MUTED).width('100%')
-      Column({ space: 20 }) {
-        Row() {
-          Text('3-PHONE SIMULATION').fontSize(10).fontWeight(FontWeight.Bold).fontColor(INK).letterSpacing(1)
-          Blank()
-          Text('NO RADIO USED').fontSize(9).fontColor(MUTED)
-        }.width('100%')
-        Row() {
-          this.nodeBadge('A', 'First receiver', 1)
-          Text('···').fontSize(28).fontColor('#AAC388').layoutWeight(1).textAlign(TextAlign.Center)
-          this.nodeBadge('B', 'Relay phone', 2)
-          Text('···').fontSize(28).fontColor('#AAC388').layoutWeight(1).textAlign(TextAlign.Center)
-          this.nodeBadge('C', 'Next neighbour', 3)
-        }.width('100%')
-        Text(this.relay.testStatus).fontSize(12).lineHeight(17).fontColor(INK).textAlign(TextAlign.Center)
-        this.primaryButton((): string => this.relay.running ? 'Verifying and relaying…' : 'Run the signed relay drill →', 'runRelay', () => { this.relay.simulate(); })
-      }.padding(18).backgroundColor('#E4ECD9').borderRadius(22)
-      if (this.relay.events.length > 0) {
-        ForEach(this.relay.events, (event: RelayEvent) => {
-          Row({ space: 10 }) {
-            Text(event.good ? '✓' : '!').fontSize(16).fontWeight(FontWeight.Bold)
-              .fontColor(event.good ? '#316643' : '#A94A37').width(24)
-            Column({ space: 3 }) {
-              Text(event.title).fontSize(13).fontWeight(FontWeight.Bold).fontColor(INK)
-              Text(event.detail).fontSize(10).lineHeight(15).fontColor(MUTED)
-            }.layoutWeight(1).alignItems(HorizontalAlign.Start)
-          }.padding(10).width('100%').backgroundColor('#FFFFFF').borderRadius(12)
-        }, (event: RelayEvent) => event.id)
-      }
-      Column({ space: 11 }) {
-        Row() {
-          Text('NearLink').fontSize(19).fontWeight(FontWeight.Bold).fontColor(INK)
-          Blank()
-          Text(this.relay.peerCount + ' connected').fontSize(10).fontColor(MUTED)
-        }.width('100%')
-        Text(this.relay.hardwareStatus).fontSize(12).lineHeight(18).fontColor(MUTED).id('nearlinkStatus')
-        Button('Check hardware').id('checkNearLink').width('100%').height(40).fontSize(12)
-          .backgroundColor('#E7EEDD').fontColor(INK).onClick(() => { this.relay.probe(); })
-        if (this.relay.hardwareSupported) {
-          TextInput({ placeholder: 'Exact name of the nearby phone', text: this.relay.peerName })
-            .fontSize(12).onChange((value: string) => { this.relay.peerName = value; })
-          this.primaryButton((): string => 'Start relay & discover', 'startHardware', () => { this.relay.startHardware(); })
-          ForEach(this.relay.peers, (peer: PeerViewModel) => {
-            Button(peer.name + (peer.connected ? ' · connected' : ' · connect')).fontSize(11)
-              .onClick(() => { this.relay.connect(peer.address); })
-          }, (peer: PeerViewModel) => peer.address)
-          Button('Share verified alert').fontSize(12).onClick(() => { this.relay.share(); })
-          Button('Stop radio relay').fontSize(12).onClick(() => { this.relay.stop(); })
-        }
-        Text('The native NearLink adapter is included. Two compatible physical phones are needed to test radio delivery. Keep the app in the foreground.').fontSize(10).lineHeight(15).fontColor(MUTED)
-      }.padding(18).width('100%').alignItems(HorizontalAlign.Start).backgroundColor('#FFFFFF').borderRadius(20)
-    }.padding(22).width('100%')
-  }
 
-  @Builder
-  guideItem(number: string, title: string, detail: string) {
-    Row({ space: 13 }) {
-      Text(number).fontSize(14).fontWeight(FontWeight.Bold).fontColor(INK).width(34).height(34)
-        .textAlign(TextAlign.Center).backgroundColor(LIME).borderRadius(11)
-      Column({ space: 6 }) {
-        Text(title).fontSize(16).fontWeight(FontWeight.Bold).fontColor(INK)
-        Text(detail).fontSize(12).lineHeight(18).fontColor(MUTED)
-      }.layoutWeight(1).alignItems(HorizontalAlign.Start)
-    }.width('100%').alignItems(VerticalAlign.Top).padding(17).backgroundColor('#FFFFFF').borderRadius(18)
-  }
-  @Builder
-  guideView() {
-    Column({ space: 17 }) {
-      this.sectionTitle('PREPARE BEFORE YOU NEED IT', 'A plan, not a panic')
-      Text('A short offline reminder based on Poland’s public safety guide. Follow current instructions from the authorities.').fontSize(13).lineHeight(19).fontColor(MUTED)
-      this.guideItem('01', 'Know your nearby options', 'Explore protective points before an emergency. Check the actual entrance and access conditions. A map marker cannot confirm that a place is open or safe to reach.')
-      this.guideItem('02', 'Keep essentials ready', 'Prepare your evacuation bag and a household plan in advance. Include what you personally need, and keep your phone and power bank charged.')
-      this.guideItem('03', 'Follow verified instructions', 'Read official alerts carefully. If evacuation is ordered, follow the designated directions. Check whether neighbours know about the alert and let loved ones know your plan.')
-      this.guideItem('04', 'Help information travel', 'With compatible phones, keep SafeMesh open to relay signed messages. Relaying cannot overcome jamming, a lack of nearby devices, or a compromised signing authority.')
-      Column({ space: 9 }) {
-        Text('What “verified” means here').fontSize(17).fontWeight(FontWeight.Bold).fontColor(INK)
-        Text('This prototype verifies a pinned exercise key using ECDSA P-256. It is not connected to RCB. A real service needs an authorised issuer, secure key custody, rotation and revocation. Forwarders cannot edit signed content without detection.').fontSize(12).lineHeight(19).fontColor(MUTED)
-        Text('Expired and repeated packets are suppressed. Hop counts limit honest relays; malicious peers may reset them. Device clock accuracy matters.').fontSize(11).lineHeight(17).fontColor(MUTED)
-      }.padding(18).backgroundColor('#E4ECD9').borderRadius(20)
-      Text('Sources stored with the project:\ngov.pl/web/poradnikbezpieczenstwa\ngov.pl/web/poradnikbezpieczenstwa/ewakuacja\nPSP “Gdzie się ukryć” · dane.gov.pl\nMap: © OpenStreetMap contributors, ODbL').fontSize(10).lineHeight(17).fontColor(MUTED)
-      Column({ space: 12 }) {
-        Text('SOURCE & LICENCE LINKS').fontSize(10).fontWeight(FontWeight.Bold).fontColor(MUTED)
-        Hyperlink('https://www.openstreetmap.org/copyright', 'OpenStreetMap contributors · ODbL').color(INK)
-        Hyperlink('https://dane.gov.pl/pl/dataset/28058,punkty-schronienia-w-polsce', 'KG PSP · protective-point dataset').color(INK)
-        Hyperlink('https://creativecommons.org/licenses/by/4.0/', 'PSP data licence · CC BY 4.0').color(INK)
-        Hyperlink('https://www.gov.pl/web/poradnikbezpieczenstwa', 'Poland’s public safety guide').color(INK)
-        Text('External links open in your browser and need connectivity. The bundled map and guide remain offline.').fontSize(10).lineHeight(15).fontColor(MUTED)
-      }.width('100%').alignItems(HorizontalAlign.Start)
-    }.padding(22).width('100%')
-  }
-
-  @Builder
-  navItem(index: number, icon: string, label: string) {
-    Column({ space: 4 }) {
-      Text(icon).fontSize(21).height(26).fontWeight(FontWeight.Bold).fontColor(this.tab === index ? INK : '#8D9A8F')
-      Text(label).fontSize(10).height(14).fontWeight(this.tab === index ? FontWeight.Bold : FontWeight.Normal)
-        .fontColor(this.tab === index ? INK : '#8D9A8F')
-    }.layoutWeight(1).height(55).justifyContent(FlexAlign.Center).borderRadius(13)
-      .backgroundColor(this.tab === index ? '#E4ECD9' : '#FFFFFF')
-      .id('tab' + index).onClick(() => { this.selectTab(index); })
-  }
   build() {
     Column() {
       this.header()
-      this.drillBanner()
-      if (this.notice.length > 0) {
-        Text(this.notice).fontSize(11).fontColor(INK).padding(9).backgroundColor(LIME).width('100%')
-          .onClick(() => { this.notice = ''; })
-      }
       Scroll(this.pageScroll) {
-        Column() {
+        Column({ space: 16 }) {
+          this.drillBanner()
+          if (this.notice.length > 0) {
+            Column({ space: 8 }) {
+              Text(this.notice).fontSize(16).fontColor(INK).width('100%')
+              this.action(() => this.t('dismiss'), 'dismissNotice', () => { this.notice = ''; }, () => true, false)
+            }.padding(16).width('100%').backgroundColor(SOFT).borderRadius(16)
+          }
           if (this.tab === 0) { this.homeView() }
           else if (this.tab === 1) { this.mapView() }
           else if (this.tab === 2) { this.relayView() }
-          else { this.guideView() }
-        }.width('100%')
-      }.layoutWeight(1).width('100%').scrollBar(BarState.Off)
-      Row({ space: 5 }) {
-        this.navItem(0, '⌂', 'Home')
-        this.navItem(1, '⌖', 'Map')
-        this.navItem(2, '⋯', 'Relay')
-        this.navItem(3, '≡', 'Guide')
-      }.width('100%').padding({ left: 14, right: 14, top: 8, bottom: 8 }).backgroundColor('#FFFFFF')
+          else if (this.tab === 3) { this.guideView() }
+          else { this.settingsView() }
+        }.padding(this.viewportWidth < 340 ? 12 : 20).width('100%').constraintSize({ maxWidth: 720 })
+      }.layoutWeight(1).width('100%').scrollBar(BarState.Auto).align(Alignment.Top)
+      if (this.tab !== 4) { this.navigation() }
     }.width('100%').height('100%').backgroundColor(PAPER)
+      .onAreaChange((_old: Area, area: Area) => {
+        this.viewportWidth = Number(area.width);
+        this.viewportHeight = Number(area.height);
+      })
   }
 }

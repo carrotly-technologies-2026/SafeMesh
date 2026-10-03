@@ -2,7 +2,99 @@
   "color": [
     {
       "name": "start_window_background",
-      "value": "#000000"
+      "value": "#101C18"
+    },
+    {
+      "name": "ink",
+      "value": "#E4F2E9"
+    },
+    {
+      "name": "muted",
+      "value": "#B9CCC0"
+    },
+    {
+      "name": "paper",
+      "value": "#101C18"
+    },
+    {
+      "name": "surface",
+      "value": "#1D2B24"
+    },
+    {
+      "name": "soft",
+      "value": "#293D2E"
+    },
+    {
+      "name": "accent",
+      "value": "#D8F58A"
+    },
+    {
+      "name": "action_bg",
+      "value": "#D8F58A"
+    },
+    {
+      "name": "action_fg",
+      "value": "#163325"
+    },
+    {
+      "name": "warning_bg",
+      "value": "#3C3122"
+    },
+    {
+      "name": "warning_fg",
+      "value": "#F2D4A0"
+    },
+    {
+      "name": "border",
+      "value": "#536A5B"
+    },
+    {
+      "name": "success",
+      "value": "#A4E5B6"
+    },
+    {
+      "name": "danger",
+      "value": "#FFBAA9"
+    },
+    {
+      "name": "map_outside",
+      "value": "#17221C"
+    },
+    {
+      "name": "map_land",
+      "value": "#24352A"
+    },
+    {
+      "name": "map_park",
+      "value": "#3F593E"
+    },
+    {
+      "name": "map_water",
+      "value": "#36585F"
+    },
+    {
+      "name": "map_road",
+      "value": "#708371"
+    },
+    {
+      "name": "map_label",
+      "value": "#D2E2D4"
+    },
+    {
+      "name": "map_point",
+      "value": "#DDECD8"
+    },
+    {
+      "name": "map_selected",
+      "value": "#D8F58A"
+    },
+    {
+      "name": "map_plus",
+      "value": "#163325"
+    },
+    {
+      "name": "map_origin",
+      "value": "#93B7FF"
     }
   ]
 }
