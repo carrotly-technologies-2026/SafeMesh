@@ -1,0 +1,15 @@
+{
+  "capture": "Win32 PrintWindow, three Emulator.exe client areas, one loop per frame",
+  "audio": false,
+  "startedEpoch": 1791068927.145,
+  "frames": 1710,
+  "fps": 12,
+  "crop": "8,20,478,1030",
+  "pids": [
+    17032,
+    2820,
+    16500
+  ],
+  "elapsedSeconds": 142.46,
+  "lateFrames": 0
+}

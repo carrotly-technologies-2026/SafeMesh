@@ -1,0 +1,47 @@
+[
+  {
+    "start": 6.0,
+    "end": 12.0,
+    "caption": "Three separate SafeMesh apps run on three HarmonyOS (API 24) emulators. A local test link stands in for the NearLink radio: A and B are in range, C is out of range."
+  },
+  {
+    "start": 12.0,
+    "end": 21.81,
+    "caption": "Each phone joins the relay in its role. Recipients have no Send button: verified alerts are stored and relayed automatically."
+  },
+  {
+    "start": 21.81,
+    "end": 39.0,
+    "caption": "A is an authenticated exercise issuer. A separate signing service holds the private key; the phone only receives the signed alert and verifies it before saving."
+  },
+  {
+    "start": 39.0,
+    "end": 50.33,
+    "caption": "A publishes an English exercise alert: ECDSA P-256 signature, critical priority, valid for one hour."
+  },
+  {
+    "start": 50.33,
+    "end": 63.75,
+    "caption": "B verifies the signature on the device, saves the alert, returns an app-level ACK and shows a banner. C is out of range and has nothing yet."
+  },
+  {
+    "start": 63.75,
+    "end": 78.29,
+    "caption": "A leaves the area and B meets C, with no internet and no cellular network. C receives the alert from B at hop 2, although A and C were never connected."
+  },
+  {
+    "start": 78.29,
+    "end": 96.53,
+    "caption": "A forged copy is injected (text changed after signing). C rejects it: no ACK, not stored, not forwarded."
+  },
+  {
+    "start": 96.53,
+    "end": 117.43,
+    "caption": "Offline map: 40 State Fire Service (PSP) protective points in central Kraków ship inside the app. Address search works without Polish diacritics."
+  },
+  {
+    "start": 117.43,
+    "end": 124.46,
+    "caption": "The NearLink adapter (NearLink Kit) is built in. Emulators have no radio and report that; a physical phone-to-phone NearLink test is next."
+  }
+]
