@@ -69,7 +69,7 @@ Common signing errors:
 > - After the session, restore it with `git checkout -- build-profile.json5`. If you need it again later, keep it with `git stash push build-profile.json5 -m "local phone signing"`.
 > - The emulator helpers `scripts/run-demo.ps1` and `scripts/start-authority-demo.ps1` install the **unsigned** HAP, so they are for emulators only.
 
-**Wrong branch warning.** The `testing` branch (PR #1) holds an **OpenHarmony public-debug-key** signing setup for Oniro/OpenHarmony (`runtimeOS: "OpenHarmony"`, `signatures/OpenHarmony.p12`). It replaces `NearLinkTransport.ets` with a stub that is always unavailable and drops `ACCESS_NEARLINK`. **Do not use it for these tests.**
+**Product warning.** Build and install the **`default`** product (HarmonyOS), which DevEco uses unless told otherwise. The `oniro` product (OpenHarmony / Oniro, see COMMANDS.md) replaces the NearLink adapter with a stub and drops `ACCESS_NEARLINK`. Never run `oniro-app sign .` in this checkout: it would add the OpenHarmony key to the HarmonyOS product. *Historical note:* the `testing` branch (PR #1) holds an **OpenHarmony public-debug-key** signing setup for Oniro/OpenHarmony (`runtimeOS: "OpenHarmony"`, `signatures/OpenHarmony.p12`). It replaces `NearLinkTransport.ets` with a stub that is always unavailable and drops `ACCESS_NEARLINK`. **Do not use it for these tests.**
 
 ## 4. Build, install and launch on each phone
 
@@ -113,7 +113,7 @@ foreach ($s in $A, $B, $C) {
 | 2 | **Exact NearLink name** noted | Read it on the NearLink settings page. The app scans **only by exact device name** (1–30 chars) because API 24 `ScanFilters` cannot filter by service UUID. Huawei's FAQ reports advertised names being cut to 9 bytes, so use **short ASCII names of 9 characters or fewer** (e.g. `SM-A`, `SM-B`, `SM-C`). Rename with the owner's consent under Settings > About phone > Device name (设置 > 关于本机 > 设备名称); verify on site that the NearLink page shows the new name. |
 | 3 | Clock correct | Turn automatic date and time on. The fixture is valid **2026-10-03 19:57:54 UTC → 2026-10-06 19:57:54 UTC**. Alerts dated more than **5 minutes** in the future are rejected as `future`. |
 | 4 | Screen stays on, app in foreground | The relay stops whenever the page is hidden (screen lock, home, app switch). Turn auto-lock off or enable the developer option *Stay awake* (verify on site), or run `& $hdc -t $s shell power-shell setmode 602` and `& $hdc -t $s shell power-shell timeout -o 7200000` (both confirmed on the API 24 emulator on 2026-10-04; verify on a phone). Turn on Do Not Disturb. |
-| 5 | App language | Tap the gear → **App language / Język aplikacji** → *Polski* or *English*. Use the same on all phones so the video is consistent. With no saved choice, v1.4.1 starts in Polish on a Polish system and in English on any other locale. |
+| 5 | App language | Tap the gear → **App language / Język aplikacji** → *System*, *Polski* or *English*. *System* (the default) follows the phone: Polish on a Polish phone, English otherwise. Use the same on all phones so the video is consistent. |
 | 6 | Permissions | The NearLink prompt appears at the first **Start NearLink**; choose **Allow**. Location is used only by Map → *Use my location* and is not needed here. Optional fallback: `hdc install -g` pre-grants permissions for debug HAPs (hdc API 24+, verify). |
 | 7 | hilog ready | Run the commands below on every phone. |
 

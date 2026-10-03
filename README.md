@@ -2,13 +2,14 @@
 
 **Signed warnings. Offline protective-point maps. A path from one phone to the next.**
 
-HackYeah 2026 · Huawei challenge **“Imagine What’s Next”** · native HarmonyOS app (ArkTS + ArkUI) · minimum API 20, validated on API 24 emulators · current release **v1.4.1**
+HackYeah 2026 · Huawei challenge **“Imagine What’s Next”** · native HarmonyOS app (ArkTS + ArkUI) · minimum API 20, validated on API 24 emulators · also builds for OpenHarmony / Oniro · current release **v1.5.0**
 
 ## For the jury: start here
 
-- **Demo video, 2 min 13 s, captioned:** [SafeMesh-1.4.1-demo.mp4](https://github.com/carrotly-technologies-2026/SafeMesh/releases/download/v1.4.1/SafeMesh-1.4.1-demo.mp4). Three separate emulator apps side by side: an authenticated issuer on A publishes a custom English alert; B verifies, stores, ACKs and relays it; after A leaves, C receives it from B at hop 2; a forged copy is rejected; then the offline map and the NearLink capability check.
-- **Install:** [SafeMesh-1.4.1.hap](https://github.com/carrotly-technologies-2026/SafeMesh/releases/download/v1.4.1/SafeMesh-1.4.1.hap) with its [SHA-256 manifest](https://github.com/carrotly-technologies-2026/SafeMesh/releases/download/v1.4.1/SafeMesh-1.4.1.sha256.txt), both in [Release v1.4.1](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/v1.4.1). It is an unsigned debug package for an API 20+ emulator; see [Install the packaged demo](#install-the-packaged-demo).
+- **Demo video, 2 min 13 s, captioned:** [SafeMesh-1.4.1-demo.mp4](https://github.com/carrotly-technologies-2026/SafeMesh/releases/download/v1.4.1/SafeMesh-1.4.1-demo.mp4), recorded on v1.4.1. The relay flow is unchanged in v1.5.0. Three separate emulator apps side by side: an authenticated issuer on A publishes a custom English alert; B verifies, stores, ACKs and relays it; after A leaves, C receives it from B at hop 2; a forged copy is rejected; then the offline map and the NearLink capability check.
+- **Install:** [SafeMesh-1.5.0.hap](https://github.com/carrotly-technologies-2026/SafeMesh/releases/download/v1.5.0/SafeMesh-1.5.0.hap) with its [SHA-256 manifest](https://github.com/carrotly-technologies-2026/SafeMesh/releases/download/v1.5.0/SafeMesh-1.5.0.sha256.txt), both in [Release v1.5.0](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/v1.5.0). It is an unsigned debug package for an API 20+ emulator; see [Install the packaged demo](#install-the-packaged-demo).
 - **Challenge areas:** **Human-Centric Technology** (lead) and **Spatial Experiences**. See [Challenge fit](#challenge-fit).
+- **HarmonyOS and the open stack:** one codebase builds two products. `default` targets HarmonyOS with the NearLink Kit adapter. `oniro` targets OpenHarmony API 23 for the Eclipse Oniro emulator on Linux, with a NearLink stub. See [OpenHarmony / Oniro build](#openharmony--oniro-build).
 - **Platform capabilities:** NearLink Kit, Crypto Architecture Kit, Network Kit, Location Kit, ArkData, Accessibility Kit and Localization Kit. See [Platform capabilities used](#platform-capabilities-used).
 - **Real or simulated:** the three app processes, on-device signature checks, store-and-forward with ACKs, rejection of forged content, the offline map and the UI are real. The radio link between emulators is a clearly labelled local WebSocket hub standing in for NearLink, and the issuer is a local exercise signing service. NearLink on physical phones has **not been tested yet**; the test plan is [docs/PHYSICAL_TESTING.md](docs/PHYSICAL_TESTING.md).
 - **Built during the hackathon:** all code, tests, data processing and documentation in this repository were written on 3–4 October 2026 at HackYeah, with AI coding agents as disclosed in [AI_WORKFLOW.md](AI_WORKFLOW.md). Pre-existing material: the DevEco Studio *Empty Ability* boilerplate (for example the Huawei Apache-2.0 header in `EntryAbility.ets`), the organizers' DevEco CLI patches, and public PSP and OpenStreetMap data.
@@ -32,6 +33,22 @@ HackYeah 2026 · Huawei challenge **“Imagine What’s Next”** · native Harm
 | Screen-reader announcements for new alerts, expiry and results | `@kit.AccessibilityKit` | `pages/Index.ets` |
 | System language, locale-aware times, explicit PL/EN resource managers | `@kit.LocalizationKit` (`i18n`, `intl`, `resourceManager`) | `pages/Index.ets`, `views/UiCopy.ets` |
 | System dark mode, font scale, system bar colours, `SymbolGlyph` icons, Canvas map | `@kit.AbilityKit` configuration, `@kit.ArkUI` | `entryability/EntryAbility.ets`, `views/OfflineMap.ets` |
+
+## OpenHarmony / Oniro build
+
+The same source also builds an **OpenHarmony** product for the **Eclipse Oniro** emulator (OpenHarmony 6.1, API 23, QEMU on Linux), the open-source European distribution named in the challenge. NearLink Kit exists only in HarmonyOS, so the products differ only where they must:
+
+| | `default` product | `oniro` product |
+| --- | --- | --- |
+| Runtime | HarmonyOS, target API 24, minimum API 20 | OpenHarmony, API 23, minimum API 20 |
+| NearLink transport | `entry/src/harmonyos/transport/NearLinkTransport.ets` (NearLink Kit) | `entry/src/oniro/transport/NearLinkTransport.ets` (always "unsupported") |
+| Manifest | `module.json5` as written: `phone`, `ACCESS_NEARLINK` | Adjusted only for this product by the root `hvigorfile.ts`: `default` device type, no `ACCESS_NEARLINK` |
+| Signing | Unsigned for emulators; phones are signed locally in DevEco | Public OpenHarmony SDK debug key via `scripts/oniro/sign.sh` |
+| Tooling | DevEco Studio / DevEco CLI (Windows, macOS) | `oniro-app build --product oniro` (Linux), see [COMMANDS.md](COMMANDS.md) |
+
+Everything else is shared: the protocol, relay, inbox, issuer console, map, UI and the local emulator test link. `RelayViewModel` imports `entry/transport/NearLinkTransport`, which hvigor resolves from the target's `sourceRoots`. `tests/build-variants.test.mjs` keeps NearLink Kit out of the shared and Oniro sources and checks that both adapters expose the same API.
+
+Status: the Oniro port and its scripts were contributed by a team member, who ran it on the Oniro emulator before the merge. After the merge, the `oniro` product compiles, packages and signs with the OpenHarmony SDK on Windows (the API 24 OpenHarmony part of the DevEco SDK, which has no HMS kits). The produced HAP declares `default`, has no `ACCESS_NEARLINK` and contains the stub, not the NearLink Kit adapter. The API 23 run on the Oniro emulator must be repeated with `scripts/oniro/deploy.sh` after this merge.
 
 **Background relaying is deliberately not faked.** Relaying runs while the app is in the foreground. HarmonyOS introduced a NearLink continuous-task mode (`MODE_NEARLINK`) only in API 26. On our API 20–24 target the remaining modes (`dataTransfer`, `bluetoothInteraction`) do not describe a NearLink relay, and the system's consistency check would suspend a mismatched task. The next step is API 26 with `MODE_NEARLINK` and the documented `continuousTaskSuspend` reconnect pattern.
 
@@ -70,7 +87,15 @@ Three separate HarmonyOS emulator apps exchange packets through an explicitly la
 
 **Demo only:** SafeMesh is not connected to RCB or an official warning issuer. Bundled and custom alerts are signed exercises. Mapped PSP protective points are reference records; current access, condition and protection are not verified by the app.
 
-**v1.4.1 (current release):**
+**v1.5.0 (current release):**
+- The `oniro` OpenHarmony product was merged next to the HarmonyOS product without changing the HarmonyOS build.
+- Settings → App language offers **System / Polski / English**. *System* is the default: it follows the phone's language, Polish on a Polish phone and English otherwise, and it is re-checked when the app returns to the foreground. *Polski* and *English* are explicit, saved choices.
+
+Checks: **172 host tests**, the ArkTS check with **zero errors in 21 files for each product's source set**, **zero Code Linter issues** and a successful HarmonyOS build. The HarmonyOS HAP has SHA-256 `7663aa1ddee81d4d36b4862b05291cba1ed8c4a35826ed419f5ba85321c5a5ac`. Native checks on the API 24 emulators:
+- The [language preference flow passed 5/5 steps](artifacts/logs/v150-language-preference.json), including relaunches.
+- A [relay smoke test](artifacts/logs/v150-relay-smoke.json) passed: an exercise loaded on A after connecting reached B at hop 1 with an app ACK, and the real NearLink adapter still loaded.
+
+**v1.4.1:**
 - A first launch follows the system language: Polish on a Polish system, English otherwise. Before, it always started in Polish.
 - *Load exercise message* now also queues the alert for peers that are already connected.
 - The NearLink diagnostics show delivery counters, and transport status, links and errors are logged as `SAFEMESH_TRANSPORT_*` for the physical test.
@@ -87,7 +112,7 @@ Checks: **168 host tests**, **21 ArkTS files / zero errors**, **zero Code Linter
 | Map / Mapa | Switch between Map and List; search all 40 central Kraków PSP addresses, including searches without Polish diacritics. Select a marker or row to open point details, save it, or show it on the map. Back returns to the originating screen. |
 | Relay / Łączność | Choose emulator A/B/C, connect to the local test link and inspect neighbors and ACK/retry counters. Verified alerts relay automatically while connected; there is no recipient Send button. Open diagnostics for verification tools. |
 | Guide | Read a short offline preparedness reminder and see what the prototype's verification claim means. |
-| Settings / Ustawienia | Open the header gear to choose saved **PL / EN** and **Light / Dark / System** preferences. System follows the device appearance. Where a signed language variant exists, the app selects it; otherwise it shows the original with a language notice. |
+| Settings / Ustawienia | Open the header gear to choose saved **System / Polski / English** language and **System / Light / Dark** appearance preferences. System follows the device language or appearance. Where a signed language variant exists, the app selects it; otherwise it shows the original with a language notice. |
 | Tests and diagnostics / Testy i diagnostyka | Enter from Settings or Relay. Open the authenticated exercise-authority console, load the bundled fixture for verification, run the six-check local test, inspect diagnostics or check NearLink capability. Back returns to the screen that opened diagnostics. |
 | Exercise authority / Nadawca ćwiczeń | Enter the local operator's activation code. An authenticated publisher can write a title, instructions and area, choose PL/EN, priority and validity, then publish. The returned signature is verified on-device before the alert is saved and queued automatically. This is an exercise console, not a government account. |
 
@@ -141,19 +166,19 @@ Use `-Device <serial>` for another target or `-NoRun` to build/package only. If 
 
 ### Install the packaged demo
 
-Download `SafeMesh-1.4.1.hap` and `SafeMesh-1.4.1.sha256.txt` from [Release v1.4.1](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/v1.4.1). The HAP is a debug **unsigned emulator package**, built as `entry/build/default/outputs/default/entry-default-unsigned.hap`, with SHA-256 `a2cf126786d6a1dce58fe96020fc31c63b776dd7a4593eb2e95d8c9e361ffd3e`. It installs on an API 20+ HarmonyOS emulator. A physical phone needs a debug-signed build; see [docs/PHYSICAL_TESTING.md](docs/PHYSICAL_TESTING.md#3-signing-for-physical-devices).
+Download `SafeMesh-1.5.0.hap` and `SafeMesh-1.5.0.sha256.txt` from [Release v1.5.0](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/v1.5.0). The HAP is the HarmonyOS `default` product as a debug **unsigned emulator package**, built as `entry/build/default/outputs/default/entry-default-unsigned.hap`, with SHA-256 `7663aa1ddee81d4d36b4862b05291cba1ed8c4a35826ed419f5ba85321c5a5ac`. It installs on an API 20+ HarmonyOS emulator. A physical phone needs a debug-signed build; see [docs/PHYSICAL_TESTING.md](docs/PHYSICAL_TESTING.md#3-signing-for-physical-devices).
 
 ```powershell
 $hdc = Join-Path $env:DEVECO_CLI_STUDIO_PATH 'sdk\default\openharmony\toolchains\hdc.exe'
-(Get-FileHash .\SafeMesh-1.4.1.hap -Algorithm SHA256).Hash   # compare with the manifest
+(Get-FileHash .\SafeMesh-1.5.0.hap -Algorithm SHA256).Hash   # compare with the manifest
 & $hdc list targets
-& $hdc -t 127.0.0.1:5555 install -r .\SafeMesh-1.4.1.hap
+& $hdc -t 127.0.0.1:5555 install -r .\SafeMesh-1.5.0.hap
 & $hdc -t 127.0.0.1:5555 shell aa start -b org.safemesh.alerts -a EntryAbility
 ```
 
 Use the serial printed by `hdc list targets`. The last command alone relaunches an installed app. No production certificate or private issuer key is included.
 
-Packages from earlier checkpoints (v1.4.0 `dd7ca2cd…`, v1.3, v1.2 and v1.1) were written to the git-ignored `dist/` folder of the development machine and are not part of the repository. Their hashes and validation records remain in `artifacts/` and the reports linked below.
+[Release v1.4.1](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/v1.4.1) remains available with its HAP and the demo video. Packages from earlier checkpoints (v1.4.0 `dd7ca2cd…`, v1.3, v1.2 and v1.1) were written to the git-ignored `dist/` folder of the development machine and are not part of the repository. Their hashes and validation records remain in `artifacts/` and the reports linked below.
 
 ## Publish a custom alert to three emulators
 
@@ -196,7 +221,7 @@ This walkthrough uses the bundled verification fixture and does not require the 
 
 1. Start on **Home / Start**: the empty state offers **Connect devices / Połącz urządzenia**. Open the header gear, then **Tests and diagnostics / Testy i diagnostyka** → **Load exercise message / Wczytaj wiadomość ćwiczebną** (`diagnosticDrill`). Choose **Read alert / Przeczytaj alert** in the banner, or return to Home and open the inbox row, to inspect the verified text and expiry. Opening it clears its unread status.
 2. Open **Map / Mapa**. Search an address with or without Polish diacritics (`searchPoints`), switch Map/List, and open a marker or result. In point details, save the point (`savePoint`), use **Show on map / Pokaż na mapie**, or go Back. Home should show the saved address; the map remains on its own tab.
-3. Open **Settings / Ustawienia** and switch **Polski / English** (`languagePl` / `languageEn`). The bundled fixture includes both signed language versions. Custom alerts retain their signed original when no matching translation exists. Try Light/Dark/System, then relaunch to check stored preferences, saved content and read status.
+3. Open **Settings / Ustawienia** and switch **System / Polski / English** (`languageSystem` / `languagePl` / `languageEn`). The bundled fixture includes both signed language versions. Custom alerts retain their signed original when no matching translation exists. Try Light/Dark/System, then relaunch to check stored preferences, saved content and read status.
 4. Open diagnostics from Settings or Relay, then **Run verification test / Uruchom test weryfikacji** (`runRelay`). The intended result is six passing checks: A → B → C, duplicate suppression, forged-content rejection and expiry rejection. This test runs within one app process.
 5. In diagnostics, **Check NearLink support / Sprawdź obsługę NearLink** (`checkNearLink`) shows the emulator's unsupported-radio result. Use the three-emulator walkthrough above for actual inter-app packet exchange over the local transport mock.
 
@@ -243,7 +268,7 @@ $env:DEVECO_CLI_STUDIO_PATH = Join-Path $env:USERPROFILE 'DevEcoStudio'
 .\scripts\check.ps1 -Build
 ```
 
-The helper discovers every `tests/*.test.mjs` suite, runs host tests, ArkTS checking and Code Linter, then builds the entry module when `-Build` is present. It stops on a nonzero exit and reports `CHECKS: PASS` only after the requested checks complete. Omit `-Build` for checks without packaging; use `scripts/run-demo.ps1` afterward to package/deploy the build.
+The helper discovers every `tests/*.test.mjs` suite and runs host tests. It runs the DevEco CLI ArkTS check once per product source set (`harmonyos` and `oniro`), each in a temporary mirror, because DevEco CLI 1.3.4 does not resolve target `sourceRoots`. It then runs Code Linter, then builds the entry module when `-Build` is present. It stops on a nonzero exit and reports `CHECKS: PASS` only after the requested checks complete. Omit `-Build` for checks without packaging; use `scripts/run-demo.ps1` afterward to package/deploy the build.
 
 | Suite | Coverage |
 | --- | --- |
@@ -260,6 +285,7 @@ The helper discovers every `tests/*.test.mjs` suite, runs host tests, ArkTS chec
 | `tests/delivery.test.mjs` | Full-cache synchronization, delayed/reconnected peers, strict ACK matching, loss/retry policy, expiry, deadlines, transport switching, retired callbacks, foreground lifecycle and three independent ViewModels. |
 | `tests/location.test.mjs` | Native one-shot location permission/capability handling, usable results and failure paths. |
 | `tests/emulator-transport.test.mjs` | Actual ArkTS WebSocket adapter with platform mocks: handshake, peer updates, packet bounds, sender filtering, deadlines, error diagnostics and stop races. |
+| `tests/build-variants.test.mjs` | HarmonyOS / Oniro product split: Oniro stub behavior, matching adapter APIs, NearLink Kit confined to `src/harmonyos`, unchanged HarmonyOS product and manifest. |
 | `tests/mesh-lab-server.test.mjs` | Actual local sockets and RFC WebSocket framing, topology, injected loss, malformed input, host/origin checks, heartbeat cleanup and public fixture derivation. |
 
 Tests discover the TypeScript compiler inside DevEco Studio through `DEVECO_CLI_STUDIO_PATH`; see [NearLink evidence](artifacts/research/nearlink.md) for fallback locations. Protocol/integration/storage tests also accept `ARKTS_TYPESCRIPT_PATH`. The map suite uses Node 24's type-erasure support. Host fixture time is controlled inside the relevant tests; the native app uses the actual device clock.
@@ -342,7 +368,13 @@ entry/src/main/ets/
   model/DemoAlerts.ets            Signed exercise fixtures
   model/DemoTrust.ets             Exercise public key only
   model/OfflineMapData.ets        Bundled reference data
-  transport/NearLinkTransport.ets Public native radio adapter
+  transport/RelayTransport.ets    Shared link contract and status types
+entry/src/harmonyos/transport/NearLinkTransport.ets  NearLink Kit adapter (default product)
+entry/src/oniro/transport/NearLinkTransport.ets      NearLink stub (oniro product)
+hvigorfile.ts                     Oniro-only manifest adjustments
+signatures/                       Public OpenHarmony SDK debug signing inputs (oniro product)
+scripts/oniro/                    Oniro emulator, signing, deploy, services, send-alert
+COMMANDS.md                       Linux / Oniro workflow
   transport/RelayTransport.ets    Shared packet-link contract
   transport/EmulatorTransport.ets Local WebSocket link between separate emulator apps
 scripts/prepare-demo-authority.mjs Persistent local demo key and token setup
@@ -358,7 +390,7 @@ scripts/record-mesh-demo.py       Synchronized three-emulator recorder
 dist/                             Git-ignored local packages; releases are on GitHub
 ```
 
-Release v1.4.1 on GitHub carries `SafeMesh-1.4.1.hap`, `SafeMesh-1.4.1-demo.mp4` and `SafeMesh-1.4.1.sha256.txt`.
+Release v1.5.0 on GitHub carries `SafeMesh-1.5.0.hap` and `SafeMesh-1.5.0.sha256.txt`, plus the v1.4.1 demo video. Release v1.4.1 keeps its own HAP and video.
 
 ## Validation scope
 
