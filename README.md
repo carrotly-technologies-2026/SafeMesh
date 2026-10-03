@@ -91,7 +91,7 @@ Three separate HarmonyOS emulator apps exchange packets through an explicitly la
 - The `oniro` OpenHarmony product was merged next to the HarmonyOS product without changing the HarmonyOS build.
 - Settings → App language offers **System / Polski / English**. *System* is the default: it follows the phone's language, Polish on a Polish phone and English otherwise, and it is re-checked when the app returns to the foreground. *Polski* and *English* are explicit, saved choices.
 
-Checks: **172 host tests**, the ArkTS check with **zero errors in 21 files for each product's source set**, **zero Code Linter issues** and a successful HarmonyOS build. The HarmonyOS HAP has SHA-256 `7663aa1ddee81d4d36b4862b05291cba1ed8c4a35826ed419f5ba85321c5a5ac`. Native checks on the API 24 emulators:
+Checks: **172 host tests**, the ArkTS check with **zero errors in 21 files for each product's source set**, **zero Code Linter issues** and a successful HarmonyOS build ([log](artifacts/logs/v150-checks-build.log)). The HarmonyOS HAP has SHA-256 `7663aa1ddee81d4d36b4862b05291cba1ed8c4a35826ed419f5ba85321c5a5ac`. Native checks on the API 24 emulators:
 - The [language preference flow passed 5/5 steps](artifacts/logs/v150-language-preference.json), including relaunches.
 - A [relay smoke test](artifacts/logs/v150-relay-smoke.json) passed: an exercise loaded on A after connecting reached B at hop 1 with an app ACK, and the real NearLink adapter still loaded.
 
