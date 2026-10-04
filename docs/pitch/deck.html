@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SafeMesh pitch deck</title>
+<!--
+  SafeMesh pitch deck, HackYeah 2026, Huawei "Imagine What's Next".
+  Open in a browser: arrow keys or click to move between slides, F for full screen.
+  scripts/render-pitch.py renders it to PDF, PNG and PPTX (with these speaker notes).
+  Every number on these slides comes from the repository: see the notes under each slide.
+-->
+<style>
+:root {
+  --forest: #163E33; --forest-2: #1B5A46; --deep: #0E2720; --lime: #D8F58A; --ivory: #F4F6F0;
+  --sage: #B5DAC6; --soft: #E9EFEC; --ink: #192923; --muted: #55635D; --line: #D7DFDA;
+  --danger: #A33826; --danger-soft: #F8E3DE; --warn: #765512; --warn-soft: #FFF4DC; --blue: #345FC6;
+  --font: 'HarmonyOS Sans SC', 'HarmonyOS Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #0b1512; font-family: var(--font); color: var(--ink); }
+.deck { position: relative; }
+.slide {
+  width: 1920px; height: 1080px; position: relative; overflow: hidden; background: var(--ivory);
+  padding: 84px 104px 120px; display: flex; flex-direction: column;
+}
+.slide.dark { background: radial-gradient(1200px 800px at 85% 10%, #1f5546 0%, var(--forest) 45%, var(--deep) 100%); color: var(--ivory); }
+.slide.dark .muted, .slide.dark .lead { color: #C3D3CA; }
+.notes { display: none; }
+h1, h2, h3, p { margin: 0; }
+h1 { font-size: 92px; line-height: 1.0; letter-spacing: -0.02em; font-weight: 700; }
+h2 { font-size: 60px; line-height: 1.08; letter-spacing: -0.015em; font-weight: 700; max-width: 1500px; }
+h3 { font-size: 30px; line-height: 1.2; font-weight: 700; }
+.kicker { display: inline-flex; align-items: center; gap: 12px; font-size: 20px; font-weight: 700; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--forest-2); margin-bottom: 22px; }
+.kicker::before { content: ''; width: 34px; height: 4px; border-radius: 2px; background: currentColor; }
+.dark .kicker { color: var(--lime); }
+.lead { font-size: 30px; line-height: 1.4; color: var(--muted); max-width: 1300px; margin-top: 22px; }
+.muted { color: var(--muted); }
+.small { font-size: 20px; line-height: 1.45; }
+.body { font-size: 25px; line-height: 1.45; }
+.footer { position: absolute; left: 104px; right: 104px; bottom: 40px; display: flex; justify-content: space-between;
+  align-items: center; font-size: 18px; color: var(--muted); letter-spacing: 0.02em; }
+.dark .footer { color: #9DB5A8; }
+.footer .brand { display: flex; align-items: center; gap: 12px; }
+.footer img { width: 28px; height: 28px; }
+.grow { flex: 1; min-height: 0; }
+.row { display: flex; gap: 40px; }
+.col { display: flex; flex-direction: column; }
+.card { background: #fff; border: 1px solid var(--line); border-radius: 28px; padding: 34px 36px; }
+.dark .card { background: rgba(255,255,255,0.06); border-color: rgba(216,245,138,0.18); }
+.icon { width: 56px; height: 56px; border-radius: 16px; display: grid; place-items: center; background: var(--soft); color: var(--forest-2); flex: none; }
+.icon svg { width: 32px; height: 32px; }
+.dark .icon { background: rgba(216,245,138,0.14); color: var(--lime); }
+svg.i { fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+.pill { display: inline-flex; align-items: center; gap: 10px; padding: 10px 20px; border-radius: 999px; font-size: 21px; font-weight: 700;
+  background: var(--soft); color: var(--forest-2); }
+.dark .pill { background: rgba(216,245,138,0.14); color: var(--lime); }
+.pill.lime { background: var(--lime); color: var(--forest); }
+.pill.red { background: var(--danger-soft); color: var(--danger); }
+.pill.amber { background: var(--warn-soft); color: var(--warn); }
+.phone { background: #0b1411; padding: 10px; border-radius: 52px; box-shadow: 0 40px 70px rgba(14,39,32,0.28), 0 10px 22px rgba(14,39,32,0.18); flex: none; position: relative; }
+.phone img { display: block; width: 100%; border-radius: 43px; }
+.phone .tag { position: absolute; left: 50%; top: -22px; transform: translate(-50%, -100%); white-space: nowrap; }
+.big { font-size: 112px; font-weight: 700; line-height: 1; letter-spacing: -0.03em; color: var(--forest-2); }
+.dark .big { color: var(--lime); }
+table { border-collapse: collapse; width: 100%; }
+td, th { text-align: left; vertical-align: top; padding: 18px 22px; border-bottom: 1px solid var(--line); font-size: 23px; line-height: 1.38; }
+.criteria td { font-size: 25px; padding: 24px 22px; }
+th { font-size: 18px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); }
+.check, .cross { display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; flex: none; }
+.check { background: var(--forest-2); color: #fff; }
+.cross { background: var(--danger); color: #fff; }
+.check svg, .cross svg { width: 20px; height: 20px; }
+.mono { font-family: 'Cascadia Mono', Consolas, 'SFMono-Regular', monospace; }
+.source { position: absolute; left: 104px; right: 104px; bottom: 74px; font-size: 16px; color: var(--muted); }
+.dark .source { color: #9DB5A8; }
+/* slide-specific */
+.title-wrap { display: grid; grid-template-columns: 820px 1fr; gap: 40px; align-items: center; height: 100%; }
+.title-cover { position: absolute; right: 90px; top: 110px; width: 880px; height: 842px; object-fit: cover; border-radius: 40px; box-shadow: 0 50px 90px rgba(0,0,0,0.35); }
+.logo-row { display: flex; align-items: center; gap: 26px; margin-bottom: 34px; }
+.logo-row img { width: 108px; height: 108px; border-radius: 26px; box-shadow: 0 16px 36px rgba(0,0,0,0.3); }
+.tagline { font-size: 40px; line-height: 1.25; margin-top: 30px; color: #E6F0EA; max-width: 760px; }
+.tagline b { color: var(--lime); font-weight: 700; }
+.meta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 44px; max-width: 760px; }
+.flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; align-items: stretch; }
+.node { text-align: center; }
+.terminal { background: #0E1714; color: #CFE3D7; border-radius: 22px; padding: 26px 30px; font-size: 20px; line-height: 1.55; box-shadow: 0 30px 60px rgba(14,39,32,0.25); }
+.terminal .ok { color: #9BE27A; }
+.terminal .dim { color: #6F877A; }
+.statgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
+.stat { background: #fff; border: 1px solid var(--line); border-radius: 26px; padding: 30px 32px; }
+.stat .big { font-size: 84px; }
+.stat p { font-size: 22px; line-height: 1.35; color: var(--muted); margin-top: 10px; }
+.tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+.tile { background: #fff; border: 1px solid var(--line); border-radius: 22px; padding: 24px 26px; display: flex; gap: 20px; align-items: flex-start; }
+.tile h3 { font-size: 25px; }
+.tile p { font-size: 20px; line-height: 1.38; color: var(--muted); margin-top: 6px; }
+.tile code, .body code, td code, .small code { font-family: 'Cascadia Mono', Consolas, monospace; font-size: 0.84em; background: var(--soft); padding: 2px 7px; border-radius: 7px; color: var(--forest-2); }
+.dark code { background: rgba(216,245,138,0.14); color: var(--lime); }
+.three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+.layer { border-radius: 22px; padding: 22px 28px; font-size: 22px; line-height: 1.35; }
+.layer b { display: block; font-size: 25px; margin-bottom: 4px; }
+
+/* screen viewer */
+body.view { display: grid; place-items: center; min-height: 100vh; overflow: hidden; }
+body.view .slide { display: none; transform-origin: top left; position: absolute; left: 0; top: 0; }
+body.view .slide.current { display: flex; }
+body.view .hint { position: fixed; bottom: 10px; right: 14px; color: #6d8a7c; font: 13px var(--font); }
+@page { size: 1920px 1080px; margin: 0; }
+@media print { html, body { background: none; } .slide { break-after: page; } .hint { display: none; } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v5.2c0 4.4-2.9 8.1-7 9.8-4.1-1.7-7-5.4-7-9.8V6l7-3z"/><path d="M8.6 12.2l2.4 2.4 4.6-4.8"/></symbol>
+  <symbol id="i-relay" viewBox="0 0 24 24"><rect x="2.5" y="6" width="6" height="12" rx="1.6"/><rect x="15.5" y="6" width="6" height="12" rx="1.6"/><path d="M10.5 10.5c1-.9 2-.9 3 0M10 13.5c1.3-1.2 2.7-1.2 4 0"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0113 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/></symbol>
+  <symbol id="i-tower" viewBox="0 0 24 24"><path d="M12 10v11M8.5 21l3.5-11 3.5 11M7 6.5a7 7 0 000 7M17 6.5a7 7 0 010 7M9.5 8.3a3.6 3.6 0 000 3.4M14.5 8.3a3.6 3.6 0 010 3.4"/><path d="M3.5 3.5l17 17"/></symbol>
+  <symbol id="i-forward" viewBox="0 0 24 24"><path d="M4 6.5h11a3 3 0 013 3V12"/><path d="M15 9l3 3 3-3"/><rect x="3" y="12.5" width="11" height="7.5" rx="2"/><path d="M6 16.2h5"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M11 12l8.5-8.5M16.5 6.5l2 2M14.5 8.5l1.6 1.6"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.2"/><path d="M8 10.5V7.8a4 4 0 018 0v2.7"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.5 3.8 5.5 3.8 9s-1.2 6.5-3.8 9c-2.6-2.5-3.8-5.5-3.8-9S9.4 5.5 12 3z"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.5 14.5A8 8 0 019.5 4.5a8 8 0 1010 10z"/></symbol>
+  <symbol id="i-text" viewBox="0 0 24 24"><path d="M3.5 19l5-14 5 14M5.3 14h6.4M15 19l3.2-8.6 3.3 8.6M15.9 16.4h4.6"/></symbol>
+  <symbol id="i-ear" viewBox="0 0 24 24"><path d="M7 9a5 5 0 0110 0c0 3-2.5 3.6-3 6-.4 2-1.6 3.5-3.5 3.5"/><path d="M10 9.5a2 2 0 014 0"/></symbol>
+  <symbol id="i-vibrate" viewBox="0 0 24 24"><rect x="8" y="4" width="8" height="16" rx="1.8"/><path d="M4.5 8v8M2 10v4M19.5 8v8M22 10v4"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></symbol>
+  <symbol id="i-network" viewBox="0 0 24 24"><circle cx="5" cy="12" r="2.5"/><circle cx="19" cy="6" r="2.5"/><circle cx="19" cy="18" r="2.5"/><path d="M7.3 11l9.4-4M7.3 13l9.4 4"/></symbol>
+  <symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="2.8"/><path d="M5 6v12c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8V6M5 12c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8"/></symbol>
+  <symbol id="i-locate" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3"/></symbol>
+  <symbol id="i-code" viewBox="0 0 24 24"><path d="M8.5 7L3.5 12l5 5M15.5 7l5 5-5 5M13.5 4.5l-3 15"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3.5l9 4.5-9 4.5-9-4.5 9-4.5z"/><path d="M3 12l9 4.5 9-4.5M3 16l9 4.5 9-4.5"/></symbol>
+  <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9.5 3.5h5M10.5 3.5v6L5 19a1.5 1.5 0 001.3 2.2h11.4A1.5 1.5 0 0019 19l-5.5-9.5v-6"/><path d="M7.5 15h9"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l5.5 3.5-5.5 3.5z"/></symbol>
+  <symbol id="i-radio" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1.8"/><path d="M8.5 8.5a5 5 0 000 7M15.5 8.5a5 5 0 010 7M5.6 5.6a9 9 0 000 12.8M18.4 5.6a9 9 0 010 12.8"/></symbol>
+</svg>
+
+<main class="deck">
+
+<!-- 1 · Title ------------------------------------------------------------------>
+<section class="slide dark" data-title="SafeMesh">
+  <img class="title-cover" src="img/cover-art.jpg" alt="Concept illustration: three phones over a city map, connected by dotted paths">
+  <div style="position:relative; max-width: 820px; margin-top: 70px">
+    <div class="logo-row"><img src="img/logo.svg" alt=""><span class="pill lime">HackYeah 2026 · Huawei “Imagine What’s Next”</span></div>
+    <h1>SafeMesh</h1>
+    <p class="tagline">Verified emergency alerts that travel <b>phone to phone</b>, when the mobile network is down.</p>
+    <div class="meta">
+      <span class="pill">Native HarmonyOS · ArkTS + ArkUI</span>
+      <span class="pill">NearLink-ready</span>
+      <span class="pill">OpenHarmony / Oniro build</span>
+      <span class="pill">Human-Centric + Spatial</span>
+    </div>
+  </div>
+  <div class="footer"><span class="brand">github.com/carrotly-technologies-2026/SafeMesh</span><span>Illustration: concept art, not a screenshot</span></div>
+  <aside class="notes">SafeMesh is a native HarmonyOS app for one narrow, real problem: getting a trustworthy warning to people when the mobile network is down. Everything in this deck is backed by the repository: code, tests, logs and recorded emulator runs. The cover is a concept illustration; every other phone image is a real emulator screenshot.</aside>
+</section>
+
+<!-- 2 · Problem ---------------------------------------------------------------->
+<section class="slide" data-title="The problem">
+  <div class="kicker">The problem</div>
+  <h2>When the network fails, warnings stop, and rumours spread.</h2>
+  <div class="three grow" style="margin-top: 48px; align-content: start">
+    <div class="card">
+      <div class="icon"><svg class="i"><use href="#i-tower"/></svg></div>
+      <h3 style="margin-top: 26px">Networks fail when they matter most</h3>
+      <p class="body muted" style="margin-top: 14px">In its December 2022 assessment of Ukraine, the ITU reported almost <b style="color:var(--ink)">11%</b> of mobile operators’ base stations out of service. Floods, storms and blackouts take towers down too.</p>
+    </div>
+    <div class="card">
+      <div class="icon"><svg class="i"><use href="#i-forward"/></svg></div>
+      <h3 style="margin-top: 26px">Forwarded messages can’t be trusted</h3>
+      <p class="body muted" style="margin-top: 14px">A forwarded text or screenshot carries no proof of who wrote it, or whether someone changed it on the way. In a crisis, that is how rumours win.</p>
+    </div>
+    <div class="card">
+      <div class="icon"><svg class="i"><use href="#i-pin"/></svg></div>
+      <h3 style="margin-top: 26px">Help is local, and needs to be offline</h3>
+      <p class="body muted" style="margin-top: 14px">“Where is the nearest protective point?” has to be answerable without downloading anything, from the first launch.</p>
+    </div>
+  </div>
+  <div class="row" style="gap: 28px; align-items: center; background: var(--forest); color: var(--ivory); border-radius: 26px; padding: 28px 36px; margin-bottom: 40px">
+    <span class="pill lime" style="flex: none">Who it is for</span>
+    <p class="body" style="color: #DCE8E1">People in an outage area who still need a warning they can trust, and the crisis teams, volunteer fire brigades and schools that run drills for exactly this moment.</p>
+  </div>
+  <p class="source">Source: ITU, <i>Interim assessment on damages to telecommunication infrastructure and resilience of the ICT ecosystem in Ukraine</i>, December 2022. A historical example of the risk, not an estimate for Poland.</p>
+  <div class="footer"><span class="brand"><img src="img/logo.svg" alt="">SafeMesh</span><span>02</span></div>
+  <aside class="notes">Three connected needs. First, connectivity: a documented example is Ukraine, where the ITU counted almost 11 percent of mobile base stations out of service. Second, trust: a forwarded message has no proof of origin or integrity. Third, local reference information that works offline. SafeMesh addresses all three in one app.</aside>
+</section>
+
+<!-- 3 · Solution --------------------------------------------------------------->
+<section class="slide" data-title="The solution">
+  <div class="kicker">The solution</div>
+  <div class="row grow" style="gap: 70px">
+    <div class="col" style="flex: 1">
+      <h2 style="font-size: 56px">One native app. Three ideas that only work together.</h2>
+      <div class="col" style="gap: 26px; margin-top: 48px">
+        <div class="row" style="gap: 26px; align-items: flex-start">
+          <div class="icon"><svg class="i"><use href="#i-shield"/></svg></div>
+          <div><h3>Signed alerts</h3><p class="body muted" style="margin-top: 6px">Every phone verifies an ECDSA P-256 signature against a pinned issuer key before it shows, stores or forwards an alert.</p></div>
+        </div>
+        <div class="row" style="gap: 26px; align-items: flex-start">
+          <div class="icon"><svg class="i"><use href="#i-relay"/></svg></div>
+          <div><h3>Phone-to-phone relay</h3><p class="body muted" style="margin-top: 6px">Store-and-forward: each phone keeps verified alerts and passes them to the next phone in range, with delivery receipts and retries.</p></div>
+        </div>
+        <div class="row" style="gap: 26px; align-items: flex-start">
+          <div class="icon"><svg class="i"><use href="#i-pin"/></svg></div>
+          <div><h3>Offline protective points</h3><p class="body muted" style="margin-top: 6px">A bundled vector map of central Kraków with 40 State Fire Service protective points. Works from the first launch.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="row" style="gap: 34px; align-items: center; padding-top: 10px">
+      <div class="phone" style="width: 360px"><img src="img/screen-message.jpg" alt="Verified alert detail"></div>
+      <div class="phone" style="width: 360px; margin-top: 90px"><img src="img/screen-map.jpg" alt="Offline map"></div>
+    </div>
+  </div>
+  <div class="footer"><span class="brand"><img src="img/logo.svg" alt="">SafeMesh</span><span>03</span></div>
+  <aside class="notes">Signatures alone do not help if the alert cannot reach you; a mesh alone spreads rumours as fast as facts; a map alone tells you nothing about what is happening. Together they give a verified warning plus the local information to act on it. Both phones are real screenshots from the HarmonyOS API 24 emulator.</aside>
+</section>
+
+<!-- 4 · How it travels --------------------------------------------------------->
+<section class="slide" data-title="How a warning travels">
+  <div class="kicker">How a warning travels</div>
+  <h2>Every phone is a verifier, not just a router.</h2>
+  <div class="grow" style="margin-top: 30px; position: relative">
+    <svg viewBox="0 0 1712 520" width="1712" height="520" style="display:block">
+      <defs>
+        <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#1B5A46"/></marker>
+        <marker id="arr-r" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#A33826"/></marker>
+      </defs>
+      <!-- issuer -->
+      <rect x="0" y="120" width="300" height="200" rx="26" fill="#163E33"/>
+      <g transform="translate(36,150)" stroke="#D8F58A" fill="none" stroke-width="3" stroke-linecap="round"><circle cx="20" cy="40" r="15"/><path d="M31 29l30-30M50 10l7 7M43 17l6 6"/></g>
+      <text x="36" y="250" fill="#F4F6F0" font-size="28" font-weight="700">Exercise issuer</text>
+      <text x="36" y="286" fill="#C3D3CA" font-size="21">signs with the private key</text>
+      <!-- phones -->
+      <g font-size="26" font-weight="700" fill="#192923">
+        <g transform="translate(420,60)"><rect width="260" height="330" rx="34" fill="#fff" stroke="#D7DFDA" stroke-width="2"/><text x="30" y="58">Phone A</text></g>
+        <g transform="translate(870,60)"><rect width="260" height="330" rx="34" fill="#fff" stroke="#D7DFDA" stroke-width="2"/><text x="30" y="58">Phone B</text></g>
+        <g transform="translate(1320,60)"><rect width="260" height="330" rx="34" fill="#fff" stroke="#D7DFDA" stroke-width="2"/><text x="30" y="58">Phone C</text></g>
+      </g>
+      <g font-size="21" fill="#55635D">
+        <g transform="translate(450,110)"><text y="30">✔ verify signature</text><text y="66">✔ store + show</text><text y="102">✔ queue for peers</text></g>
+        <g transform="translate(900,110)"><text y="30">✔ verify signature</text><text y="66">✔ store + banner</text><text y="102">✔ ACK to A</text><text y="138">✔ relay onward</text></g>
+        <g transform="translate(1350,110)"><text y="30">✔ verify signature</text><text y="66">✔ store + banner</text><text y="102">✔ ACK to B</text></g>
+      </g>
+      <g font-size="22" font-weight="700" fill="#1B5A46">
+        <text x="450" y="360">hop 0</text><text x="900" y="360">hop 1</text><text x="1350" y="360">hop 2</text>
+      </g>
+      <!-- links -->
+      <path d="M300 220 H410" stroke="#1B5A46" stroke-width="4" marker-end="url(#arr)"/>
+      <text x="312" y="200" font-size="18" fill="#1B5A46">signed</text>
+      <path d="M690 220 H860" stroke="#1B5A46" stroke-width="4" stroke-dasharray="2 12" stroke-linecap="round" marker-end="url(#arr)"/>
+      <path d="M1140 220 H1310" stroke="#1B5A46" stroke-width="4" stroke-dasharray="2 12" stroke-linecap="round" marker-end="url(#arr)"/>
+      <text x="705" y="200" font-size="18" fill="#1B5A46">short-range link</text>
+      <text x="1153" y="200" font-size="18" fill="#1B5A46">later, after A left</text>
+      <!-- A and C never meet -->
+      <path d="M550 400 C 700 470, 1300 470, 1450 400" stroke="#9DB5A8" stroke-width="3" stroke-dasharray="10 10" fill="none"/>
+      <text x="870" y="492" font-size="22" fill="#55635D">A and C are never in range of each other</text>
+      <!-- forged -->
+      <g transform="translate(1600,40)">
+        <rect width="112" height="70" rx="16" fill="#F8E3DE" stroke="#A33826" stroke-width="2"/>
+        <text x="16" y="31" font-size="18" font-weight="700" fill="#A33826">forged</text><text x="16" y="56" font-size="16" fill="#A33826">text changed</text>
+      </g>
+      <path d="M1640 112 L1588 150" stroke="#A33826" stroke-width="3" marker-end="url(#arr-r)"/>
+      <g transform="translate(1560,150)"><circle r="20" fill="#A33826"/><path d="M-8 -8L8 8M8 -8L-8 8" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/></g>
+    </svg>
+  </div>
+  <div class="three" style="gap: 24px">
+    <p class="small muted"><b style="color:var(--ink)">Rejected:</b> altered text, unknown issuer key, expired alerts. No ACK, not stored, not forwarded.</p>
+    <p class="small muted"><b style="color:var(--ink)">Duplicates</b> are acknowledged again (to recover lost ACKs) but never forwarded twice. Cooperative hop budget: 8.</p>
+    <p class="small muted"><b style="color:var(--ink)">An ACK</b> must match the peer, a fresh random token, the key ID, alert ID and revision. It is a receiving-app receipt, not proof a person read it.</p>
+  </div>
+  <div class="footer"><span class="brand"><img src="img/logo.svg" alt="">SafeMesh</span><span>04</span></div>
+  <aside class="notes">The issuer signs once. Phone A verifies and queues it. When A meets B, B verifies, stores, shows a banner, acknowledges and relays. Later A is gone, B meets C, and C receives the alert at hop 2 although A and C were never in range. A forged copy with changed text fails the signature check at C: no acknowledgement, not stored, not forwarded. This is the exact scenario in the demo video.</aside>
+</section>
+
+<!-- 5 · Demo ------------------------------------------------------------------->
+<section class="slide" data-title="It runs">
+  <div class="kicker">Demo · three emulators, three separate apps</div>
+  <h2>One alert, three phones, and A and C never meet.</h2>
+  <div class="row grow" style="gap: 60px; align-items: flex-end; justify-content: center; margin-top: 70px">
+    <div class="phone" style="width: 330px"><span class="tag pill lime">A · issuer publishes</span><img src="img/demo-a.jpg" alt="Phone A, exercise authority console after publishing"></div>
+    <div class="phone" style="width: 330px"><span class="tag pill lime">B · verified at hop 1</span><img src="img/demo-b.jpg" alt="Phone B, verified alert"></div>
+    <div class="phone" style="width: 330px"><span class="tag pill lime">C · hop 2, from B</span><img src="img/demo-c.jpg" alt="Phone C, alert received from B at hop 2"></div>
+    <div class="col" style="width: 420px; gap: 22px; align-self: center">
+      <p class="body"><b>Real:</b> three app processes on HarmonyOS API 24 emulators, on-device signature checks, storage, ACKs, retries and the forged-copy rejection.</p>
+      <p class="body muted"><b style="color:var(--warn)">Labelled stand-in:</b> emulators have no radio, so a local test link carries the packets (A–B, then B–C, never A–C).</p>
+      <span class="pill" style="align-self: flex-start"><svg class="i" style="width:26px;height:26px"><use href="#i-play"/></svg>Full run in the demo video</span>
+    </div>
+  </div>
+  <div class="footer"><span class="brand"><img src="img/logo.svg" alt="">SafeMesh</span><span>05</span></div>
+  <aside class="notes">These are stills from the recorded demo. A is the authenticated exercise issuer and publishes a custom alert. B verifies it at hop 1. Then A leaves, B meets C, and C receives it at hop 2. The test link is clearly labelled in the app as an emulator stand-in for NearLink; everything above the link is the real app.</aside>
+</section>
+
+<!-- 6 · Trust ------------------------------------------------------------------>
+<section class="slide" data-title="Trust model">
+  <div class="kicker">Trust model</div>
+  <h2>Built to survive a hostile crowd, honest about its limits.</h2>
+  <div class="row grow" style="gap: 56px; margin-top: 40px">
+    <div style="flex: 1.35">
+      <table>
+        <tr><th>If someone…</th><th>SafeMesh…</th></tr>
+        <tr><td>changes the text of an alert</td><td>rejects it: the ECDSA P-256 / SHA-256 signature no longer matches the canonical payload</td></tr>
+        <tr><td>invents an issuer</td><td>accepts only the pinned public key; the private key never ships in the app</td></tr>
+        <tr><td>replays an old alert</td><td>drops expired alerts and re-verifies its replay history on restore</td></tr>
+        <tr><td>floods duplicates</td><td>re-acknowledges them but never forwards them twice</td></tr>
+        <tr><td>picks device role A</td><td>gets no publishing rights: the issuer console needs an activation code</td></tr>
+        <tr><td>edits a translation</td><td>fails verification: v2 signs every language version of the text</td></tr>
+      </table>
+    </div>
+    <div class="col" style="flex: 0.75; gap: 26px">
+      <div class="card" style="background: var(--warn-soft); border-color: #EBD9AE">
+        <h3 style="color: var(--warn)">What signatures cannot stop</h3>
+        <p class="body" style="color: var(--warn); margin-top: 12px">Jamming, phones that silently drop messages, or a stolen issuer key. A real deployment needs audited key custody, rotation and revocation.</p>
+      </div>
+      <div class="card">
+        <h3>Privacy</h3>
+        <p class="body muted" style="margin-top: 12px">Location is optional, one-shot and foreground-only. It is never saved or relayed. Alerts carry no personal data.</p>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span class="brand"><img src="img/logo.svg" alt="">SafeMesh</span><span>06</span></div>
+  <aside class="notes">Each row is covered by host tests running the actual ArkTS code with real ECDSA: protocol, alert display, inbox, delivery and integration suites. We also state what signatures cannot do: jamming, dropping, or a compromised issuer key are outside what a signature can prevent.</aside>
+</section>
+
+<!-- 7 · Offline map ------------------------------------------------------------>
+<section class="slide" data-title="Offline map">
+  <div class="kicker">Spatial · offline map</div>
+  <div class="row grow" style="gap: 70px">
+    <div class="col" style="flex: 1">
+      <h2 style="font-size: 56px">Where to go, from the first launch, with no data connection.</h2>
+      <div class="col body muted" style="gap: 20px; margin-top: 44px">
+        <p><b style="color:var(--ink)">40 protective points</b> from the State Fire Service (PSP) dataset, central Kraków, with names, addresses and access categories.</p>
+        <p><b style="color:var(--ink)">Vector map in the app</b> (404 KB, OpenStreetMap geometry), drawn on an ArkUI Canvas. No tile server.</p>
+        <p><b style="color:var(--ink)">Search</b> all 40 addresses, with or without Polish diacritics. Save a place; it survives restarts.</p>
+        <p><b style="color:var(--ink)">Distance</b> from a labelled demo origin, or one optional foreground location fix (≤ 250 m accuracy, inside the map).</p>
+        <p><b style="color:var(--ink)">No false promises:</b> straight-line distance, no route guidance, no claim that a shelter is open.</p>
+      </div>
+    </div>
+    <div class="row" style="gap: 30px; align-items: flex-start">
+      <div class="phone" style="width: 330px"><img src="img/screen-map.jpg" alt="Map"></div>
+      <div class="phone" style="width: 330px; margin-top: 110px"><img src="img/screen-point.jpg" alt="Protective point detail"></div>
+    </div>
+  </div>
+  <p class="source">© OpenStreetMap contributors (ODbL) · Komenda Główna PSP (CC BY 4.0). PSP data 2026-09-28, OSM snapshot 2026-10-03.</p>
+  <div class="footer"><span class="brand"><img src="img/logo.svg" alt="">SafeMesh</span><span>07</span></div>
+  <aside class="notes">The map pack is built by scripts/refresh-map.py from public data and ships inside the HAP. Map tests cover dataset preservation, projection, distances and Canvas bounds. Location uses one foreground request with a ten-second timeout; poor accuracy or a fix outside the pack keeps the labelled origin.</aside>
+</section>
+
+<!-- 8 · Inclusive -------------------------------------------------------------->
+<section class="slide" data-title="Human-centric">
+  <div class="kicker">Human-centric by design</div>
+  <h2>Usable by everyone, in the moment it matters.</h2>
+  <div class="row grow" style="gap: 54px; margin-top: 92px; align-items: flex-start">
+    <div class="row" style="gap: 26px">
+      <div class="phone" style="width: 290px"><span class="tag pill">English · light</span><img src="img/screen-home-en-light.jpg" alt="Home in English, light"></div>
+      <div class="phone" style="width: 290px"><span class="tag pill">Polski · dark</span><img src="img/screen-home-pl-dark.jpg" alt="Home in Polish, dark"></div>
+    </div>
+    <div class="tiles" style="grid-template-columns: 1fr 1fr; flex: 1; margin-top: 0">
+      <div class="tile"><div class="icon"><svg class="i"><use href="#i-globe"/></svg></div><div><h3>Polish and English</h3><p>Follows the phone’s language by default; signed translations switch with it.</p></div></div>
+      <div class="tile"><div class="icon"><svg class="i"><use href="#i-moon"/></svg></div><div><h3>Light, dark, system</h3><p>Saved choice, system bars match.</p></div></div>
+      <div class="tile"><div class="icon"><svg class="i"><use href="#i-text"/></svg></div><div><h3>Large text</h3><p>Layouts checked at the system 1.45× preset, up to 2×.</p></div></div>
+      <div class="tile"><div class="icon"><svg class="i"><use href="#i-ear"/></svg></div><div><h3>Screen readers</h3><p>Labels on every control; new alerts and results are announced.</p></div></div>
+      <div class="tile"><div class="icon"><svg class="i"><use href="#i-vibrate"/></svg></div><div><h3>Vibration</h3><p>Short for new alerts, stronger for critical; respects silent mode.</p></div></div>
+      <div class="tile"><div class="icon"><svg class="i"><use href="#i-sun"/></svg></div><div><h3>Screen stays on</h3><p>Only while a relay link is active, so relaying does not pause.</p></div></div>
+    </div>
+  </div>
+  <div class="footer"><span class="brand"><img src="img/logo.svg" alt="">SafeMesh</span><span>08</span></div>
+  <aside class="notes">Both screenshots show the same inbox state: English light and Polish dark. The full gallery in docs/gallery shows all 17 screens in four variants. Vibration and keep-screen-on are settings, both on by default.</aside>
+</section>
+
+<!-- 9 · Platform --------------------------------------------------------------->
+<section class="slide" data-title="Built on HarmonyOS">
+  <div class="kicker">Platform capabilities</div>
+  <h2>Built on HarmonyOS itself, not on a generic web view.</h2>
+  <div class="tiles grow" style="margin-top: 44px; align-content: start">
+    <div class="tile"><div class="icon"><svg class="i"><use href="#i-radio"/></svg></div><div><h3>NearLink Kit</h3><p>Capability check, advertising, scan, reliable data channel, MTU framing.</p></div></div>
+    <div class="tile"><div class="icon"><svg class="i"><use href="#i-key"/></svg></div><div><h3>Crypto Architecture Kit</h3><p>On-device ECDSA P-256 verification; random delivery tokens.</p></div></div>
+    <div class="tile"><div class="icon"><svg class="i"><use href="#i-network"/></svg></div><div><h3>Network Kit</h3><p>WebSocket test link between emulator apps; loopback issuer client.</p></div></div>
+    <div class="tile"><div class="icon"><svg class="i"><use href="#i-locate"/></svg></div><div><h3>Location Kit</h3><p>One-shot foreground fix behind a runtime permission.</p></div></div>
+    <div class="tile"><div class="icon"><svg class="i"><use href="#i-db"/></svg></div><div><h3>ArkData preferences</h3><p>Chunked, generation-committed storage that survives interrupted writes.</p></div></div>
+    <div class="tile"><div class="icon"><svg class="i"><use href="#i-ear"/></svg></div><div><h3>Accessibility Kit</h3><p>Spoken announcements for new alerts, expiry and results.</p></div></div>
+    <div class="tile"><div class="icon"><svg class="i"><use href="#i-globe"/></svg></div><div><h3>Localization Kit</h3><p>System language, locale-aware times, PL/EN resource managers.</p></div></div>
+    <div class="tile"><div class="icon"><svg class="i"><use href="#i-vibrate"/></svg></div><div><h3>Sensor Service Kit</h3><p>Vibrator presets with a timed fallback; alarm usage for critical alerts.</p></div></div>
+    <div class="tile"><div class="icon"><svg class="i"><use href="#i-layers"/></svg></div><div><h3>ArkUI + AbilityKit</h3><p>Keep-screen-on window flag, SymbolGlyph icons, Canvas map, dark mode, font scale.</p></div></div>
+  </div>
+  <div class="row" style="gap: 24px; margin-bottom: 40px">
+    <div class="card" style="flex: 1; background: var(--forest); color: var(--ivory); border: none; padding: 26px 32px">
+      <p class="body"><b style="color: var(--lime)">API levels</b> · minimum API 20, as the challenge requires; built and validated with target API 24 (HarmonyOS 6.1.1) in DevEco Studio.</p></div>
+    <div class="card" style="flex: 1; padding: 26px 32px">
+      <p class="body"><b>Five permissions, each used</b> · <code>ACCESS_NEARLINK</code>, <code>APPROXIMATELY_LOCATION</code>, <code>LOCATION</code>, <code>VIBRATE</code>, <code>INTERNET</code> (loopback test link and issuer).</p></div>
+  </div>
+  <div class="footer"><span class="brand"><img src="img/logo.svg" alt="">SafeMesh</span><span>09</span></div>
+  <aside class="notes">Each tile maps to a source file listed in the README table "Platform capabilities used". The app declares only the permissions it uses: NearLink, approximate and precise location, vibration, and internet for the loopback test link and issuer.</aside>
+</section>
+
+<!-- 10 · NearLink -------------------------------------------------------------->
+<section class="slide dark" data-title="NearLink">
+  <div class="kicker">NearLink (星闪)</div>
+  <h2>Ready for HarmonyOS’s own short-range radio.</h2>
+  <div class="row" style="gap: 18px; margin-top: 44px; align-items: stretch">
+    <div class="card" style="flex:1"><span class="pill lime">1</span><h3 style="margin-top:18px">Capability</h3><p class="small" style="margin-top:10px; color:#C3D3CA"><code>isNearLinkSupported()</code> on API 23+; the system capability on API 20–22, where that call does not exist.</p></div>
+    <div class="card" style="flex:1"><span class="pill lime">2</span><h3 style="margin-top:18px">Advertise + scan</h3><p class="small" style="margin-top:10px; color:#C3D3CA">A custom application UUID; scan by the peer’s exact device name, because API 24 requires a discovery filter.</p></div>
+    <div class="card" style="flex:1"><span class="pill lime">3</span><h3 style="margin-top:18px">Reliable channel</h3><p class="small" style="margin-top:10px; color:#C3D3CA"><code>dataTransfer</code> with bounded framing, so one alert can span the negotiated MTU.</p></div>
+    <div class="card" style="flex:1"><span class="pill lime">4</span><h3 style="margin-top:18px">Same relay rules</h3><p class="small" style="margin-top:10px; color:#C3D3CA">The <code>RelayTransport</code> contract: verify, store, ACK, forward, exactly as on the emulators.</p></div>
+  </div>
+  <div class="terminal mono" style="margin-top: 34px; font-size: 21px; background: rgba(0,0,0,0.32)">
+    <div class="dim">// entry/src/harmonyos/transport/NearLinkTransport.ets</div>
+    <div>if (!canIUse(<span class="ok">'SystemCapability.Communication.NearLink.Core'</span>)) { <span class="dim">/* unsupported */</span> }</div>
+    <div class="dim">// isNearLinkSupported() exists from API 23 (HarmonyOS 6.1.0); on API 20–22 the system capability decides.</div>
+    <div>this.supported = deviceInfo.sdkApiVersion &gt;= 23 ? manager.isNearLinkSupported() : true;</div>
+  </div>
+  <div class="row" style="gap: 40px; margin-top: 40px">
+    <div style="flex:1"><h3 style="color: var(--lime)">Done</h3><p class="body" style="margin-top: 10px">Adapter implemented and covered by host tests with platform mocks: discovery, confirmed connections, split and merged reads, cleanup.</p></div>
+    <div style="flex:1"><h3 style="color: var(--lime)">Not yet proven</h3><p class="body" style="margin-top: 10px">Emulators have no NearLink radio. The physical A → B → C test on phones has a step-by-step runbook: <code>docs/PHYSICAL_TESTING.md</code>.</p></div>
+    <div style="flex:1"><h3 style="color: var(--lime)">Background</h3><p class="body" style="margin-top: 10px">The NearLink continuous-task mode arrives in API 26. Until then relaying runs in the foreground, and we say so in the app.</p></div>
+  </div>
+  <div class="footer"><span class="brand"><img src="img/logo.svg" alt="">SafeMesh</span><span>10</span></div>
+  <aside class="notes">NearLink is the platform feature SafeMesh was designed around. The adapter is real code, entry/src/harmonyos/transport/NearLinkTransport.ets. We found and fixed a real compatibility issue: isNearLinkSupported only exists from API 23, so on HarmonyOS 6.0 phones the app now relies on the system capability. We do not claim a physical radio test yet.</aside>
+</section>
+
+<!-- 11 · Open stack ------------------------------------------------------------>
+<section class="slide" data-title="One codebase, two systems">
+  <div class="kicker">Open platform · digital sovereignty</div>
+  <h2>One codebase. HarmonyOS and the open-source Oniro.</h2>
+  <div class="row grow" style="gap: 40px; margin-top: 54px; align-items: stretch">
+    <div class="col" style="flex: 1; gap: 22px">
+      <div class="layer" style="background: var(--forest); color: var(--ivory)"><b style="color: var(--lime)">Shared core: everything users see</b>Signed alert protocol, relay engine and delivery queue, inbox, issuer console, offline map, UI, emulator test link.</div>
+      <div class="row" style="gap: 22px">
+        <div class="layer card" style="flex:1"><b>default product</b>HarmonyOS, target API 24, minimum API 20. <code>src/harmonyos</code>: the NearLink Kit adapter.</div>
+        <div class="layer card" style="flex:1"><b>oniro product</b>OpenHarmony API 23 on the Eclipse Oniro emulator (Linux). <code>src/oniro</code>: a NearLink stub.</div>
+      </div>
+      <p class="body muted">hvigor picks the adapter through each target’s <code>sourceRoots</code>; the root <code>hvigorfile.ts</code> adjusts the manifest for Oniro only. Tests keep NearLink Kit out of the shared code.</p>
+    </div>
+    <div class="card" style="flex: 0.7; background: var(--soft); border: none">
+      <h3>Why it matters</h3>
+      <p class="body muted" style="margin-top: 16px">Public-safety software should be auditable and shippable on hardware you control. The Oniro product builds with the open-source toolchain (<code>oniro-app</code>), signs with the public OpenHarmony debug key and runs on the Oniro emulator; a team member ran it there.</p>
+      <div class="terminal mono" style="margin-top: 24px; font-size: 18px; box-shadow: none">
+        <div class="dim"># Linux, open-source toolchain, three nodes</div>
+        <div>scripts/oniro/emulator.sh A   <span class="dim"># and B, C</span></div>
+        <div>scripts/oniro/deploy.sh       <span class="dim"># build --product oniro</span></div>
+        <div>scripts/oniro/services.sh start</div>
+        <div>node scripts/oniro/send-alert.mjs …</div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span class="brand"><img src="img/logo.svg" alt="">SafeMesh</span><span>11</span></div>
+  <aside class="notes">The challenge asks what an open mobile platform makes possible. SafeMesh shows the code is not locked to one vendor: the same repository produces a HarmonyOS package with NearLink and an OpenHarmony package for Oniro, differing only where the platform requires it. COMMANDS.md documents the Linux workflow.</aside>
+</section>
+
+<!-- 12 · Architecture ---------------------------------------------------------->
+<section class="slide" data-title="Architecture">
+  <div class="kicker">Architecture · MVVM</div>
+  <h2>Small, testable layers. The radio never decides trust.</h2>
+  <div class="row grow" style="gap: 46px; margin-top: 46px; align-items: stretch">
+    <div class="col" style="flex: 1.2; gap: 14px">
+      <div class="layer" style="background: #fff; border: 1px solid var(--line)"><b>views/</b>One component per screen: home, map, relay, guide, settings, diagnostics, issuer. Shared controls and theme.</div>
+      <div class="layer" style="background: var(--soft)"><b>viewmodel/</b><code>AlertViewModel</code> inbox · <code>RelayViewModel</code> transport + delivery · <code>AuthorityViewModel</code> issuer · <code>MapViewModel</code></div>
+      <div class="layer" style="background: var(--sage)"><b>model/</b><code>AlertProtocol</code> signature + policy · <code>DeliveryProtocol</code> wire format · <code>DeliveryQueue</code> ACKs + retries · <code>LocalStore</code> · <code>DeviceLocation</code> · <code>AuthorityClient</code></div>
+      <div class="layer" style="background: var(--forest); color: var(--ivory)"><b style="color: var(--lime)">transport/ · one RelayTransport contract</b><code>NearLinkTransport</code> on phones · <code>EmulatorTransport</code> for the labelled lab</div>
+    </div>
+    <div class="col" style="flex: 0.8; gap: 18px">
+      <div class="card"><h3>Lab services (laptop, loopback only)</h3>
+        <p class="body muted" style="margin-top: 12px"><code>demo-authority-server.mjs</code>: holds the exercise private key, needs a bearer token, returns signed envelopes.</p>
+        <p class="body muted" style="margin-top: 12px"><code>mesh-lab-server.mjs</code>: routes only A–B and B–C, can drop or inject packets for fault tests. Stores and ACKs nothing.</p></div>
+      <div class="card"><h3>Bounded by design</h3><p class="body muted" style="margin-top: 12px">4 KiB canonical alert, 8 peers, 128 alerts per peer, 4 packets per batch, 3 attempts, hop budget 8.</p></div>
+    </div>
+  </div>
+  <div class="footer"><span class="brand"><img src="img/logo.svg" alt="">SafeMesh</span><span>12</span></div>
+  <aside class="notes">The UI shell, pages/Index.ets, was split from 1,150 lines into screen components; 16 of 19 screens were pixel-identical afterwards and the rest differ only in a timestamp or scroll offset. The model layer has no UI dependencies, which is why 177 host tests can run the real ArkTS code.</aside>
+</section>
+
+<!-- 13 · Evidence -------------------------------------------------------------->
+<section class="slide" data-title="Evidence">
+  <div class="kicker">Technical execution · evidence</div>
+  <h2>Every claim has a test, a log or a recording behind it.</h2>
+  <div class="row grow" style="gap: 44px; margin-top: 44px; align-items: flex-start">
+    <div class="statgrid" style="flex: 1.25">
+      <div class="stat"><div class="big">177</div><p>host tests in 16 suites, running the real ArkTS sources</p></div>
+      <div class="stat"><div class="big">0</div><p>ArkTS errors, in both products’ source sets</p></div>
+      <div class="stat"><div class="big">0</div><p>Code Linter issues</p></div>
+      <div class="stat"><div class="big">17/17</div><p>assertions over captured native evidence (v1.4 relay run)</p></div>
+      <div class="stat"><div class="big">68</div><p>full-page screenshots: 17 screens × EN/PL × light/dark</p></div>
+      <div class="stat"><div class="big">4.3k</div><p>lines of tests for 8k lines of ArkTS</p></div>
+    </div>
+    <div class="col" style="flex: 0.9; gap: 20px">
+      <div class="terminal mono">
+        <div class="dim">PS&gt; .\scripts\check.ps1 -Build</div>
+        <div>ℹ tests 177</div>
+        <div>ℹ pass 177</div>
+        <div>ℹ fail 0</div>
+        <div class="dim"># ArkTS check, harmonyos source set</div>
+        <div class="ok">No errors found in 32 file(s).</div>
+        <div class="dim"># ArkTS check, oniro source set</div>
+        <div class="ok">No errors found in 32 file(s).</div>
+        <div>Summary: <span class="ok">Issues: 0</span> | Errors: 0 | Warnings: 0</div>
+        <div>&gt; hvigor <span class="ok">BUILD SUCCESSFUL</span></div>
+        <div class="ok">CHECKS: PASS</div>
+      </div>
+      <p class="body muted">A fresh clone from GitHub builds and passes the same checks. Every release has a SHA-256, and the commit history shows each step since 3 October, 18:07. AI-assisted development is documented in <code>AI_WORKFLOW.md</code>.</p>
+    </div>
+  </div>
+  <div class="footer"><span class="brand"><img src="img/logo.svg" alt="">SafeMesh</span><span>13</span></div>
+  <aside class="notes">The terminal lines are copied from artifacts/logs/v160-checks-build.log. The 17 of 17 evidence assertions are in artifacts/logs/authority-v14-assertions.json. The screen gallery is generated by scripts/capture-gallery.py.</aside>
+</section>
+
+<!-- 14 · Status ---------------------------------------------------------------->
+<section class="slide" data-title="Honest status">
+  <div class="kicker">What is real · what is next</div>
+  <h2>A narrow prototype that works, and says what it doesn’t do yet.</h2>
+  <div class="three grow" style="margin-top: 44px; align-content: start">
+    <div class="card"><span class="pill">Works today</span>
+      <ul class="body" style="margin: 22px 0 0; padding-left: 28px; line-height: 1.6">
+        <li>Signed alerts, verified on every phone</li><li>Store-and-forward with ACKs and retries</li><li>Forged, expired and duplicate handling</li><li>Issuer console with activation code</li><li>Offline map, search, saved place</li><li>PL/EN, dark mode, large text</li>
+      </ul></div>
+    <div class="card" style="background: var(--warn-soft); border-color: #EBD9AE"><span class="pill amber">Simulated and labelled</span>
+      <ul class="body" style="margin: 22px 0 0; padding-left: 28px; line-height: 1.6; color: var(--warn)">
+        <li>Radio between emulators: a local test link</li><li>Issuer: a local exercise signing service, not RCB</li><li>Alerts are exercises, marked in the app</li>
+      </ul></div>
+    <div class="card" style="background: var(--forest); color: var(--ivory); border: none"><span class="pill lime">Next</span>
+      <ul class="body" style="margin: 22px 0 0; padding-left: 28px; line-height: 1.6">
+        <li>NearLink A → B → C on physical phones (runbook ready)</li><li>Background relaying with API 26 NearLink tasks</li><li>Issuer key rotation and revocation</li><li>Map packs for any city (refresh script exists)</li>
+      </ul></div>
+  </div>
+  <div class="row" style="gap: 26px; align-items: center; border: 2px dashed var(--sage); border-radius: 26px; padding: 26px 34px; margin-bottom: 40px">
+    <span class="pill" style="flex: none">Physical test plan</span>
+    <p class="body muted">NearLink phones without internet: A sends a signed alert to B, A leaves, B later delivers it to C. Logs tagged <code>SAFEMESH_TRANSPORT_*</code> record every link change and error; delivery counters show pending, acknowledged and retried alerts.</p>
+  </div>
+  <div class="footer"><span class="brand"><img src="img/logo.svg" alt="">SafeMesh</span><span>14</span></div>
+  <aside class="notes">We would rather show a narrow solution that works than a broad concept. The two stand-ins are labelled in the app and in the README. The physical NearLink test plan, including signing for phones, is in docs/PHYSICAL_TESTING.md.</aside>
+</section>
+
+<!-- 15 · Criteria -------------------------------------------------------------->
+<section class="slide" data-title="Against the criteria">
+  <div class="kicker">For the jury</div>
+  <h2 style="font-size: 54px">How SafeMesh meets the six criteria.</h2>
+  <table class="criteria" style="margin-top: 34px">
+    <tr><th style="width: 360px">Criterion</th><th>Evidence</th></tr>
+    <tr><td><b>Originality</b> · 20%</td><td>Verification on every hop plus store-and-forward, so trust survives forwarding; one app also carries the offline map.</td></tr>
+    <tr><td><b>Usefulness</b> · 20%</td><td>Human-Centric (lead) and Spatial: keeps a verified warning and local protective points usable without a network. Bilingual and accessible.</td></tr>
+    <tr><td><b>Technical execution</b> · 20%</td><td>177 tests, 0 ArkTS errors, 0 lint issues, bounded protocol, failure handling (lost ACKs, restarts, timeouts), no secrets in the repo.</td></tr>
+    <tr><td><b>Platform use</b> · 20%</td><td>NearLink Kit adapter, Crypto, Network, Location, ArkData, Accessibility, Localization, Sensor and window APIs; a separate Oniro product.</td></tr>
+    <tr><td><b>Demo</b> · 10%</td><td>Three separate apps on emulators in one synchronized recording; stand-ins labelled; 68-screenshot gallery.</td></tr>
+    <tr><td><b>Reproducibility</b> · 10%</td><td>README, one-command checks, release HAP with SHA-256, fresh-clone build, scripted demo and gallery, commit history, <code>AI_WORKFLOW.md</code>.</td></tr>
+  </table>
+  <div class="footer"><span class="brand"><img src="img/logo.svg" alt="">SafeMesh</span><span>15</span></div>
+  <aside class="notes">This slide is a map for the jury: each line points to evidence in the repository. The README section "For the jury: start here" has the same links.</aside>
+</section>
+
+<!-- 16 · Close ----------------------------------------------------------------->
+<section class="slide dark" data-title="Thank you">
+  <div class="row grow" style="align-items: center; gap: 80px">
+    <div class="col" style="flex: 1">
+      <div class="logo-row"><img src="img/logo.svg" alt=""></div>
+      <h1 style="font-size: 104px">The network can fail.<br><span style="color: var(--lime)">The warning still arrives.</span></h1>
+      <div class="col body" style="gap: 14px; margin-top: 56px; color: #DCE8E1">
+        <p><b style="color: var(--lime)">Code</b> · github.com/carrotly-technologies-2026/SafeMesh</p>
+        <p><b style="color: var(--lime)">Install, video, deck</b> · the latest GitHub release</p>
+        <p><b style="color: var(--lime)">Every screen</b> · docs/gallery in the repository</p>
+      </div>
+    </div>
+    <div class="col" style="align-items: center; gap: 18px">
+      <div style="background: #fff; padding: 26px; border-radius: 30px"><img src="img/qr-repo.svg" alt="QR code to the GitHub repository" style="width: 300px; height: 300px; display:block"></div>
+      <span class="small" style="color: #C3D3CA">Scan for the repository</span>
+    </div>
+  </div>
+  <div class="footer"><span class="brand">Team SafeMesh · HackYeah 2026, Kraków</span><span>Apache-2.0 · map data ODbL / CC BY 4.0</span></div>
+  <aside class="notes">Thank you. The repository README starts with a section for the jury that links the release, the demo video, this deck, the screen gallery and the test logs.</aside>
+</section>
+
+</main>
+<div class="hint">← → to navigate · F for full screen</div>
+<script>
+(function () {
+  if (document.documentElement.classList.contains('render') || location.search.indexOf('render') >= 0) {
+    document.documentElement.classList.add('render');
+    return;
+  }
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var index = Math.max(0, Math.min(slides.length - 1, (parseInt(location.hash.slice(1), 10) || 1) - 1));
+  document.body.classList.add('view');
+  function fit() {
+    var scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+    slides.forEach(function (slide) {
+      slide.style.transform = 'translate(' + (window.innerWidth - 1920 * scale) / 2 + 'px,' +
+        (window.innerHeight - 1080 * scale) / 2 + 'px) scale(' + scale + ')';
+    });
+  }
+  function show(next) {
+    index = Math.max(0, Math.min(slides.length - 1, next));
+    slides.forEach(function (slide, i) { slide.classList.toggle('current', i === index); });
+    history.replaceState(null, '', '#' + (index + 1));
+  }
+  document.addEventListener('keydown', function (event) {
+    if (['ArrowRight', 'PageDown', ' '].indexOf(event.key) >= 0) { show(index + 1); }
+    if (['ArrowLeft', 'PageUp'].indexOf(event.key) >= 0) { show(index - 1); }
+    if (event.key === 'Home') { show(0); }
+    if (event.key === 'End') { show(slides.length - 1); }
+    if (event.key === 'f' || event.key === 'F') {
+      if (document.fullscreenElement) { document.exitFullscreen(); } else { document.documentElement.requestFullscreen(); }
+    }
+  });
+  document.addEventListener('click', function (event) { show(index + (event.clientX > window.innerWidth / 3 ? 1 : -1)); });
+  window.addEventListener('resize', fit);
+  fit();
+  show(index);
+})();
+</script>
+</body>
+</html>
