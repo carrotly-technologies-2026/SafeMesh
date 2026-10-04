@@ -62,7 +62,11 @@ In the app, open **Relay / Łączność**, choose **A** and tap **Connect / Poł
 node scripts/oniro/send-alert.mjs "Tytuł" "Treść komunikatu" "Kraków" critical
 ```
 
-The script acts as emulator B. The local authority signs the alert, the hub delivers it to A, and A verifies, stores and acknowledges it. Severity is `info`, `warning` or `critical`. The alert is in Polish and valid for 60 minutes. A must be connected and in the foreground.
+The local authority signs the alert and the hub delivers it. Severity is `info`, `warning` or `critical`. The alert is in Polish and valid for 60 minutes. Receiving apps must be connected and in the foreground.
+
+- **One emulator (A):** the script connects as a fake emulator B and sends the alert to A.
+- **Three emulators (A, B, C):** the hub has no free node, so it injects the alert as A → B. B verifies it and relays it to C.
+- Override the direction with `FROM=C TO=B node scripts/oniro/send-alert.mjs ...`.
 
 To publish from the app instead: Settings → **Tests and diagnostics / Testy i diagnostyka** → **Exercise authority / Nadawca ćwiczeń**. The activation code is in `.cache/demo-authority/session-token.txt`. Do not share it or commit it.
 

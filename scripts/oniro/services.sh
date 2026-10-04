@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Start or stop the mesh hub (8765) and exercise authority (8768), and forward both ports into the emulator.
+# Start or stop the mesh hub (8765) and exercise authority (8768), and forward their ports into every running emulator.
+# Emulator A gets the hub and the authority; B and C get the hub on their own in-emulator port (8766, 8767).
 # Usage: services.sh start|stop|status
 set -euo pipefail
 source "$(dirname "$0")/common.sh"
@@ -28,9 +29,19 @@ case "${1:-}" in
     start_one hub mesh-lab-server.mjs
     start_one authority demo-authority-server.mjs
     sleep 1
-    "$HDC" tconn 127.0.0.1:55555 >/dev/null
-    for port in 8765 8768; do
-      "$HDC" fport ls | grep -q "tcp:$port tcp:$port" || "$HDC" rport "tcp:$port" "tcp:$port"
+    for node in "${NODES[@]}"; do
+      target="$(node_target "$node")"
+      if ! node_online "$node"; then
+        echo "Emulator $node ($target) is not running, no port forwards."; continue
+      fi
+      forwards=("$(node_hub_port "$node"):8765")
+      [[ "$node" == A ]] && forwards+=("8768:8768")
+      for pair in "${forwards[@]}"; do
+        remote="${pair%%:*}" local="${pair##*:}"
+        "$HDC" fport ls | grep -qE "^$target +tcp:$remote tcp:$local" ||
+          "$HDC" -t "$target" rport "tcp:$remote" "tcp:$local" >/dev/null
+      done
+      echo "Emulator $node ($target): forwards ${forwards[*]}"
     done
     ;;
   stop)
