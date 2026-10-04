@@ -1,6 +1,8 @@
-import { common, ConfigurationConstant } from '@kit.AbilityKit';
+import { bundleManager, common, ConfigurationConstant } from '@kit.AbilityKit';
 import { accessibility } from '@kit.AccessibilityKit';
+import { window } from '@kit.ArkUI';
 import { i18n, intl } from '@kit.LocalizationKit';
+import { AlertFeedback } from '../model/AlertFeedback';
 import { LocalStore } from '../model/LocalStore';
 import { AlertViewModel, AlertInboxItem } from '../viewmodel/AlertViewModel';
 import { AuthorityViewModel } from '../viewmodel/AuthorityViewModel';
@@ -30,6 +32,8 @@ struct Index {
   @State language: string = 'en';
   @State languagePreference: string = 'system';
   @State themePreference: string = 'system';
+  @State keepScreenOn: boolean = true;
+  @State alertVibration: boolean = true;
   @State settingsBusy: boolean = true;
   @State initialized: boolean = false;
   @State query: string = '';
@@ -44,6 +48,9 @@ struct Index {
   @StorageLink('safeMeshThemeRevision') themeRevision: number = 0;
   private store: LocalStore = new LocalStore();
   private copy: UiCopy = new UiCopy();
+  private feedback: AlertFeedback = new AlertFeedback();
+  private screenKeptOn: boolean = false;
+  private appVersion: string = '';
   @State @Watch('onAlertChanged') alerts: AlertViewModel = new AlertViewModel(this.store);
   @State map: MapViewModel = new MapViewModel();
   @State @Watch('onRelayChanged') relay: RelayViewModel = new RelayViewModel(this.alerts);
@@ -60,6 +67,9 @@ struct Index {
   aboutToAppear(): void {
     const context: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
     this.copy.initialize(context);
+    try {
+      this.appVersion = bundleManager.getBundleInfoForSelfSync(bundleManager.BundleFlag.GET_BUNDLE_INFO_DEFAULT).versionName;
+    } catch (error) { this.appVersion = ''; }
     this.initialize(context);
   }
 
@@ -74,6 +84,7 @@ struct Index {
   }
 
   aboutToDisappear(): void {
+    this.applyKeepScreenOn(false);
     this.alerts.dispose();
     this.relay.stop();
     this.authority.dispose();
@@ -97,6 +108,9 @@ struct Index {
       const savedTheme: string = await this.store.read('ui_theme');
       this.themePreference = savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : 'system';
       this.applyTheme(this.themePreference);
+      // Both relay comfort settings default to on; only an explicit 'off' disables them.
+      this.keepScreenOn = (await this.store.read('keep_screen_on')) !== 'off';
+      this.alertVibration = (await this.store.read('alert_vibration')) !== 'off';
       await this.map.restoreSaved(this.store);
       await this.alerts.restore();
       await this.relay.probe();
@@ -173,6 +187,36 @@ struct Index {
     finally { this.settingsBusy = false; }
   }
 
+  private async chooseToggle(key: string, enabled: boolean): Promise<void> {
+    if (this.settingsBusy) { return; }
+    this.settingsBusy = true;
+    this.notice = '';
+    if (key === 'keep_screen_on') { this.keepScreenOn = enabled; this.updateKeepScreenOn(); }
+    else { this.alertVibration = enabled; }
+    try {
+      await this.store.write(key, enabled ? 'on' : 'off');
+      this.announce(this.t('settings_saved'));
+    } catch (error) { this.notice = this.t('settings_save_failed'); }
+    finally { this.settingsBusy = false; }
+  }
+
+  /** While relaying, keep the screen awake like a navigation session; leaving the app still pauses relaying. */
+  private updateKeepScreenOn(): void {
+    this.applyKeepScreenOn(this.keepScreenOn && this.relay.isConnected);
+  }
+
+  private applyKeepScreenOn(keep: boolean): void {
+    if (keep === this.screenKeptOn) { return; }
+    this.screenKeptOn = keep;
+    try {
+      const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+      window.getLastWindow(context)
+        .then((mainWindow: window.Window) => mainWindow.setWindowKeepScreenOn(keep))
+        .then(() => { console.info('SAFEMESH_KEEP_SCREEN_ON ' + keep); })
+        .catch(() => { this.screenKeptOn = !keep; console.warn('SAFEMESH_KEEP_SCREEN_ON failed'); });
+    } catch (error) { this.screenKeptOn = !keep; }
+  }
+
   private announce(message: string): void {
     const event: accessibility.EventInfo = {
       type: 'announceForAccessibility',
@@ -187,7 +231,10 @@ struct Index {
     if (this.alerts.arrivalSequence !== this.lastArrivalSequence) {
       this.lastArrivalSequence = this.alerts.arrivalSequence;
       const message: AlertInboxItem | undefined = this.alerts.getMessage(this.alerts.arrivalIdentity);
-      if (message !== undefined) { this.announce(this.t('new_alert') + '. ' + message.title); }
+      if (message !== undefined) {
+        this.announce(this.t('new_alert') + '. ' + message.title);
+        if (this.alertVibration) { this.feedback.vibrate(message.severity); }
+      }
     }
     const identity: string = this.alerts.received ? this.alerts.currentIdentity : '';
     if (identity !== this.lastAnnouncedAlert) {
@@ -205,6 +252,7 @@ struct Index {
   }
 
   private onRelayChanged(): void {
+    this.updateKeepScreenOn();
     if (!this.relay.running && this.relay.events.length > 0 && this.relay.testState !== this.lastAnnouncedRelay) {
       this.lastAnnouncedRelay = this.relay.testState;
       this.announce(this.t('test_' + this.relay.testState));
@@ -818,6 +866,15 @@ struct Index {
   }
 
   @Builder
+  private settingsToggle(label: () => string, id: string, isOn: () => boolean, change: (enabled: boolean) => void) {
+    Row({ space: 16 }) {
+      Text(label()).fontSize(16).fontColor(INK).layoutWeight(1)
+      Toggle({ type: ToggleType.Switch, isOn: isOn() }).id(id).selectedColor(SUCCESS)
+        .enabled(!this.settingsBusy).accessibilityText(label()).onChange(change)
+    }.width('100%').padding(16).constraintSize({ minHeight: 54 }).backgroundColor(SURFACE)
+  }
+
+  @Builder
   private settingsView() {
     Column({ space: 12 }) {
       this.section('theme_label')
@@ -840,6 +897,15 @@ struct Index {
       }.width('100%').borderRadius(12).clip(true)
       Text(this.t('language_auto_hint')).fontSize(12).fontColor(MUTED).width('100%')
       Text(this.t('text_size_hint')).fontSize(12).fontColor(MUTED).width('100%')
+      this.section('relay_comfort_label')
+      Column() {
+        this.settingsToggle(() => this.t('keep_screen_on'), 'keepScreenOn', () => this.keepScreenOn,
+          (enabled: boolean) => { this.chooseToggle('keep_screen_on', enabled); })
+        this.divider()
+        this.settingsToggle(() => this.t('alert_vibration'), 'alertVibration', () => this.alertVibration,
+          (enabled: boolean) => { this.chooseToggle('alert_vibration', enabled); })
+      }.width('100%').borderRadius(12).clip(true)
+      Text(this.t('relay_comfort_hint')).fontSize(12).fontColor(MUTED).width('100%')
       this.divider()
       this.rowLink($r('sys.symbol.checkmark_shield'), () => this.t('diagnostics_title'), () => this.t('diagnostics_hint'),
         'settingsDiagnostics', () => { this.diagnosticsParent = 4; this.selectTab(5); })
@@ -848,7 +914,7 @@ struct Index {
       Text(this.t('pack_date') + ': ' + this.map.sourceDate + ' · ' + this.map.packSize).fontSize(12).fontColor(MUTED).width('100%')
       this.sourceLink('https://dane.gov.pl/pl/dataset/28058,punkty-schronienia-w-polsce', () => this.t('source_psp'))
       this.sourceLink('https://www.openstreetmap.org/copyright', () => this.t('source_osm'))
-      Text('SafeMesh 1.4.0').fontSize(12).fontColor(MUTED).width('100%')
+      Text('SafeMesh ' + this.appVersion).fontSize(12).fontColor(MUTED).width('100%')
     }.width('100%').alignItems(HorizontalAlign.Start)
   }
 

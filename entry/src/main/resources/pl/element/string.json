@@ -1279,6 +1279,22 @@
     {
       "name": "language_auto_hint",
       "value": "Systemowy dopasowuje język do ustawień telefonu: polski na telefonie po polsku, w innym przypadku angielski."
+    },
+    {
+      "name": "relay_comfort_label",
+      "value": "Przekazywanie i alerty"
+    },
+    {
+      "name": "keep_screen_on",
+      "value": "Nie wygaszaj ekranu podczas połączenia"
+    },
+    {
+      "name": "alert_vibration",
+      "value": "Wibracja przy nowym alercie"
+    },
+    {
+      "name": "relay_comfort_hint",
+      "value": "Przekazywanie zatrzymuje się, gdy ekran zgaśnie lub wyjdziesz z aplikacji, dlatego niewygaszanie ekranu zużywa więcej baterii. Wibracja respektuje tryb cichy telefonu."
     }
   ]
 }

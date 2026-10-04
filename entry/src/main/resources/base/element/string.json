@@ -1279,6 +1279,22 @@
     {
       "name": "language_auto_hint",
       "value": "System follows the phone’s language: Polish on a Polish phone, English otherwise."
+    },
+    {
+      "name": "relay_comfort_label",
+      "value": "Relaying and alerts"
+    },
+    {
+      "name": "keep_screen_on",
+      "value": "Keep screen on while connected"
+    },
+    {
+      "name": "alert_vibration",
+      "value": "Vibrate on new alerts"
+    },
+    {
+      "name": "relay_comfort_hint",
+      "value": "Relaying pauses when the screen turns off or you leave the app, so keeping the screen on uses more battery. Vibration follows the phone’s silent mode."
     }
   ]
 }

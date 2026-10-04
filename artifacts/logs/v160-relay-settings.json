@@ -1,0 +1,50 @@
+{
+  "app": null,
+  "steps": [
+    {
+      "step": "defaults",
+      "keepScreenOn": "true",
+      "alertVibration": "true",
+      "versionLabel": [
+        "SafeMesh 1.6.0"
+      ]
+    },
+    {
+      "step": "A idle",
+      "screenLocks": 0
+    },
+    {
+      "step": "A connected, keep on",
+      "screenLocks": 1
+    },
+    {
+      "step": "A connected, keep off",
+      "toggle": "false",
+      "screenLocks": 0
+    },
+    {
+      "step": "A connected, keep on again",
+      "screenLocks": 1
+    },
+    {
+      "step": "B received, vibration on",
+      "feedbackLog": [
+        "vibrated=false severity=warning"
+      ]
+    },
+    {
+      "step": "C loaded, vibration off",
+      "toggle": null,
+      "feedbackLog": []
+    },
+    {
+      "step": "A disconnected",
+      "screenLocks": 0
+    },
+    {
+      "step": "C after relaunch",
+      "keepScreenOn": "true",
+      "alertVibration": "false"
+    }
+  ]
+}
