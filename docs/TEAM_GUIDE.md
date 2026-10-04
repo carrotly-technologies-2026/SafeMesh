@@ -12,7 +12,10 @@ How to build, run, test, record and release SafeMesh, and where the submission s
 | Start the three-emulator demo (issuer, hub, A/B/C) | `powershell -ExecutionPolicy Bypass -File scripts\start-authority-demo.ps1` | 1–3 min |
 | Control the emulator "radio" (ranges, loss, forged packets) | `node scripts\mesh-lab-control.mjs …` (§5.4) | instant |
 | Re-check the recorded v1.4 native evidence | `node scripts\validate-authority-evidence.mjs` | seconds |
-| Record a demo video | `python scripts\record-mesh-demo.py …` (§6) | — |
+| Record a raw demo capture | `python scripts\record-mesh-demo.py …` (§6) | — |
+| Make the narrated demo video | `scripts\demo-video\` (§6, [DEMO_VIDEO.md](DEMO_VIDEO.md)) | about 30 min |
+| Regenerate the screen gallery | `python scripts\capture-gallery.py --device 127.0.0.1:5555 --peer 127.0.0.1:5557:B --peer 127.0.0.1:5559:C` | about 40 min |
+| Render the pitch deck (PDF, PPTX, previews) | `python scripts\render-pitch.py --screens` | under 1 min |
 | Run on Linux / Oniro (OpenHarmony) | [COMMANDS.md](../COMMANDS.md) | — |
 | Test NearLink on physical phones | [docs/PHYSICAL_TESTING.md](PHYSICAL_TESTING.md) | — |
 | Refresh the bundled exercise before it expires | `.\scripts\run-demo.ps1 -RefreshDrill` (§8.1) | about 1 min |
@@ -42,7 +45,7 @@ Products:
 | `default` | HarmonyOS, target API 24, min API 20 | Real adapter | No (emulators); phones are signed locally in DevEco | DevEco Studio / `devecocli` on Windows |
 | `oniro` | OpenHarmony API 23, min API 20, device type `default` | Stub ("unsupported") | OpenHarmony public debug key | `oniro-app build --product oniro` on Linux |
 
-Releases: [v1.6.0](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/v1.6.0) is current (HAP and SHA-256, plus the demo video). [v1.4.1](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/v1.4.1) is where the video was recorded.
+Releases: [v1.6.0](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/v1.6.0) is the current app (HAP and SHA-256). The [submission pack `submission-1.6.0`](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/submission-1.6.0) has the same HAP plus the narrated video, subtitles, pitch deck (PDF, PPTX) and the full-resolution gallery. [v1.4.1](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/v1.4.1) holds the earlier silent video.
 
 ## 3. Setup (Windows, HarmonyOS product)
 
@@ -220,7 +223,17 @@ python scripts\record-mesh-demo.py --pids <A> <B> <C> --output dist\SafeMesh-mes
 New-Item .cache\stop.flag   # stops the three-window recording from another terminal
 ```
 
-Both use only the `Emulator.exe` windows, never the desktop, and the FFmpeg bundled with DevEco Studio. Keep the windows visible and unminimized, and keep their size unchanged. The recorders refuse to overwrite an output. Never film the activation code, the `.cache` folder or a terminal showing them.
+**The narrated video** (2 min 58 s) is made by three scripts; see [DEMO_VIDEO.md](DEMO_VIDEO.md) for the full steps and the edit list:
+
+```powershell
+python scripts\demo-video\narrate.py --models <kokoro model folder>      # offline TTS -> .cache\demo-video\voice
+python scripts\demo-video\drive.py --pids <A> <B> <C>                    # clears the apps, drives A/B/C, records
+python scripts\demo-video\render.py --out dist\SafeMesh-demo-1.6.0.mp4   # timeline, frames, audio, encode, .srt
+```
+
+`render.py --preview 40,80,120` writes stills only, which is quick for checking a change to `scenes.html`.
+
+Both recorders use only the `Emulator.exe` windows, never the desktop, and the FFmpeg bundled with DevEco Studio. Keep the windows visible and unminimized, and keep their size unchanged. The recorders refuse to overwrite an output. Never film the activation code, the `.cache` folder or a terminal showing them.
 
 ## 7. Other platforms
 
@@ -290,7 +303,9 @@ Huawei "Imagine What's Next" deliverables:
 | Public source repository | Done: github.com/carrotly-technologies-2026/SafeMesh |
 | Reproducible setup, build, install and launch | Done: README, this guide and `check.ps1`. A fresh clone of `main` (`fe5d56b`) from GitHub passed `check.ps1 -Build` on the team laptop: 172/172, ArkTS 0/0, lint 0, build OK ([log](../artifacts/logs/v150-fresh-clone-checks.log)). Builds are not byte-identical, so a rebuilt HAP has a different SHA-256 from the released one. This is the same machine, not a second computer. |
 | Working `.hap` | Done: Release v1.6.0 (`SafeMesh-1.6.0.hap`, SHA-256 `a66efd9e…`) |
-| Recorded demonstration | Done: `SafeMesh-1.4.1-demo.mp4` in the releases. **Open:** upload to YouTube (Unlisted) for the form |
+| Recorded demonstration | Done: narrated `SafeMesh-demo-1.6.0.mp4` (2:58) with `.srt` in the [submission pack](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/submission-1.6.0). **Open:** upload to YouTube (Unlisted) for the form |
+| Presentation | Done: [docs/pitch/SafeMesh-pitch.pdf](pitch/SafeMesh-pitch.pdf), 16 slides; PPTX with speaker notes in the submission pack |
+| Screenshots | Done: [docs/gallery](gallery/README.md), 17 screens × EN/PL × light/dark |
 | Architecture and implementation description | Done: README (*Architecture*, *Platform capabilities*, *Transport and signature design*) |
 | `AI_WORKFLOW.md` | Done, including the team-reported tools for v1.2–v1.4 and the Oniro work (ChatGPT "Astra" and Claude Opus 5.5) |
 | Target HarmonyOS / OpenHarmony / Oniro, min API 20 | Done: `default` (HarmonyOS) and `oniro` (OpenHarmony API 23) products |
@@ -302,8 +317,8 @@ Remaining work, in order of value:
 | # | Task | Owner | Why it matters |
 | --- | --- | --- | --- |
 | 1 | Physical NearLink test (A → B → C) with recorded evidence, then the README "Physical NearLink validation" section | Team at the venue | Biggest lever for *Use of platform capabilities* and *Demonstration*: today NearLink is implemented but unverified |
-| 2 | YouTube upload and form update (links to Release v1.6.0, texts from SUBMISSION.md) | Team | The form requires a YouTube link |
+| 2 | YouTube upload of `SafeMesh-demo-1.6.0.mp4` with the `.srt` subtitles and the chapters from DEMO_VIDEO.md, then the form update (links and texts from SUBMISSION.md) | Team | The form requires a YouTube link |
 | 3 | Done: the team member re-ran the merged `oniro` product on the Oniro emulator. Optional: add a screenshot as `artifacts/screenshots/oniro-*` for the jury | Oniro maintainer | Visible evidence for the open-stack build |
-| 4 | Short pitch deck, if the jury invites teams to present | Team | Rules allow the jury to invite teams; nothing exists yet |
+| 4 | Done: pitch deck (PDF, PPTX with speaker notes, HTML). If the jury invites the team, present from the PPTX; slide 5 and the video show the live run | Team | Rules allow the jury to invite teams |
 | 5 | Done in v1.6.0: `pages/Index.ets` split into screen components, verified by pixel comparison | — | — |
 | 6 | Roadmap, not for the hackathon: background relaying with the API 26 `MODE_NEARLINK` continuous task, official issuer integration and key management | — | Documented in README as next steps |

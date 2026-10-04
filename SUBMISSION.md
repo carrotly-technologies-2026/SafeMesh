@@ -5,8 +5,10 @@ Paste-ready text for the HackYeah 2026 submission form. Challenge: **Huawei, “
 ## Links
 
 - Code repository: https://github.com/carrotly-technologies-2026/SafeMesh
-- Release with the HAP: https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/v1.6.0 (the demo video is in https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/v1.4.1)
-- Demo video file: https://github.com/carrotly-technologies-2026/SafeMesh/releases/download/v1.4.1/SafeMesh-1.4.1-demo.mp4 (the form asks for a YouTube link: upload this file as *Unlisted* or *Public* and paste that link)
+- Submission pack (HAP, demo video, subtitles, pitch deck, screen gallery): https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/submission-1.6.0
+- Demo video file, 2 min 58 s, narrated: https://github.com/carrotly-technologies-2026/SafeMesh/releases/download/submission-1.6.0/SafeMesh-demo-1.6.0.mp4. The form asks for a YouTube link: upload this file as *Unlisted* or *Public*, add `SafeMesh-demo-1.6.0.srt` as English subtitles, and paste that link. Chapters for the YouTube description are in [docs/DEMO_VIDEO.md](docs/DEMO_VIDEO.md).
+- Presentation: https://github.com/carrotly-technologies-2026/SafeMesh/blob/main/docs/pitch/SafeMesh-pitch.pdf (16 slides; a PPTX with speaker notes is in the submission pack)
+- All screens: https://github.com/carrotly-technologies-2026/SafeMesh/blob/main/docs/gallery/README.md
 - Cover image: [artifacts/cover/SafeMesh-cover.png](artifacts/cover/SafeMesh-cover.png). Alt text: *Three connected phones above a stylized city map, illustrating signed alerts, offline maps and nearby-device relaying.* The cover is a conceptual illustration generated with an image tool; its [prompt](artifacts/cover/PROMPT.txt) is included. It is not an app screenshot.
 
 ## Challenge area
@@ -39,7 +41,7 @@ Done and demonstrated on three API 24 emulators (release v1.4.1; v1.5.0 adds the
 - v1.5.0: a System / Polski / English language setting, and a second build product for OpenHarmony and the Eclipse Oniro emulator (NearLink stubbed there).
 - v1.6.0: optional keep-screen-on while relaying and vibration for new alerts (both on by default), and the UI split into screen components.
 
-Evidence: 177 automated host tests, a clean ArkTS check and Code Linter, 17/17 assertions over recorded native evidence for the v1.4 multi-emulator scenario, and a captioned demo video of the final build.
+Evidence: 177 automated host tests, a clean ArkTS check and Code Linter, 17/17 assertions over recorded native evidence for the v1.4 multi-emulator scenario, a narrated demo video recorded on v1.6.0, and a gallery of every screen in English and Polish, light and dark.
 
 Next step: the first physical NearLink test on HarmonyOS phones, following docs/PHYSICAL_TESTING.md. After that: background relaying with the API 26 NearLink continuous-task mode, and work with public-safety organisations on authorised issuing and data maintenance.
 
@@ -70,8 +72,9 @@ The bundled exercise fixture is valid until **2026-10-06 19:57:54 UTC**. Custom 
 
 ## Files
 
-- `SafeMesh-1.6.0.hap` and `SafeMesh-1.6.0.sha256.txt`, attached to GitHub Release v1.6.0.
-- `SafeMesh-1.4.1-demo.mp4`, attached to GitHub Releases v1.4.1 through v1.6.0.
+- `SafeMesh-1.6.0.hap` and `SafeMesh-1.6.0.sha256.txt`, attached to GitHub Release v1.6.0 and to the submission pack `submission-1.6.0`.
+- `SafeMesh-demo-1.6.0.mp4` and `SafeMesh-demo-1.6.0.srt`, `SafeMesh-pitch.pdf`, `SafeMesh-pitch.pptx` and `SafeMesh-gallery-1.6.0.zip`, attached to the submission pack.
+- `docs/pitch/SafeMesh-pitch.pdf` and `docs/gallery/` in the repository.
 - `artifacts/cover/SafeMesh-cover.png`: cover image.
 
 Built by the SafeMesh team at HackYeah 2026. AI-assisted development is documented in [AI_WORKFLOW.md](AI_WORKFLOW.md).
