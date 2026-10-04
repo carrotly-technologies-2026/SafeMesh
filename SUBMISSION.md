@@ -5,7 +5,7 @@ Paste-ready text for the HackYeah 2026 submission form. Challenge: **Huawei, “
 ## Links
 
 - Code repository: https://github.com/carrotly-technologies-2026/SafeMesh
-- Release with the HAP: https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/v1.5.0 (the demo video is in https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/v1.4.1)
+- Release with the HAP: https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/v1.5.1 (the demo video is in https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/v1.4.1)
 - Demo video file: https://github.com/carrotly-technologies-2026/SafeMesh/releases/download/v1.4.1/SafeMesh-1.4.1-demo.mp4 (the form asks for a YouTube link: upload this file as *Unlisted* or *Public* and paste that link)
 - Cover image: [artifacts/cover/SafeMesh-cover.png](artifacts/cover/SafeMesh-cover.png). Alt text: *Three connected phones above a stylized city map, illustrating signed alerts, offline maps and nearby-device relaying.* The cover is a conceptual illustration generated with an image tool; its [prompt](artifacts/cover/PROMPT.txt) is included. It is not an app screenshot.
 
@@ -38,7 +38,7 @@ Done and demonstrated on three API 24 emulators (release v1.4.1; v1.5.0 adds the
 - PL/EN, light/dark and large-text support.
 - v1.5.0: a System / Polski / English language setting, and a second build product for OpenHarmony and the Eclipse Oniro emulator (NearLink stubbed there).
 
-Evidence: 168 automated host tests, a clean ArkTS check and Code Linter, 17/17 assertions over recorded native evidence for the v1.4 multi-emulator scenario, and a captioned demo video of the final build.
+Evidence: 174 automated host tests, a clean ArkTS check and Code Linter, 17/17 assertions over recorded native evidence for the v1.4 multi-emulator scenario, and a captioned demo video of the final build.
 
 Next step: the first physical NearLink test on HarmonyOS phones, following docs/PHYSICAL_TESTING.md. After that: background relaying with the API 26 NearLink continuous-task mode, and work with public-safety organisations on authorised issuing and data maintenance.
 
@@ -49,11 +49,11 @@ Current limits, stated in the app and README:
 
 ## Instructions on how to open the project
 
-1. **Quickest check, install the prebuilt HAP.** Start any API 20+ HarmonyOS phone emulator in DevEco Studio, download `SafeMesh-1.5.0.hap` from the release, then run:
+1. **Quickest check, install the prebuilt HAP.** Start any API 20+ HarmonyOS phone emulator in DevEco Studio, download `SafeMesh-1.5.1.hap` from the release, then run:
    ```powershell
    $hdc = Join-Path $env:USERPROFILE 'DevEcoStudio\sdk\default\openharmony\toolchains\hdc.exe'
    & $hdc list targets
-   & $hdc -t <serial> install -r .\SafeMesh-1.5.0.hap
+   & $hdc -t <serial> install -r .\SafeMesh-1.5.1.hap
    & $hdc -t <serial> shell aa start -b org.safemesh.alerts -a EntryAbility
    ```
 2. **Build from source.** Clone the repository and open it in **DevEco Studio 6.1.1** with the **HarmonyOS SDK API 24 including HMS kits** (NearLink Kit is not in a plain OpenHarmony SDK). Install **Node.js 24** and **DevEco CLI 1.3.4** with the organizers' patches, following README → *Run on Windows*. Then run `.\scripts\check.ps1 -Build` (tests, ArkTS check, lint, build) and `.\scripts\run-demo.ps1 -Device <serial>` (build, install, launch).
@@ -69,8 +69,8 @@ The bundled exercise fixture is valid until **2026-10-06 19:57:54 UTC**. Custom 
 
 ## Files
 
-- `SafeMesh-1.5.0.hap` and `SafeMesh-1.5.0.sha256.txt`, attached to GitHub Release v1.5.0.
-- `SafeMesh-1.4.1-demo.mp4`, attached to GitHub Releases v1.4.1 and v1.5.0.
+- `SafeMesh-1.5.1.hap` and `SafeMesh-1.5.1.sha256.txt`, attached to GitHub Release v1.5.1.
+- `SafeMesh-1.4.1-demo.mp4`, attached to GitHub Releases v1.4.1, v1.5.0 and v1.5.1.
 - `artifacts/cover/SafeMesh-cover.png`: cover image.
 
 Built by the SafeMesh team at HackYeah 2026. AI-assisted development is documented in [AI_WORKFLOW.md](AI_WORKFLOW.md).

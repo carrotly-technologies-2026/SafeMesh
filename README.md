@@ -2,13 +2,13 @@
 
 **Signed warnings. Offline protective-point maps. A path from one phone to the next.**
 
-HackYeah 2026 · Huawei challenge **“Imagine What’s Next”** · native HarmonyOS app (ArkTS + ArkUI) · minimum API 20, validated on API 24 emulators · also builds for OpenHarmony / Oniro · current release **v1.5.0**
+HackYeah 2026 · Huawei challenge **“Imagine What’s Next”** · native HarmonyOS app (ArkTS + ArkUI) · minimum API 20, validated on API 24 emulators · also builds for OpenHarmony / Oniro · current release **v1.5.1**
 
 ## For the jury: start here
 
-- **Demo video, 2 min 13 s, captioned:** [SafeMesh-1.4.1-demo.mp4](https://github.com/carrotly-technologies-2026/SafeMesh/releases/download/v1.4.1/SafeMesh-1.4.1-demo.mp4), recorded on v1.4.1. The relay flow is unchanged in v1.5.0. Three separate emulator apps side by side: an authenticated issuer on A publishes a custom English alert; B verifies, stores, ACKs and relays it; after A leaves, C receives it from B at hop 2; a forged copy is rejected; then the offline map and the NearLink capability check.
-- **Install:** [SafeMesh-1.5.0.hap](https://github.com/carrotly-technologies-2026/SafeMesh/releases/download/v1.5.0/SafeMesh-1.5.0.hap) with its [SHA-256 manifest](https://github.com/carrotly-technologies-2026/SafeMesh/releases/download/v1.5.0/SafeMesh-1.5.0.sha256.txt), both in [Release v1.5.0](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/v1.5.0). It is an unsigned debug package for an API 20+ emulator; see [Install the packaged demo](#install-the-packaged-demo).
-- **How to run and test everything:** [docs/TEAM_GUIDE.md](docs/TEAM_GUIDE.md) covers commands, expected output of every check, all 172 host tests, the single- and three-emulator walkthroughs, hub fault injection, recording and releases.
+- **Demo video, 2 min 13 s, captioned:** [SafeMesh-1.4.1-demo.mp4](https://github.com/carrotly-technologies-2026/SafeMesh/releases/download/v1.4.1/SafeMesh-1.4.1-demo.mp4), recorded on v1.4.1. The relay flow is unchanged in v1.5.1. Three separate emulator apps side by side: an authenticated issuer on A publishes a custom English alert; B verifies, stores, ACKs and relays it; after A leaves, C receives it from B at hop 2; a forged copy is rejected; then the offline map and the NearLink capability check.
+- **Install:** [SafeMesh-1.5.1.hap](https://github.com/carrotly-technologies-2026/SafeMesh/releases/download/v1.5.1/SafeMesh-1.5.1.hap) with its [SHA-256 manifest](https://github.com/carrotly-technologies-2026/SafeMesh/releases/download/v1.5.1/SafeMesh-1.5.1.sha256.txt), both in [Release v1.5.1](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/v1.5.1). It is an unsigned debug package for an API 20+ emulator; see [Install the packaged demo](#install-the-packaged-demo).
+- **How to run and test everything:** [docs/TEAM_GUIDE.md](docs/TEAM_GUIDE.md) covers commands, expected output of every check, all 174 host tests, the single- and three-emulator walkthroughs, hub fault injection, recording and releases.
 - **Challenge areas:** **Human-Centric Technology** (lead) and **Spatial Experiences**. See [Challenge fit](#challenge-fit).
 - **HarmonyOS and the open stack:** one codebase builds two products. `default` targets HarmonyOS with the NearLink Kit adapter. `oniro` targets OpenHarmony API 23 for the Eclipse Oniro emulator on Linux, with a NearLink stub. See [OpenHarmony / Oniro build](#openharmony--oniro-build).
 - **Platform capabilities:** NearLink Kit, Crypto Architecture Kit, Network Kit, Location Kit, ArkData, Accessibility Kit and Localization Kit. See [Platform capabilities used](#platform-capabilities-used).
@@ -88,7 +88,9 @@ Three separate HarmonyOS emulator apps exchange packets through an explicitly la
 
 **Demo only:** SafeMesh is not connected to RCB or an official warning issuer. Bundled and custom alerts are signed exercises. Mapped PSP protective points are reference records; current access, condition and protection are not verified by the app.
 
-**v1.5.0 (current release):**
+**v1.5.1 (current release):** NearLink capability detection works on HarmonyOS 6.0.x phones (API 20–22). `manager.isNearLinkSupported()` exists only from API 23, and on older systems the call failed, so supported phones were reported as "unavailable". The app now asks it only on API 23+ and otherwise relies on the NearLink system capability. The NearLink APIs used start at API 13 (scan, advertising) and API 18 (data transfer). There are two new adapter tests. Checks: **174 host tests**, ArkTS 0 errors for both source sets, Code Linter 0, build OK ([log](artifacts/logs/v151-checks-build.log)). HAP SHA-256 `5d31a1ca02fd67f4d242d1d14482285ef334c76e80d04e5389596cd7eb21d45d`. On the emulators, the in-app verification test passes and the NearLink check still reports "unavailable".
+
+**v1.5.0:**
 - The `oniro` OpenHarmony product was merged next to the HarmonyOS product without changing the HarmonyOS build.
 - Settings → App language offers **System / Polski / English**. *System* is the default: it follows the phone's language, Polish on a Polish phone and English otherwise, and it is re-checked when the app returns to the foreground. *Polski* and *English* are explicit, saved choices.
 
@@ -125,7 +127,7 @@ A point's saved badge appears only after the native local write completes. Faile
 
 ## Run on Windows
 
-Prerequisites: DevEco Studio with the HarmonyOS 6.1.1 / API 24 SDK, DevEco CLI, Node.js 24, and a running compatible emulator. This workspace used DevEco CLI 1.3.4 and an API 24 phone emulator. Minimum app API is 20; compile/target SDK is 24. Native NearLink support detection needs API 23 or later and compatible physical hardware.
+Prerequisites: DevEco Studio with the HarmonyOS 6.1.1 / API 24 SDK, DevEco CLI, Node.js 24, and a running compatible emulator. This workspace used DevEco CLI 1.3.4 and an API 24 phone emulator. Minimum app API is 20; compile/target SDK is 24. Physical NearLink needs a phone with NearLink hardware on API 20 or later. From API 23 the app also asks `manager.isNearLinkSupported()`; on API 20–22 that call does not exist, so the NearLink system capability decides.
 
 For a fresh Windows machine, follow the organizers' [DevEco installation and emulator setup](https://github.com/onirodeveloper/hackyeah2026-challenge/blob/main/quickstart-guide.md). Install the Huawei HarmonyOS SDK, including its HMS kits; a plain OpenHarmony SDK alone does not contain NearLink Kit. The tested toolchain uses Node **24.21.0** and npm **11.19.0**. Keep Node24 on `PATH`; the Studio-bundled Node18 does not satisfy this CLI's requirements.
 
@@ -167,13 +169,13 @@ Use `-Device <serial>` for another target or `-NoRun` to build/package only. If 
 
 ### Install the packaged demo
 
-Download `SafeMesh-1.5.0.hap` and `SafeMesh-1.5.0.sha256.txt` from [Release v1.5.0](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/v1.5.0). The HAP is the HarmonyOS `default` product as a debug **unsigned emulator package**, built as `entry/build/default/outputs/default/entry-default-unsigned.hap`, with SHA-256 `7663aa1ddee81d4d36b4862b05291cba1ed8c4a35826ed419f5ba85321c5a5ac`. It installs on an API 20+ HarmonyOS emulator. A physical phone needs a debug-signed build; see [docs/PHYSICAL_TESTING.md](docs/PHYSICAL_TESTING.md#3-signing-for-physical-devices).
+Download `SafeMesh-1.5.1.hap` and `SafeMesh-1.5.1.sha256.txt` from [Release v1.5.1](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/v1.5.1). The HAP is the HarmonyOS `default` product as a debug **unsigned emulator package**, built as `entry/build/default/outputs/default/entry-default-unsigned.hap`, with SHA-256 `5d31a1ca02fd67f4d242d1d14482285ef334c76e80d04e5389596cd7eb21d45d`. It installs on an API 20+ HarmonyOS emulator. A physical phone needs a debug-signed build; see [docs/PHYSICAL_TESTING.md](docs/PHYSICAL_TESTING.md#3-signing-for-physical-devices).
 
 ```powershell
 $hdc = Join-Path $env:DEVECO_CLI_STUDIO_PATH 'sdk\default\openharmony\toolchains\hdc.exe'
-(Get-FileHash .\SafeMesh-1.5.0.hap -Algorithm SHA256).Hash   # compare with the manifest
+(Get-FileHash .\SafeMesh-1.5.1.hap -Algorithm SHA256).Hash   # compare with the manifest
 & $hdc list targets
-& $hdc -t 127.0.0.1:5555 install -r .\SafeMesh-1.5.0.hap
+& $hdc -t 127.0.0.1:5555 install -r .\SafeMesh-1.5.1.hap
 & $hdc -t 127.0.0.1:5555 shell aa start -b org.safemesh.alerts -a EntryAbility
 ```
 
@@ -392,7 +394,7 @@ scripts/record-mesh-demo.py       Synchronized three-emulator recorder
 dist/                             Git-ignored local packages; releases are on GitHub
 ```
 
-Release v1.5.0 on GitHub carries `SafeMesh-1.5.0.hap` and `SafeMesh-1.5.0.sha256.txt`, plus the v1.4.1 demo video. Release v1.4.1 keeps its own HAP and video.
+Release v1.5.1 on GitHub carries `SafeMesh-1.5.1.hap` and `SafeMesh-1.5.1.sha256.txt`, plus the v1.4.1 demo video. Releases v1.5.0 and v1.4.1 keep their own HAPs; v1.4.1 also holds the video.
 
 ## Validation scope
 

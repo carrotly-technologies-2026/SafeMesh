@@ -27,7 +27,7 @@ How to build, run, test, record and release SafeMesh, and where the submission s
 | `entry/src/oniro/transport/NearLinkTransport.ets` | NearLink stub, used by the **`oniro`** product (OpenHarmony / Oniro) |
 | `build-profile.json5`, `entry/build-profile.json5`, `hvigorfile.ts` | Two products, two targets (`sourceRoots`), Oniro-only manifest changes |
 | `entry/src/main/resources/{base,en,pl}` | UI strings (base = English) and the offline map pack (`rawfile/map-pack.json`) |
-| `tests/` | 15 host test suites, 172 tests (§4) |
+| `tests/` | 15 host test suites, 174 tests (§4) |
 | `scripts/` | Checks, build/deploy, issuer service, emulator hub, fixtures, recorders, map refresh; `scripts/oniro/` for Linux |
 | `artifacts/` | Evidence: `logs/`, `screenshots/`, `research/` (design and validation reports) |
 | `docs/` | This guide and the physical NearLink runbook |
@@ -42,7 +42,7 @@ Products:
 | `default` | HarmonyOS, target API 24, min API 20 | Real adapter | No (emulators); phones are signed locally in DevEco | DevEco Studio / `devecocli` on Windows |
 | `oniro` | OpenHarmony API 23, min API 20, device type `default` | Stub ("unsupported") | OpenHarmony public debug key | `oniro-app build --product oniro` on Linux |
 
-Releases: [v1.5.0](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/v1.5.0) is current (HAP and SHA-256, plus the demo video). [v1.4.1](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/v1.4.1) is where the video was recorded.
+Releases: [v1.5.1](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/v1.5.1) is current (HAP and SHA-256, plus the demo video). [v1.4.1](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/v1.4.1) is where the video was recorded.
 
 ## 3. Setup (Windows, HarmonyOS product)
 
@@ -94,8 +94,8 @@ It runs, in order, and stops at the first failure:
 Passing output looks like this:
 
 ```text
-ℹ tests 172
-ℹ pass 172
+ℹ tests 174
+ℹ pass 174
 ℹ fail 0
 ArkTS check: harmonyos source set
 No errors found in 21 file(s).
@@ -124,7 +124,7 @@ The suites transpile the **real `.ets` source** with the TypeScript compiler bun
 | `authority-client.test.mjs` | 11 | App-side issuer client and console ViewModel: pinned service, token handling, response checks |
 | `emulator-transport.test.mjs` | 12 | WebSocket emulator link: handshake, peers, bounds, deadlines, error paths |
 | `mesh-lab-server.test.mjs` | 18 | Test hub over real sockets: RFC 6455 framing, topology, injected loss, host/origin checks |
-| `nearlink.test.mjs` | 12 | NearLink adapter with a mocked kit: capability gate, permission, exact-name scan, MTU framing, split/coalesced reads, cleanup |
+| `nearlink.test.mjs` | 14 | NearLink adapter with a mocked kit: capability gate (API 20–22 syscap path, API 23+ capability query), permission, exact-name scan, MTU framing, split/coalesced reads, cleanup |
 | `build-variants.test.mjs` | 4 | HarmonyOS/Oniro split: stub behavior, matching APIs, NearLink Kit only in `src/harmonyos`, unchanged HarmonyOS product and manifest |
 | `map.test.mjs` | 18 | Map pack, attribution, projection, search, distances, Canvas bounds |
 | `location.test.mjs` | 3 | One-shot location permission and failure paths |
@@ -150,7 +150,7 @@ It replays the captured v1.4 native evidence in `artifacts/logs/`: signatures ag
 Install a downloaded HAP without building:
 
 ```powershell
-& $hdc -t 127.0.0.1:5555 install -r .\SafeMesh-1.5.0.hap
+& $hdc -t 127.0.0.1:5555 install -r .\SafeMesh-1.5.1.hap
 & $hdc -t 127.0.0.1:5555 shell aa start -b org.safemesh.alerts -a EntryAbility
 & $hdc -t 127.0.0.1:5555 shell aa force-stop org.safemesh.alerts           # stop
 & $hdc -t 127.0.0.1:5555 shell bm clean -n org.safemesh.alerts -d          # wipe app data (inbox, settings)
@@ -288,7 +288,7 @@ Huawei "Imagine What's Next" deliverables:
 | --- | --- |
 | Public source repository | Done: github.com/carrotly-technologies-2026/SafeMesh |
 | Reproducible setup, build, install and launch | Done: README, this guide and `check.ps1`. A fresh clone of `main` (`fe5d56b`) from GitHub passed `check.ps1 -Build` on the team laptop: 172/172, ArkTS 0/0, lint 0, build OK ([log](../artifacts/logs/v150-fresh-clone-checks.log)). Builds are not byte-identical, so a rebuilt HAP has a different SHA-256 from the released one. This is the same machine, not a second computer. |
-| Working `.hap` | Done: Release v1.5.0 (`SafeMesh-1.5.0.hap`, SHA-256 `7663aa1d…`) |
+| Working `.hap` | Done: Release v1.5.1 (`SafeMesh-1.5.1.hap`, SHA-256 `5d31a1ca…`) |
 | Recorded demonstration | Done: `SafeMesh-1.4.1-demo.mp4` in the releases. **Open:** upload to YouTube (Unlisted) for the form |
 | Architecture and implementation description | Done: README (*Architecture*, *Platform capabilities*, *Transport and signature design*) |
 | `AI_WORKFLOW.md` | Done. **Open:** the team confirms which agent and model did the v1.2–v1.4 sessions |
@@ -301,7 +301,7 @@ Remaining work, in order of value:
 | # | Task | Owner | Why it matters |
 | --- | --- | --- | --- |
 | 1 | Physical NearLink test (A → B → C) with recorded evidence, then the README "Physical NearLink validation" section | Team at the venue | Biggest lever for *Use of platform capabilities* and *Demonstration*: today NearLink is implemented but unverified |
-| 2 | YouTube upload and form update (links to Release v1.5.0, texts from SUBMISSION.md) | Team | The form requires a YouTube link |
+| 2 | YouTube upload and form update (links to Release v1.5.1, texts from SUBMISSION.md) | Team | The form requires a YouTube link |
 | 3 | Re-run `scripts/oniro/deploy.sh` on the Oniro emulator (API 23) after the merge; add a screenshot to `artifacts/screenshots/oniro-*` | Oniro maintainer | Confirms the merged `oniro` product on its real toolchain |
 | 4 | Short pitch deck, if the jury invites teams to present | Team | Rules allow the jury to invite teams; nothing exists yet |
 | 5 | Optional: split `pages/Index.ets` (about 1,080 lines) into components | Later | Code readability; deliberately deferred to avoid regressions before judging |

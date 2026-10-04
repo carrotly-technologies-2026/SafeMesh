@@ -1,6 +1,6 @@
 # SafeMesh: physical NearLink test runbook
 
-This runbook covers the first test of SafeMesh's NearLink (星闪 / SparkLink) relay on real HarmonyOS phones. Use it with the `main` branch at **v1.4.1 or later**. Until now all validation used API 24 emulators, which have no NearLink radio, so **every NearLink result below is still unverified**. Anything marked **verify on site** comes from documentation or code reading and has not been tried on a phone.
+This runbook covers the first test of SafeMesh's NearLink (星闪 / SparkLink) relay on real HarmonyOS phones. Use it with the `main` branch at **v1.5.1 or later**: v1.5.1 fixes NearLink detection on API 20–22 phones. Until now all validation used API 24 emulators, which have no NearLink radio, so **every NearLink result below is still unverified**. Anything marked **verify on site** comes from documentation or code reading and has not been tried on a phone.
 
 > **Read this first.** These points come from reading the code, and each one can ruin a run:
 > 1. **Order of loading and connecting.** Since v1.4.1, *Load exercise message* also queues the alert for peers that are already connected, and a newly confirmed channel synchronizes every saved alert. Builds before v1.4.1 pushed only on a new connection, so with an older HAP load the alert on A **before** connecting.
@@ -35,7 +35,7 @@ A FAIL with good evidence is a valid result. Record it; do not retry silently.
 | --- | --- | --- |
 | Phones | 2 minimum for (a), (b), (d); **3 for (c)**. Label them A, B, C with tape. | — |
 | NearLink hardware | The phone settings have a NearLink (星闪) entry. | Settings > Multi-device collaboration > NearLink (设置 > 多设备协同 > 星闪), or Settings > NearLink & Bluetooth (设置 > 星闪和蓝牙). English labels: verify on site. |
-| OS level | **API ≥ 23 (HarmonyOS 6.1.0+)**. The app installs from API 20, but the capability gate calls `manager.isNearLinkSupported()` (API 23) after `canIUse('SystemCapability.Communication.NearLink.Core')`. Below API 23 the app reports "unavailable". | `& $hdc -t <serial> shell param get const.ohos.apiversion` |
+| OS level | **API ≥ 20 (HarmonyOS 6.0+) with NearLink hardware.** The gate is `canIUse('SystemCapability.Communication.NearLink.Core')`. From API 23 the app also asks `manager.isNearLinkSupported()`; on API 20–22 that function does not exist (since v1.5.1 the app no longer calls it there). The NearLink APIs used start at API 13 (scan, advertising) and API 18 (data transfer). | `& $hdc -t <serial> shell param get const.ohos.apiversion` |
 | Phone access | Owner's consent to enable developer options and USB debugging, rename the device, and change screen-lock or clock settings. | Ask the mentors. |
 | Cables | One USB-C **data** cable per phone and enough laptop ports. | — |
 | Laptop | Windows, DevEco Studio 6.1.1 in `C:\Users\user\DevEcoStudio`, HarmonyOS SDK API 24 **including HMS kits** (NearLink Kit; a plain OpenHarmony SDK is not enough), Node 24, DevEco CLI 1.3.4. | `devecocli.cmd -V`, `node --version` |
@@ -292,7 +292,7 @@ Other `SAFEMESH_` tags: `SAFEMESH_NATIVE_DIAGNOSTICS`, `SAFEMESH_RELAY_ERROR`, `
 
 | Symptom | Likely cause → action |
 | --- | --- |
-| "NearLink is unavailable on this device." | API < 23 (`param get const.ohos.apiversion`), or no NearLink hardware (no NearLink entry in Settings). Nothing can be fixed in the app; record the phone as unsupported. |
+| "NearLink is unavailable on this device." | No NearLink hardware (no NearLink entry in Settings), or API < 20. With a build older than v1.5.1 it also happened on API 20–22 phones; reinstall the current build. Otherwise record the phone as unsupported. |
 | "Enable NearLink in phone settings…" | Switch NearLink on (§5.1), then tap **Check NearLink support** and **Start NearLink**. |
 | "NearLink access denied…" | The permission was refused. Allow it in the app's permission settings (path: verify on site), or uninstall and reinstall to get the prompt again. |
 | "NearLink failed…" right after Start | Read `SAFEMESH_TRANSPORT_ERROR … op=start code=…`. Possible causes: a stale port (`1009700020` UUID already registered) after a crash, so force-stop and relaunch; advertising rejected, so shorten the device name; NearLink switched off mid-start. System NearLink lines: `hilog -x -e "[Nn]ear[Ll]ink"` (verify). |

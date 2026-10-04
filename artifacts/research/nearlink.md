@@ -21,7 +21,7 @@ Authoritative local declarations:
 
 | Capability | Installed public API | Minimum version |
 | --- | --- | --- |
-| Capability detection | `manager.isNearLinkSupported()` | API 23 |
+| Capability detection | `canIUse('SystemCapability.Communication.NearLink.Core')`, plus `manager.isNearLinkSupported()` from API 23 | syscap; API 23 |
 | Radio state | `manager.getState()` | API 13 |
 | Advertising | `advertising.startAdvertising(params)` | API 13 |
 | Filtered discovery | `scan.startScan(filters, options)` and `scan.on('deviceFound', callback)` | API 13 |
