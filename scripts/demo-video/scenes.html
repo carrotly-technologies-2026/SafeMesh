@@ -1,0 +1,573 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SafeMesh demo video scenes</title>
+<!--
+  Frame-by-frame compositor for the SafeMesh demo video. render.py loads this page in a
+  headless browser, calls setup(timeline) once and renderFrame(t) for every frame, and
+  pipes screenshots to FFmpeg. Nothing here plays by itself: every visual is a pure
+  function of the video time t, so the output is deterministic and repeatable.
+-->
+<style>
+:root { --forest: #163E33; --deep: #0B1F19; --lime: #D8F58A; --ivory: #F4F6F0; --sage: #98D9B4; --muted: #A9BDB2;
+  --coral: #FF9C86; --line: rgba(216,245,138,0.22); --font: 'HarmonyOS Sans SC', 'Segoe UI', system-ui, sans-serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: var(--deep); font-family: var(--font); color: var(--ivory); }
+#bg { position: absolute; inset: 0; background: radial-gradient(1500px 1000px at 72% 18%, #1E5244 0%, #163E33 38%, #0B1F19 100%); }
+#mapwrap { position: absolute; inset: 0; overflow: hidden; }
+#map { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+.scene { position: absolute; inset: 0; opacity: 0; visibility: hidden; }
+.abs { position: absolute; }
+.pill { display: inline-flex; align-items: center; gap: 10px; padding: 10px 20px; border-radius: 999px; font-size: 24px; font-weight: 700;
+  background: rgba(216,245,138,0.14); color: var(--lime); white-space: nowrap; }
+.pill.solid { background: var(--lime); color: var(--forest); }
+.pill.coral { background: rgba(255,156,134,0.16); color: var(--coral); }
+.pill.grey { background: rgba(244,246,240,0.10); color: var(--muted); }
+h1 { margin: 0; font-size: 150px; line-height: 1; letter-spacing: -0.03em; }
+h2 { margin: 0; font-size: 68px; line-height: 1.08; letter-spacing: -0.02em; }
+.kicker { font-size: 24px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--lime); }
+.card { background: rgba(255,255,255,0.06); border: 1px solid rgba(216,245,138,0.2); border-radius: 28px; }
+svg.i { fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+
+/* captions */
+#caption { position: absolute; left: 0; right: 0; bottom: 26px; display: flex; justify-content: center; pointer-events: none; }
+#caption span { max-width: 1560px; text-align: center; font-size: 33px; line-height: 1.32; font-weight: 400; color: #fff;
+  background: rgba(6,18,14,0.78); padding: 10px 26px; border-radius: 16px; }
+
+/* demo */
+.phone { position: absolute; top: 132px; width: 380px; height: 819px; border-radius: 46px; overflow: hidden; background: #000;
+  box-shadow: 0 0 0 9px #050c0a, 0 30px 70px rgba(0,0,0,0.55); }
+.phone canvas { width: 380px; height: 819px; display: block; }
+.ring { position: absolute; top: 132px; width: 380px; height: 819px; border-radius: 46px; box-shadow: 0 0 0 9px var(--lime), 0 0 60px 8px rgba(216,245,138,0.45); opacity: 0; }
+.plabel { position: absolute; top: 72px; width: 380px; display: flex; justify-content: center; }
+.link { position: absolute; top: 470px; height: 120px; }
+.chip { position: absolute; font-size: 21px; font-weight: 700; padding: 9px 16px; border-radius: 14px; white-space: nowrap; translate: -50% 0; }
+.chip.ok { background: var(--lime); color: var(--forest); }
+.chip.bad { background: var(--coral); color: #3B1007; }
+.dot { position: absolute; width: 30px; height: 30px; margin: -15px 0 0 -15px; border-radius: 50%; background: var(--lime);
+  box-shadow: 0 0 24px 10px rgba(216,245,138,0.6); opacity: 0; }
+.dot.bad { background: var(--coral); box-shadow: 0 0 24px 10px rgba(255,156,134,0.6); }
+#speed { position: absolute; right: 60px; top: 12px; }
+#speed .pill { font-size: 20px; padding: 7px 16px; }
+#demo-head { position: absolute; left: 60px; top: 22px; display: flex; align-items: center; gap: 16px; font-size: 24px; color: var(--muted); }
+#demo-head img { width: 40px; height: 40px; border-radius: 10px; }
+#demo-head b { color: var(--ivory); }
+
+/* tiles */
+.tile { position: absolute; width: 540px; height: 150px; display: flex; gap: 22px; align-items: center; padding: 0 30px; }
+.tile .ic { width: 70px; height: 70px; border-radius: 20px; background: rgba(216,245,138,0.14); color: var(--lime); display: grid; place-items: center; flex: none; }
+.tile .ic svg { width: 40px; height: 40px; }
+.tile b { display: block; font-size: 30px; }
+.tile span { display: block; font-size: 21px; color: var(--muted); margin-top: 4px; }
+.shot { position: absolute; width: 310px; border-radius: 38px; overflow: hidden; box-shadow: 0 0 0 8px #050c0a, 0 30px 60px rgba(0,0,0,0.5); }
+.shot img { display: block; width: 100%; }
+.stat { position: absolute; text-align: left; }
+.stat .n { font-size: 112px; font-weight: 700; line-height: 1; color: var(--lime); letter-spacing: -0.03em; }
+.stat .t { font-size: 24px; color: var(--muted); margin-top: 10px; width: 290px; line-height: 1.3; }
+.term { position: absolute; font-family: 'Cascadia Mono', Consolas, monospace; font-size: 25px; line-height: 1.6; background: rgba(0,0,0,0.38);
+  border-radius: 24px; padding: 30px 36px; color: #CFE3D7; }
+.term .ok { color: #A8EA7E; }
+.term .dim { color: #6F877A; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-radio" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1.8"/><path d="M8.5 8.5a5 5 0 000 7M15.5 8.5a5 5 0 010 7M5.6 5.6a9 9 0 000 12.8M18.4 5.6a9 9 0 010 12.8"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M11 12l8.5-8.5M16.5 6.5l2 2M14.5 8.5l1.6 1.6"/></symbol>
+  <symbol id="i-network" viewBox="0 0 24 24"><circle cx="5" cy="12" r="2.5"/><circle cx="19" cy="6" r="2.5"/><circle cx="19" cy="18" r="2.5"/><path d="M7.3 11l9.4-4M7.3 13l9.4 4"/></symbol>
+  <symbol id="i-locate" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3"/></symbol>
+  <symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="2.8"/><path d="M5 6v12c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8V6M5 12c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8"/></symbol>
+  <symbol id="i-ear" viewBox="0 0 24 24"><path d="M7 9a5 5 0 0110 0c0 3-2.5 3.6-3 6-.4 2-1.6 3.5-3.5 3.5"/><path d="M10 9.5a2 2 0 014 0"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.5 3.8 5.5 3.8 9s-1.2 6.5-3.8 9c-2.6-2.5-3.8-5.5-3.8-9S9.4 5.5 12 3z"/></symbol>
+  <symbol id="i-vibrate" viewBox="0 0 24 24"><rect x="8" y="4" width="8" height="16" rx="1.8"/><path d="M4.5 8v8M2 10v4M19.5 8v8M22 10v4"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3.5l9 4.5-9 4.5-9-4.5 9-4.5z"/><path d="M3 12l9 4.5 9-4.5M3 16l9 4.5 9-4.5"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></symbol>
+  <symbol id="i-tower" viewBox="0 0 24 24"><path d="M12 10v11M8.5 21l3.5-11 3.5 11"/><circle cx="12" cy="8.5" r="1.6"/></symbol>
+</svg>
+
+<div id="bg"></div>
+<div id="mapwrap"><svg id="map" width="1920" height="2174" viewBox="0 0 1920 2174"></svg></div>
+
+<!-- S1 · cold open -->
+<div class="scene" id="s-cold">
+  <div class="abs" id="nosvc" style="left: 70px; top: 50px"><span class="pill coral" style="font-size: 26px">● No service</span></div>
+  <div class="abs" id="cold-halo" style="left: 360px; top: 250px; width: 1200px; height: 460px; background: radial-gradient(closest-side, rgba(8,24,19,0.92), rgba(8,24,19,0.7) 55%, rgba(8,24,19,0))"></div>
+  <div class="abs" id="cold-line" style="left: 0; right: 0; top: 380px; text-align: center; font-size: 66px; font-weight: 700; line-height: 1.2"></div>
+</div>
+
+<!-- S2 · title -->
+<div class="scene" id="s-title">
+  <div class="abs" style="inset: 0; background: linear-gradient(90deg, rgba(8,24,19,0.92) 0%, rgba(8,24,19,0.78) 42%, rgba(8,24,19,0) 72%)"></div>
+  <div class="abs" style="left: 140px; top: 250px; width: 1100px">
+    <img id="t-logo" src="../../docs/pitch/img/logo.svg" style="width: 150px; height: 150px; border-radius: 36px; box-shadow: 0 20px 50px rgba(0,0,0,0.4)">
+    <h1 id="t-name" style="margin-top: 40px">SafeMesh</h1>
+    <div id="t-tag" style="font-size: 48px; line-height: 1.25; margin-top: 28px; color: #E6F0EA">Verified emergency alerts that travel<br><b style="color: var(--lime)">phone to phone</b>, with no network.</div>
+    <div id="t-pills" style="display: flex; gap: 14px; margin-top: 46px">
+      <span class="pill solid">Native HarmonyOS app</span><span class="pill">Built at HackYeah 2026</span><span class="pill">Huawei · Imagine What’s Next</span>
+    </div>
+  </div>
+</div>
+
+<!-- S3 · how it works -->
+<div class="scene" id="s-how">
+  <div class="abs kicker" style="left: 110px; top: 80px">How a warning travels</div>
+  <svg class="abs" id="how" width="1920" height="1080" viewBox="0 0 1920 1080" style="left:0; top:0"></svg>
+</div>
+
+<!-- S4 · live demo -->
+<div class="scene" id="s-demo">
+  <div id="demo-head"><img src="../../docs/pitch/img/logo.svg"><span><b>Live demo</b> · three SafeMesh apps on three HarmonyOS API 24 emulators</span></div>
+  <div id="speed"></div>
+  <div class="plabel" style="left: 120px"><span class="pill" id="lab-a">A · exercise issuer</span></div>
+  <div class="plabel" style="left: 770px"><span class="pill" id="lab-b">B · in range of A</span></div>
+  <div class="plabel" style="left: 1420px"><span class="pill grey" id="lab-c">C · out of range</span></div>
+  <div class="phone" style="left: 120px"><canvas id="cv-a" width="380" height="819"></canvas></div>
+  <div class="phone" style="left: 770px"><canvas id="cv-b" width="380" height="819"></canvas></div>
+  <div class="phone" style="left: 1420px"><canvas id="cv-c" width="380" height="819"></canvas></div>
+  <div class="ring" id="ring-a" style="left: 120px"></div>
+  <div class="ring" id="ring-b" style="left: 770px"></div>
+  <div class="ring" id="ring-c" style="left: 1420px"></div>
+  <svg class="link" id="link-ab" style="left: 500px" width="270" height="120" viewBox="0 0 270 120"></svg>
+  <svg class="link" id="link-bc" style="left: 1150px" width="270" height="120" viewBox="0 0 270 120"></svg>
+  <div class="chip ok" id="chip-b" style="left: 635px; top: 610px">✓ B verified · ACK</div>
+  <div class="chip ok" id="chip-c" style="left: 1285px; top: 610px">✓ C: hop 2, from B</div>
+  <div class="chip bad" id="chip-x" style="left: 1285px; top: 380px">✕ forged copy rejected</div>
+  <div class="dot" id="dot-1"></div>
+  <div class="dot" id="dot-2"></div>
+  <div class="dot bad" id="dot-x"></div>
+</div>
+
+<!-- S5 · platform -->
+<div class="scene" id="s-platform">
+  <div class="abs kicker" style="left: 110px; top: 80px" id="pl-kicker">Built on HarmonyOS</div>
+  <div id="tiles"></div>
+  <div class="abs" id="codebase" style="left: 0; top: 0; width: 1920px; height: 1080px"></div>
+</div>
+
+<!-- S6 · inclusive -->
+<div class="scene" id="s-incl">
+  <div class="abs kicker" style="left: 110px; top: 80px">Human-centric</div>
+  <div id="shots"></div>
+</div>
+
+<!-- S7 · evidence -->
+<div class="scene" id="s-evidence">
+  <div class="abs kicker" style="left: 110px; top: 80px">Evidence, not slides</div>
+  <div id="stats"></div>
+  <div class="term" id="term" style="left: 1130px; top: 210px; width: 680px"></div>
+</div>
+
+<!-- S8 · honest -->
+<div class="scene" id="s-next">
+  <div class="abs kicker" style="left: 110px; top: 80px">What is real · what is next</div>
+  <div class="abs card" id="col-sim" style="left: 110px; top: 220px; width: 820px; height: 560px; padding: 50px"></div>
+  <div class="abs card" id="col-next" style="left: 990px; top: 220px; width: 820px; height: 560px; padding: 50px; background: rgba(216,245,138,0.08)"></div>
+</div>
+
+<!-- S9 · outro -->
+<div class="scene" id="s-outro">
+  <div class="abs" style="left: 140px; top: 280px">
+    <img src="../../docs/pitch/img/logo.svg" style="width: 120px; height: 120px; border-radius: 30px">
+    <div id="o-1" style="font-size: 104px; font-weight: 700; line-height: 1.05; margin-top: 50px">The network can fail.</div>
+    <div id="o-2" style="font-size: 104px; font-weight: 700; line-height: 1.05; color: var(--lime)">The warning still arrives.</div>
+    <div id="o-3" style="font-size: 32px; color: #DCE8E1; margin-top: 54px">github.com/carrotly-technologies-2026/SafeMesh</div>
+  </div>
+  <div class="abs" id="o-qr" style="right: 140px; top: 400px; background: #fff; padding: 24px; border-radius: 28px">
+    <img src="../../docs/pitch/img/qr-repo.svg" style="width: 290px; height: 290px; display: block">
+  </div>
+</div>
+
+<div id="caption"><span></span></div>
+<div id="black" style="position:absolute; inset:0; background:#000; opacity:0"></div>
+
+<script>
+'use strict';
+const $ = (id) => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const ease = (x) => { x = clamp(x); return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+const out3 = (x) => 1 - Math.pow(1 - clamp(x), 3);
+const lerp = (a, b, x) => a + (b - a) * x;
+let TL = null;
+const SC = {};
+const frameCache = { index: -1, image: null };
+
+// Show element with a fade/slide in at a..a+d, optional fade out at b..b+d.
+function appear(el, t, a, d = 0.6, b = Infinity, dy = 24) {
+  const p = out3(prog(t, a, a + d)) * (Number.isFinite(b) ? 1 - ease(prog(t, b, b + d)) : 1);
+  el.style.opacity = p;
+  el.style.transform = `translateY(${(1 - p) * dy}px)`;
+  return p;
+}
+
+function sceneOpacity(t, s) {
+  const f = s.fade ?? 0.5;
+  return clamp(Math.min((t - s.start) / f, (s.end - t) / f) + 0.0001);
+}
+
+// ---------- setup -------------------------------------------------------
+window.setup = function (timeline) {
+  TL = timeline;
+  for (const s of TL.scenes) SC[s.id] = s;
+  $('map').innerHTML = TL.mapSvg;
+  buildHow();
+  buildTiles();
+  buildShots();
+  buildStats();
+  buildNext();
+  return true;
+};
+
+function buildHow() {
+  const phones = [['A', 760], ['B', 1180], ['C', 1600]];
+  const W = 140;
+  let svg = `<defs><filter id="glow"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>`;
+  svg += `<g id="h-issuer"><rect x="110" y="360" width="330" height="230" rx="30" fill="#D8F58A"/>
+    <g transform="translate(150,392)" stroke="#163E33" fill="none" stroke-width="4" stroke-linecap="round"><circle cx="22" cy="44" r="17"/><path d="M34 32l34-34M56 10l8 8M48 18l7 7"/></g>
+    <text x="150" y="530" font-size="34" font-weight="700" fill="#163E33">Issuer</text><text x="150" y="568" font-size="23" fill="#2A5446">signs every alert</text></g>`;
+  for (const [n, x] of phones) {
+    svg += `<g id="h-${n}"><rect x="${x - W}" y="300" width="${2 * W}" height="400" rx="40" fill="rgba(255,255,255,0.07)" stroke="rgba(216,245,138,0.35)" stroke-width="3"/>
+      <text x="${x}" y="370" text-anchor="middle" font-size="40" font-weight="700" fill="#F4F6F0">${n}</text>
+      <g id="h-${n}-ok" opacity="0"><circle cx="${x}" cy="470" r="44" fill="#D8F58A" filter="url(#glow)"/><path d="M${x - 20} 470l13 13 27-29" stroke="#163E33" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+      <text id="h-${n}-t" x="${x}" y="572" text-anchor="middle" font-size="23" fill="#C3D3CA" opacity="0"><tspan x="${x}" dy="0"></tspan><tspan x="${x}" dy="32"></tspan></text>
+      <text id="h-${n}-hop" x="${x}" y="664" text-anchor="middle" font-size="26" font-weight="700" fill="#D8F58A" opacity="0"></text></g>`;
+  }
+  svg += `<path id="h-l1" d="M440 475 H620" stroke="#D8F58A" stroke-width="4" stroke-dasharray="3 14" stroke-linecap="round" opacity="0"/>
+    <path id="h-l2" d="M900 475 H1040" stroke="#D8F58A" stroke-width="4" stroke-dasharray="3 14" stroke-linecap="round" opacity="0"/>
+    <path id="h-l3" d="M1320 475 H1460" stroke="#D8F58A" stroke-width="4" stroke-dasharray="3 14" stroke-linecap="round" opacity="0"/>
+    <path id="h-ack" d="M1040 515 H900" stroke="#98D9B4" stroke-width="3" stroke-dasharray="8 8" opacity="0"/>
+    <text id="h-ack-t" x="970" y="548" text-anchor="middle" font-size="22" font-weight="700" fill="#98D9B4" opacity="0">ACK</text>
+    <path id="h-arc" d="M760 720 C 900 810, 1460 810, 1600 720" stroke="rgba(244,246,240,0.35)" stroke-width="3" stroke-dasharray="10 10" fill="none" opacity="0"/>
+    <text id="h-arc-t" x="1180" y="830" text-anchor="middle" font-size="26" fill="#A9BDB2" opacity="0">A and C are never in range of each other</text>
+    <g id="h-env"><rect x="-34" y="-24" width="68" height="48" rx="9" fill="#F4F6F0"/><path d="M-34 -20 L0 6 L34 -20" stroke="#163E33" stroke-width="3" fill="none"/><circle cx="22" cy="14" r="11" fill="#D8F58A" stroke="#163E33" stroke-width="2"/></g>
+    <g id="h-bad"><rect x="-34" y="-24" width="68" height="48" rx="9" fill="#FF9C86"/><path d="M-34 -20 L0 6 L34 -20" stroke="#3B1007" stroke-width="3" fill="none"/></g>
+    <g id="h-x" opacity="0"><circle cx="1740" cy="250" r="38" fill="#FF9C86"/><path d="M1725 235l30 30M1755 235l-30 30" stroke="#3B1007" stroke-width="7" stroke-linecap="round"/></g>
+    <text id="h-x-t" x="1700" y="185" text-anchor="middle" font-size="26" font-weight="700" fill="#FF9C86" opacity="0">altered copy: rejected</text>`;
+  $('how').innerHTML = svg;
+}
+
+const TILES = [
+  ['i-radio', 'NearLink Kit', 'advertise · scan · data channel'],
+  ['i-key', 'Crypto Architecture Kit', 'ECDSA P-256 on the device'],
+  ['i-network', 'Network Kit', 'WebSocket test link'],
+  ['i-locate', 'Location Kit', 'one-shot, foreground only'],
+  ['i-db', 'ArkData', 'crash-safe local storage'],
+  ['i-ear', 'Accessibility Kit', 'spoken alert announcements'],
+  ['i-globe', 'Localization Kit', 'Polish and English'],
+  ['i-vibrate', 'Sensor Service Kit', 'vibration for new alerts'],
+  ['i-layers', 'ArkUI', 'Canvas map · keep screen on'],
+];
+function buildTiles() {
+  let html = '';
+  TILES.forEach(([icon, title, sub], i) => {
+    const x = 110 + (i % 3) * 580, y = 250 + Math.floor(i / 3) * 190;
+    html += `<div class="tile card" id="tile${i}" style="left:${x}px; top:${y}px"><div class="ic"><svg class="i"><use href="#${icon}"/></svg></div><div><b>${title}</b><span>${sub}</span></div></div>`;
+  });
+  $('tiles').innerHTML = html;
+  $('codebase').innerHTML = `
+    <div class="abs card" id="cb-core" style="left: 460px; top: 290px; width: 1000px; padding: 34px 44px; background: var(--lime); color: var(--forest); border: none; text-align: center">
+      <div style="font-size: 40px; font-weight: 700">One codebase</div><div style="font-size: 26px; margin-top: 8px">protocol · relay · inbox · issuer console · map · UI</div></div>
+    <svg class="abs" id="cb-lines" style="left:0; top:0" width="1920" height="1080"><path d="M960 440 V510 H560 V580 M960 510 H1360 V580" stroke="#D8F58A" stroke-width="4" fill="none"/></svg>
+    <div class="abs card" id="cb-h" style="left: 260px; top: 580px; width: 600px; padding: 34px 40px"><div style="font-size: 36px; font-weight: 700">HarmonyOS</div><div style="font-size: 25px; color: var(--muted); margin-top: 8px">target API 24 · NearLink Kit adapter</div></div>
+    <div class="abs card" id="cb-o" style="left: 1060px; top: 580px; width: 600px; padding: 34px 40px"><div style="font-size: 36px; font-weight: 700">OpenHarmony · Oniro</div><div style="font-size: 25px; color: var(--muted); margin-top: 8px">API 23 · open-source toolchain · Linux</div></div>`;
+}
+
+function buildShots() {
+  let html = '';
+  TL.shots.forEach((shot, i) => {
+    const x = 175 + i * 420;
+    html += `<div class="abs" id="shot${i}" style="left:${x}px; top:140px"><div class="pill" style="margin: 0 0 22px 0">${shot.label}</div>
+      <div class="shot" style="position: relative"><img src="${shot.src}"></div></div>`;
+  });
+  $('shots').innerHTML = html;
+}
+
+const STATS = [[177, '', 'automated host tests, 16 suites'], [0, '', 'ArkTS errors, both products'], [0, '', 'Code Linter issues'],
+  [17, '/17', 'native evidence assertions'], [68, '', 'screenshots in the gallery'], [1, '', 'command to check and build']];
+function buildStats() {
+  let html = '';
+  STATS.forEach(([n, suffix, text], i) => {
+    const x = 110 + (i % 3) * 330, y = 210 + Math.floor(i / 3) * 290;
+    html += `<div class="stat" id="stat${i}" style="left:${x}px; top:${y}px"><div class="n"><span>0</span>${suffix}</div><div class="t">${text}</div></div>`;
+  });
+  $('stats').innerHTML = html;
+  $('term').innerHTML = ['<span class="dim">PS&gt; .\\scripts\\check.ps1 -Build</span>', 'ℹ tests 177', 'ℹ pass 177', 'ℹ fail 0',
+    '<span class="ok">No errors found in 32 file(s).</span>', '<span class="ok">No errors found in 32 file(s).</span>',
+    'Issues: <span class="ok">0</span>', '<span class="ok">BUILD SUCCESSFUL</span>', '<span class="ok">CHECKS: PASS</span>']
+    .map((line, i) => `<div id="tl${i}" style="opacity:0">${line}</div>`).join('');
+}
+
+function buildNext() {
+  $('col-sim').innerHTML = `<div class="pill coral" style="font-size: 26px">Simulated, and labelled</div>
+    <div style="font-size: 38px; line-height: 1.5; margin-top: 40px">The radio between emulators:<br><span style="color: var(--muted)">a local test link stands in for NearLink.</span></div>
+    <div style="font-size: 38px; line-height: 1.5; margin-top: 30px">The issuer:<br><span style="color: var(--muted)">a local exercise signing service.</span></div>`;
+  $('col-next').innerHTML = `<div class="pill solid" style="font-size: 26px">Next</div>
+    <div style="font-size: 38px; line-height: 1.5; margin-top: 40px">NearLink A → B → C<br><span style="color: var(--muted)">on physical phones. Runbook ready.</span></div>
+    <div style="font-size: 38px; line-height: 1.5; margin-top: 30px">Background relaying<br><span style="color: var(--muted)">with the API 26 NearLink task mode.</span></div>`;
+}
+
+// ---------- per-scene renderers -----------------------------------------
+function renderMap(t) {
+  const cold = SC.cold, title = SC.title, outro = SC.outro;
+  const k = 1.3 + 0.12 * prog(t, cold.start, title.end);
+  const cx = TL.mapCenter[0], cy = TL.mapCenter[1];
+  $('map').style.transform = `translate(${960 - cx * k}px, ${540 - cy * k}px) scale(${k})`;
+  let o = 0;
+  if (t < title.end + 0.6) o = Math.min(1, prog(t, 0, 1.4)) * (1 - 0.45 * prog(t, title.start, title.start + 1.2)) * (1 - prog(t, title.end - 0.5, title.end + 0.4));
+  if (t > outro.start - 0.6) o = 0.35 * prog(t, outro.start - 0.4, outro.start + 0.8);
+  $('mapwrap').style.opacity = o;
+  // towers: online pulses until off, then dead
+  const off = cold.start + 3.0;
+  document.querySelectorAll('.tw').forEach((g, i) => {
+    const dead = t > off + i * 0.18;
+    g.querySelector('.tw-icon').setAttribute('stroke', dead ? '#FF9C86' : '#F4F6F0');
+    g.querySelector('.tw-x').setAttribute('opacity', dead ? 1 : 0);
+    g.querySelectorAll('.tw-ring').forEach((r, j) => {
+      const phase = ((t * 0.9 + j / 3 + i * 0.13) % 1);
+      r.setAttribute('r', 14 + phase * 70);
+      r.setAttribute('opacity', dead ? 0 : (1 - phase) * 0.7 * prog(t, 0.2, 1.0));
+    });
+  });
+  // mesh: phones light up and link to neighbours
+  const meshStart = cold.start + 5.2;
+  document.querySelectorAll('.mp').forEach((c, i) => {
+    const p = out3(prog(t, meshStart + i * 0.07, meshStart + i * 0.07 + 0.5));
+    c.setAttribute('opacity', p);
+    c.setAttribute('r', 7 + 3 * p);
+  });
+  document.querySelectorAll('.ml').forEach((l, i) => {
+    const p = ease(prog(t, meshStart + 0.6 + i * 0.03, meshStart + 1.6 + i * 0.03));
+    l.setAttribute('stroke-dashoffset', (1 - p) * 400);
+    l.setAttribute('opacity', p > 0 ? 0.85 : 0);
+  });
+  document.querySelectorAll('.sp').forEach((c, i) => {
+    c.setAttribute('opacity', 0.9 * prog(t, title.start + 2 + i * 0.03, title.start + 2.6 + i * 0.03));
+  });
+}
+
+function renderCold(t) {
+  const s = SC.cold;
+  appear($('nosvc'), t, s.start + 3.1, 0.4);
+  const line = $('cold-line');
+  const p = out3(prog(t, s.start + 5.0, s.start + 6.0));
+  line.innerHTML = 'The towers are down.<br><span style="color: var(--lime)">The warning still has to reach you.</span>';
+  line.style.opacity = p; line.style.transform = `translateY(${(1 - p) * 30}px)`;
+  $('cold-halo').style.opacity = p;
+}
+
+function renderTitle(t) {
+  const s = SC.title;
+  const pl = out3(prog(t, s.start + 0.2, s.start + 1.0));
+  $('t-logo').style.transform = `scale(${0.7 + 0.3 * pl})`; $('t-logo').style.opacity = pl;
+  appear($('t-name'), t, s.start + 0.5, 0.8, Infinity, 40);
+  appear($('t-tag'), t, s.start + 1.4, 0.8);
+  appear($('t-pills'), t, s.start + 2.4, 0.8);
+}
+
+function along(el, t, a, b, x1, y1, x2, y2) {
+  const p = ease(prog(t, a, b));
+  el.setAttribute('transform', `translate(${lerp(x1, x2, p)},${lerp(y1, y2, p)})`);
+  el.setAttribute('opacity', t >= a - 0.15 && t <= b + 0.35 ? 1 : 0);
+}
+
+function renderHow(t) {
+  const s = SC.how, a = s.start;
+  const show = (id, at, d = 0.5) => { const el = $(id); el.setAttribute('opacity', out3(prog(t, at, at + d))); return el; };
+  const issuer = $('h-issuer'); const pi = out3(prog(t, a, a + 0.6));
+  issuer.setAttribute('opacity', pi); issuer.setAttribute('transform', `translate(${(1 - pi) * -40},0)`);
+  ['A', 'B', 'C'].forEach((n, i) => {
+    const p = out3(prog(t, a + 0.3 + i * 0.2, a + 0.9 + i * 0.2));
+    $('h-' + n).setAttribute('opacity', (n === 'A' ? 1 - 0.6 * prog(t, a + 10.9, a + 11.6) : 1) * p);
+  });
+  // timeline of the story
+  show('h-l1', a + 0.8);
+  const env = $('h-env');
+  if (t < a + 6.0) along(env, t, a + 2.4, a + 3.3, 280, 475, 760, 475);
+  else if (t < a + 11.0) along(env, t, a + 8.4, a + 9.3, 760, 475, 1180, 475);
+  else along(env, t, a + 11.8, a + 12.7, 1180, 475, 1600, 475);
+  // envelope hides over a phone once delivered
+  const okA = show('h-A-ok', a + 3.4, 0.35), okB = show('h-B-ok', a + 9.4, 0.35), okC = show('h-C-ok', a + 12.8, 0.35);
+  const label = (id, one, two) => { const s = $(id).querySelectorAll('tspan'); s[0].textContent = one; s[1].textContent = two; };
+  label('h-A-t', 'verify first,', 'then show · store · send'); show('h-A-t', a + 4.2);
+  label('h-B-t', 'verify · store', 'ACK · relay on'); show('h-B-t', a + 9.7);
+  label('h-C-t', 'verify · store', 'ACK to B'); show('h-C-t', a + 13.0);
+  $('h-A-hop').textContent = 'hop 0'; show('h-A-hop', a + 4.6);
+  $('h-B-hop').textContent = 'hop 1'; show('h-B-hop', a + 9.9);
+  $('h-C-hop').textContent = 'hop 2'; show('h-C-hop', a + 13.2);
+  show('h-l2', a + 8.0);
+  const ackP = prog(t, a + 10.0, a + 10.8);
+  $('h-ack').setAttribute('opacity', ackP > 0 ? 1 - 0.6 * prog(t, a + 11.6, a + 12.2) : 0);
+  $('h-ack').setAttribute('stroke-dashoffset', -ackP * 60);
+  show('h-ack-t', a + 10.2);
+  show('h-l3', a + 11.4);
+  show('h-arc', a + 13.4); show('h-arc-t', a + 13.6);
+  // the forged copy
+  const bad = $('h-bad');
+  along(bad, t, a + 14.4, a + 15.2, 1860, 120, 1745, 250);
+  if (t > a + 15.3) bad.setAttribute('opacity', 0);
+  show('h-x', a + 15.3, 0.25); show('h-x-t', a + 15.5);
+}
+
+// Demo: video time -> capture time through piecewise-linear segments.
+function rawTime(t) {
+  const segs = TL.demo.segments;
+  for (const s of segs) if (t <= s.v1) return s.v1 > s.v0 ? s.r0 + (t - s.v0) * (s.r1 - s.r0) / (s.v1 - s.v0) : s.r0;
+  return segs[segs.length - 1].r1;
+}
+
+async function drawDemo(t) {
+  const d = TL.demo;
+  const r = clamp(rawTime(Math.max(t, SC.demo.start)), 0, d.frames / d.fps - 0.001);
+  const index = Math.min(d.frames, Math.max(1, Math.floor(r * d.fps) + 1));
+  if (frameCache.index !== index) {
+    const image = new Image();
+    image.src = d.framePattern.replace('%06d', String(index).padStart(6, '0'));
+    await image.decode();
+    frameCache.index = index; frameCache.image = image;
+  }
+  const img = frameCache.image;
+  ['a', 'b', 'c'].forEach((n, i) => {
+    const ctx = $('cv-' + n).getContext('2d');
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(img, i * d.cropWidth, 0, d.cropWidth, d.cropHeight, 0, 0, 380, 819);
+  });
+}
+
+function linkSvg(state, t) {
+  // state: 'off' (not connected yet), 'on' (in range), 'out' (out of range)
+  if (state === 'on') {
+    const off = -((t * 40) % 34);
+    return `<path d="M14 60 H256" stroke="#D8F58A" stroke-width="6" stroke-dasharray="4 30" stroke-linecap="round" stroke-dashoffset="${off}"/>
+      <text x="135" y="34" text-anchor="middle" font-size="20" font-weight="700" fill="#D8F58A">in range</text>`;
+  }
+  if (state === 'out') {
+    return `<path d="M14 60 H256" stroke="rgba(244,246,240,0.28)" stroke-width="4" stroke-dasharray="12 12"/>
+      <circle cx="135" cy="60" r="17" fill="#0B1F19" stroke="rgba(244,246,240,0.4)" stroke-width="3"/><path d="M127 52l16 16M143 52l-16 16" stroke="rgba(244,246,240,0.6)" stroke-width="3"/>
+      <text x="135" y="34" text-anchor="middle" font-size="20" fill="#A9BDB2">out of range</text>`;
+  }
+  return `<path d="M14 60 H256" stroke="rgba(244,246,240,0.18)" stroke-width="4" stroke-dasharray="2 12"/>`;
+}
+
+function moveDot(el, t, a, b, x1, x2, y = 530) {
+  if (!(t >= a - 0.1 && t <= b + 0.25)) { el.style.opacity = 0; return; }
+  const p = ease(prog(t, a, b));
+  el.style.left = lerp(x1, x2, p) + 'px'; el.style.top = y + 'px';
+  el.style.opacity = 1 - prog(t, b, b + 0.25);
+}
+
+function renderDemo(t) {
+  const e = TL.demo.events;   // video times
+  const connected = e.connect + 3.0;
+  const ab = t < connected ? 'off' : (t < e.links_bc ? 'on' : 'out');
+  const bc = t < connected ? 'off' : (t < e.links_bc ? 'out' : 'on');
+  $('link-ab').innerHTML = linkSvg(ab, t);
+  $('link-bc').innerHTML = linkSvg(bc, t);
+  $('lab-b').textContent = t < e.links_bc ? 'B · in range of A' : 'B · now in range of C';
+  const cLabel = $('lab-c');
+  cLabel.textContent = t < e.links_bc ? 'C · out of range' : 'C · in range of B';
+  cLabel.className = 'pill' + (t < e.links_bc ? ' grey' : '');
+  $('lab-a').textContent = t >= e.links_bc && t < e.nearlink ? 'A · has left the area' : 'A · exercise issuer';
+  // focus rings
+  const ring = (id, ranges) => {
+    let o = 0;
+    for (const [a, b] of ranges) o = Math.max(o, prog(t, a, a + 0.3) * (1 - prog(t, b - 0.3, b)));
+    $(id).style.opacity = o;
+  };
+  ring('ring-a', [[e.issuer, e.publish + 0.6], [e.nearlink, e.end + 2]]);
+  ring('ring-b', [[e.b_banner - 0.2, e.move], [e.map, e.nearlink]]);
+  ring('ring-c', [[e.c_banner - 0.2, e.map]]);
+  // packets
+  moveDot($('dot-1'), t, e.publish, Math.max(e.b_banner, e.publish + 0.5), 500, 770);
+  moveDot($('dot-2'), t, e.links_bc, Math.max(e.c_banner, e.links_bc + 0.5), 1150, 1420);
+  moveDot($('dot-x'), t, e.inject, Math.max(e.rejected, e.inject + 0.5), 1150, 1420, 430);
+  appear($('chip-b'), t, e.b_banner + 0.2, 0.4, e.move + 1.0, 10);
+  appear($('chip-c'), t, e.c_banner + 0.2, 0.4, e.map, 10);
+  appear($('chip-x'), t, e.rejected + 0.1, 0.4, e.map, 10);
+  // speed badge: only where the capture is compressed
+  const sb = $('speed');
+  const sp = TL.demo.speed.find((s) => t >= s.v0 && t <= s.v1);
+  if (sp) {
+    sb.innerHTML = `<span class="pill solid">▶▶ ${sp.factor.toFixed(1)}× ${sp.label}</span>`;
+    const edge = Math.min(0.2, (sp.v1 - sp.v0) / 4);
+    sb.style.opacity = prog(t, sp.v0, sp.v0 + edge) * (1 - prog(t, sp.v1 - edge, sp.v1));
+  } else {
+    sb.style.opacity = 0;
+  }
+}
+
+function renderPlatform(t) {
+  const s = SC.platform;
+  const split = TL.platformSplit;
+  TILES.forEach((_, i) => {
+    const el = $('tile' + i);
+    const p = out3(prog(t, s.start + 0.3 + i * 0.22, s.start + 0.9 + i * 0.22)) * (1 - ease(prog(t, split - 0.6, split)));
+    el.style.opacity = p; el.style.transform = `translateY(${(1 - p) * 30}px) scale(${0.96 + 0.04 * p})`;
+  });
+  $('pl-kicker').textContent = t < split ? 'Built on HarmonyOS' : 'And on the open stack';
+  appear($('cb-core'), t, split + 0.1, 0.5);
+  const lines = $('cb-lines'); lines.style.opacity = prog(t, split + 0.5, split + 0.9);
+  appear($('cb-h'), t, split + 0.7, 0.5);
+  appear($('cb-o'), t, split + 1.0, 0.5);
+}
+
+function renderIncl(t) {
+  const s = SC.incl;
+  TL.shots.forEach((_, i) => appear($('shot' + i), t, s.start + 0.2 + i * 0.35, 0.7, Infinity, 80));
+}
+
+function renderEvidence(t) {
+  const s = SC.evidence;
+  STATS.forEach(([n], i) => {
+    const el = $('stat' + i);
+    const p = appear(el, t, s.start + 0.3 + i * 0.25, 0.5);
+    const c = out3(prog(t, s.start + 0.3 + i * 0.25, s.start + 1.6 + i * 0.25));
+    el.querySelector('span').textContent = Math.round(n * c);
+  });
+  for (let i = 0; i < 9; i++) $('tl' + i).style.opacity = prog(t, s.start + 2.0 + i * 0.45, s.start + 2.1 + i * 0.45);
+  appear($('term'), t, s.start + 1.6, 0.5);
+}
+
+function renderNext(t) {
+  const s = SC.next;
+  appear($('col-sim'), t, s.start + 0.2, 0.6);
+  appear($('col-next'), t, s.start + 3.6, 0.6);
+}
+
+function renderOutro(t) {
+  const s = SC.outro;
+  appear($('o-1'), t, s.start + 0.3, 0.7);
+  appear($('o-2'), t, s.start + 1.5, 0.7);
+  appear($('o-3'), t, s.start + 2.6, 0.6);
+  appear($('o-qr'), t, s.start + 2.8, 0.6);
+  $('black').style.opacity = prog(t, TL.duration - 1.2, TL.duration - 0.05);
+}
+
+function renderCaption(t) {
+  const span = document.querySelector('#caption span');
+  const c = TL.captions.find((c) => t >= c.start && t < c.end);
+  if (!c) { span.parentElement.style.opacity = 0; return; }
+  span.textContent = c.text;
+  span.parentElement.style.opacity = prog(t, c.start, c.start + 0.15) * (1 - prog(t, c.end - 0.15, c.end));
+}
+
+const RENDER = { cold: renderCold, title: renderTitle, how: renderHow, demo: renderDemo, platform: renderPlatform,
+  incl: renderIncl, evidence: renderEvidence, next: renderNext, outro: renderOutro };
+
+window.renderFrame = async function (t) {
+  renderMap(t);
+  for (const s of TL.scenes) {
+    const el = $('s-' + s.id);
+    const o = t >= s.start && t <= s.end ? sceneOpacity(t, s) : 0;
+    el.style.opacity = o;
+    el.style.visibility = o > 0 ? 'visible' : 'hidden';
+    if (o > 0) RENDER[s.id](t);
+  }
+  if (t >= SC.demo.start - 0.6 && t <= SC.demo.end + 0.6) await drawDemo(t);
+  renderCaption(t);
+  return true;
+};
+</script>
+</body>
+</html>
