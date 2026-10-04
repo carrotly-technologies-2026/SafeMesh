@@ -224,7 +224,7 @@ Both use only the `Emulator.exe` windows, never the desktop, and the FFmpeg bund
 
 ## 7. Other platforms
 
-- **Linux / Oniro (OpenHarmony API 23):** [COMMANDS.md](../COMMANDS.md). Use `scripts/oniro/sign.sh` and `scripts/oniro/deploy.sh`. **Never run `oniro-app sign .`**, because it would sign the HarmonyOS product with the OpenHarmony key.
+- **Linux / Oniro (OpenHarmony API 23):** [COMMANDS.md](../COMMANDS.md). Up to three emulators: `scripts/oniro/emulator.sh A|B|C`, then `deploy.sh` and `services.sh start`. `node scripts/oniro/send-alert.mjs "Title" "Body" "Area" critical` publishes from the terminal, and it also works with the DevEco emulators on Windows. Use `scripts/oniro/sign.sh` and `scripts/oniro/deploy.sh`. **Never run `oniro-app sign .`**, because it would sign the HarmonyOS product with the OpenHarmony key.
 - **Physical HarmonyOS phones (NearLink):** [docs/PHYSICAL_TESTING.md](PHYSICAL_TESTING.md):
   - Build the `default` product and sign it in DevEco with all phones connected. Never commit the signed `build-profile.json5`.
   - NearLink controls are in Tests and diagnostics → NearLink radio, not on the Relay tab.
@@ -292,7 +292,7 @@ Huawei "Imagine What's Next" deliverables:
 | Working `.hap` | Done: Release v1.6.0 (`SafeMesh-1.6.0.hap`, SHA-256 `a66efd9e…`) |
 | Recorded demonstration | Done: `SafeMesh-1.4.1-demo.mp4` in the releases. **Open:** upload to YouTube (Unlisted) for the form |
 | Architecture and implementation description | Done: README (*Architecture*, *Platform capabilities*, *Transport and signature design*) |
-| `AI_WORKFLOW.md` | Done. **Open:** the team confirms which agent and model did the v1.2–v1.4 sessions |
+| `AI_WORKFLOW.md` | Done, including the team-reported tools for v1.2–v1.4 and the Oniro work (ChatGPT "Astra" and Claude Opus 5.5) |
 | Target HarmonyOS / OpenHarmony / Oniro, min API 20 | Done: `default` (HarmonyOS) and `oniro` (OpenHarmony API 23) products |
 | Runs on an emulator | Done: API 24 emulators, native evidence in `artifacts/` |
 | English materials | Done: docs, video and app (System language → English on non-Polish systems) |
@@ -303,7 +303,7 @@ Remaining work, in order of value:
 | --- | --- | --- | --- |
 | 1 | Physical NearLink test (A → B → C) with recorded evidence, then the README "Physical NearLink validation" section | Team at the venue | Biggest lever for *Use of platform capabilities* and *Demonstration*: today NearLink is implemented but unverified |
 | 2 | YouTube upload and form update (links to Release v1.6.0, texts from SUBMISSION.md) | Team | The form requires a YouTube link |
-| 3 | Re-run `scripts/oniro/deploy.sh` on the Oniro emulator (API 23) after the merge; add a screenshot to `artifacts/screenshots/oniro-*` | Oniro maintainer | Confirms the merged `oniro` product on its real toolchain |
+| 3 | Done: the team member re-ran the merged `oniro` product on the Oniro emulator. Optional: add a screenshot as `artifacts/screenshots/oniro-*` for the jury | Oniro maintainer | Visible evidence for the open-stack build |
 | 4 | Short pitch deck, if the jury invites teams to present | Team | Rules allow the jury to invite teams; nothing exists yet |
 | 5 | Done in v1.6.0: `pages/Index.ets` split into screen components, verified by pixel comparison | — | — |
 | 6 | Roadmap, not for the hackathon: background relaying with the API 26 `MODE_NEARLINK` continuous task, official issuer integration and key management | — | Documented in README as next steps |
