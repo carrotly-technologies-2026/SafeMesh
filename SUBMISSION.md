@@ -9,7 +9,7 @@ Paste-ready text for the HackYeah 2026 submission form. Challenge: **Huawei, “
 - Demo video file, 2 min 58 s, narrated: https://github.com/carrotly-technologies-2026/SafeMesh/releases/download/submission-1.6.0/SafeMesh-demo-1.6.0.mp4. The form asks for a YouTube link: upload this file as *Unlisted* or *Public*, add `SafeMesh-demo-1.6.0.srt` as English subtitles, and paste that link. Chapters for the YouTube description are in [docs/DEMO_VIDEO.md](docs/DEMO_VIDEO.md).
 - Presentation: https://github.com/carrotly-technologies-2026/SafeMesh/blob/main/docs/pitch/SafeMesh-pitch.pdf (16 slides; a PPTX with speaker notes is in the submission pack)
 - All screens: https://github.com/carrotly-technologies-2026/SafeMesh/blob/main/docs/gallery/README.md
-- Cover image: [artifacts/cover/SafeMesh-cover.png](artifacts/cover/SafeMesh-cover.png). Alt text: *Three connected phones above a stylized city map, illustrating signed alerts, offline maps and nearby-device relaying.* The cover is a conceptual illustration generated with an image tool; its [prompt](artifacts/cover/PROMPT.txt) is included. It is not an app screenshot.
+- Cover image: [artifacts/cover/SafeMesh-cover.png](artifacts/cover/SafeMesh-cover.png). Alt text: *Three real SafeMesh screenshots from the recorded demo: phone A signs an exercise alert, phone B verifies it at hop 1, phone C verifies it at hop 2.* The cover is the title slide of the pitch deck, built from real emulator screenshots.
 
 ## Challenge area
 

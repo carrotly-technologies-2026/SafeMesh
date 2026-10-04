@@ -77,7 +77,16 @@ th { font-size: 18px; text-transform: uppercase; letter-spacing: 0.12em; color: 
 .dark .source { color: #9DB5A8; }
 /* slide-specific */
 .title-wrap { display: grid; grid-template-columns: 820px 1fr; gap: 40px; align-items: center; height: 100%; }
-.title-cover { position: absolute; right: 90px; top: 110px; width: 880px; height: 842px; object-fit: cover; border-radius: 40px; box-shadow: 0 50px 90px rgba(0,0,0,0.35); }
+.title-phones { position: absolute; right: 96px; top: 150px; width: 870px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px; align-items: start; }
+.title-phones .phone { width: 100%; padding: 9px; border-radius: 44px; box-shadow: 0 40px 80px rgba(0,0,0,0.42), 0 0 0 1px rgba(216,245,138,0.16); }
+.title-phones .phone img { border-radius: 36px; }
+.title-phones .phone:nth-child(2) { margin-top: 44px; }
+.title-phones .phone:nth-child(3) { margin-top: 88px; }
+.title-phones .tag { top: -16px; font-size: 19px; padding: 8px 16px; }
+.title-track { position: absolute; right: 96px; top: 832px; width: 870px; }
+.title-track svg { display: block; width: 870px; height: 40px; }
+.title-track p { font-size: 21px; line-height: 1.4; color: #C3D3CA; margin-top: 10px; text-align: center; }
+.title-track b { color: var(--lime); font-weight: 700; }
 .logo-row { display: flex; align-items: center; gap: 26px; margin-bottom: 34px; }
 .logo-row img { width: 108px; height: 108px; border-radius: 26px; box-shadow: 0 16px 36px rgba(0,0,0,0.3); }
 .tagline { font-size: 40px; line-height: 1.25; margin-top: 30px; color: #E6F0EA; max-width: 760px; }
@@ -142,7 +151,20 @@ body.view .hint { position: fixed; bottom: 10px; right: 14px; color: #6d8a7c; fo
 
 <!-- 1 · Title ------------------------------------------------------------------>
 <section class="slide dark" data-title="SafeMesh">
-  <img class="title-cover" src="img/cover-art.jpg" alt="Concept illustration: three phones over a city map, connected by dotted paths">
+  <div class="title-phones">
+    <div class="phone"><span class="pill lime tag">A · issuer signs</span><img src="img/demo-a.jpg" alt="Phone A: exercise publisher signed in, alert signed and queued"></div>
+    <div class="phone"><span class="pill lime tag">B · hop 1 · verified</span><img src="img/demo-b.jpg" alt="Phone B: signature verified, received from device A, relay hops 1"></div>
+    <div class="phone"><span class="pill lime tag">C · hop 2 · verified</span><img src="img/demo-c.jpg" alt="Phone C: signature verified, received from device B, relay hops 2"></div>
+  </div>
+  <div class="title-track">
+    <svg viewBox="0 0 870 40" aria-hidden="true">
+      <line x1="134" y1="20" x2="736" y2="20" stroke="#D8F58A" stroke-width="3" stroke-dasharray="2 12" stroke-linecap="round"/>
+      <circle cx="134" cy="20" r="11" fill="#D8F58A" stroke="#163E33" stroke-width="5"/>
+      <circle cx="435" cy="20" r="11" fill="#D8F58A" stroke="#163E33" stroke-width="5"/>
+      <circle cx="736" cy="20" r="13" fill="#D8F58A" stroke="#163E33" stroke-width="5"/>
+    </svg>
+    <p>A leaves before C arrives. C gets the alert from B and <b>verifies the signature itself</b>.</p>
+  </div>
   <div style="position:relative; max-width: 820px; margin-top: 70px">
     <div class="logo-row"><img src="img/logo.svg" alt=""><span class="pill lime">HackYeah 2026 · Huawei “Imagine What’s Next”</span></div>
     <h1>SafeMesh</h1>
@@ -154,8 +176,8 @@ body.view .hint { position: fixed; bottom: 10px; right: 14px; color: #6d8a7c; fo
       <span class="pill">Human-Centric + Spatial</span>
     </div>
   </div>
-  <div class="footer"><span class="brand">github.com/carrotly-technologies-2026/SafeMesh</span><span>Illustration: concept art, not a screenshot</span></div>
-  <aside class="notes">SafeMesh is a native HarmonyOS app for one narrow, real problem: getting a trustworthy warning to people when the mobile network is down. Everything in this deck is backed by the repository: code, tests, logs and recorded emulator runs. The cover is a concept illustration; every other phone image is a real emulator screenshot.</aside>
+  <div class="footer"><span class="brand">github.com/carrotly-technologies-2026/SafeMesh</span><span>Real screenshots · recorded demo on three HarmonyOS API 24 emulators</span></div>
+  <aside class="notes">SafeMesh is a native HarmonyOS app for one narrow, real problem: getting a trustworthy warning to people when the mobile network is down. Everything in this deck is backed by the repository: code, tests, logs and recorded emulator runs. The three phones on this slide are real stills from the recorded demo: A signs and publishes, B verifies at hop 1, and C verifies at hop 2 after A has left. Every phone image in this deck is a real emulator screenshot.</aside>
 </section>
 
 <!-- 2 · Problem ---------------------------------------------------------------->

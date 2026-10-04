@@ -1,6 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <!-- The app's "Signature verified" shield; the check is the relay path A -> B -> C. -->
   <rect width="256" height="256" rx="64" fill="#183E35"/>
-  <path d="M169 83C156 70 139 65 121 68C100 71 87 83 87 101C87 120 102 128 126 134C145 139 153 143 153 153C153 165 142 171 127 171C112 171 99 165 87 154L73 173C86 187 106 194 127 194C157 194 180 179 180 153C180 131 162 122 138 116C119 111 112 107 112 99C112 90 120 86 131 86C141 86 150 90 157 97Z" fill="#D8F58A"/>
-  <circle cx="186" cy="63" r="9" fill="#D8F58A"/>
-  <circle cx="70" cy="197" r="9" fill="#D8F58A"/>
+  <g transform="translate(24.8 22.4) scale(8.6)" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 3l7 3v5.2c0 4.4-2.9 8.1-7 9.8-4.1-1.7-7-5.4-7-9.8V6l7-3z" stroke="#D8F58A" stroke-width="1.45"/>
+    <path d="M8.3 12.1l2.8 2.8 4.9-5.1" stroke="#D8F58A" stroke-width="1.15"/>
+    <g fill="#D8F58A" stroke="#183E35" stroke-width="0.55">
+      <circle cx="8.3" cy="12.1" r="1.25"/>
+      <circle cx="11.1" cy="14.9" r="1.25"/>
+      <circle cx="16" cy="9.8" r="1.45"/>
+    </g>
+  </g>
 </svg>

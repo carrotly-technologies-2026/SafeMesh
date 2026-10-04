@@ -125,8 +125,7 @@ def write_readme(count, notes):
              '[`deck.html`](deck.html) in a browser (arrow keys, F for full screen). The PPTX with speaker notes '
              'and the PDF are also attached to the latest GitHub release.', '',
              'Rendered by `python scripts/render-pitch.py`. Phone images are real emulator screenshots from '
-             '[the screen gallery](../gallery/README.md) and the demo recording; the title cover is a concept '
-             'illustration.', '']
+             '[the screen gallery](../gallery/README.md) and the demo recording, including the three phones on the title slide.', '']
     for number in range(1, count + 1):
         title, text = notes[number - 1]
         lines += [f'### {number}. {title}', '', f'![Slide {number}: {title}](slides/{number:02d}.jpg)', '',

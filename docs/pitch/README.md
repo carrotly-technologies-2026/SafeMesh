@@ -2,13 +2,13 @@
 
 16 slides for the HackYeah 2026 jury. **[Open the PDF](SafeMesh-pitch.pdf)**, or open [`deck.html`](deck.html) in a browser (arrow keys, F for full screen). The PPTX with speaker notes and the PDF are also attached to the latest GitHub release.
 
-Rendered by `python scripts/render-pitch.py`. Phone images are real emulator screenshots from [the screen gallery](../gallery/README.md) and the demo recording; the title cover is a concept illustration.
+Rendered by `python scripts/render-pitch.py`. Phone images are real emulator screenshots from [the screen gallery](../gallery/README.md) and the demo recording, including the three phones on the title slide.
 
 ### 1. SafeMesh
 
 ![Slide 1: SafeMesh](slides/01.jpg)
 
-> SafeMesh is a native HarmonyOS app for one narrow, real problem: getting a trustworthy warning to people when the mobile network is down. Everything in this deck is backed by the repository: code, tests, logs and recorded emulator runs. The cover is a concept illustration; every other phone image is a real emulator screenshot.
+> SafeMesh is a native HarmonyOS app for one narrow, real problem: getting a trustworthy warning to people when the mobile network is down. Everything in this deck is backed by the repository: code, tests, logs and recorded emulator runs. The three phones on this slide are real stills from the recorded demo: A signs and publishes, B verifies at hop 1, and C verifies at hop 2 after A has left. Every phone image in this deck is a real emulator screenshot.
 
 ### 2. The problem
 

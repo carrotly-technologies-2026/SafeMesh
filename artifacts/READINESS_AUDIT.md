@@ -73,7 +73,7 @@ The challenge explicitly allows an emulator demonstration with hardware limitati
 
 Clean-checkout verification used a fresh local clone of `1bd015dc9ca3cea9c230b78b0253abfc61a8bcae` on the same computer with the existing Studio/SDK/CLI/cache. It passed without semantic source changes; tooling only rewrote lockfile line endings. This is not clean-machine or byte-identical-HAP validation. Neither a Conductor project nor the supplied full project template is a mandatory requirement for this native app.
 
-The submission cover is a conceptual illustration created with the built-in `imagegen` tool. Its [prompt](cover/PROMPT.txt) and [final asset](cover/SafeMesh-cover.png) are recorded. It is not an actual app screenshot or evidence of radio communication. Development and illustration assistance are disclosed in [AI_WORKFLOW.md](../AI_WORKFLOW.md).
+The [submission cover](cover/SafeMesh-cover.png) is the pitch-deck title slide, built from three real emulator stills of the recorded demo. It is not evidence of physical radio communication. Development and illustration assistance are disclosed in [AI_WORKFLOW.md](../AI_WORKFLOW.md).
 
 ## Sources and verification basis
 
