@@ -39,7 +39,7 @@ const MESSAGE = JSON.stringify({
   signature: 'transport-test-fixture-not-an-authority-signature'
 });
 
-function makeHarness({ capable = true, permissionGranted = true } = {}) {
+function makeHarness({ capable = true, permissionGranted = true, apiVersion = 24, hardware = true } = {}) {
   const state = {
     capable, permissionGranted, importCount: 0, permissionRequests: 0,
     writes: [], messages: [], errors: [], statuses: [], peers: [], scanFilters: [],
@@ -51,7 +51,8 @@ function makeHarness({ capable = true, permissionGranted = true } = {}) {
   const off = name => state.listeners.delete(name);
   const kit = {
     manager: {
-      isNearLinkSupported: () => true,
+      // Declared from API 23; older systems do not expose the function at all.
+      isNearLinkSupported: apiVersion >= 23 ? () => hardware : undefined,
       getState: () => 1,
       NearlinkState: { STATE_ON: 1 }
     },
@@ -86,7 +87,7 @@ function makeHarness({ capable = true, permissionGranted = true } = {}) {
     exports: {},
     require(name) {
       if (name === '@kit.ArkTS') return { util };
-      if (name === '@kit.BasicServicesKit') return {};
+      if (name === '@kit.BasicServicesKit') return { deviceInfo: { sdkApiVersion: apiVersion } };
       if (name === '@kit.AbilityKit') {
         return {
           abilityAccessCtrl: {
@@ -321,4 +322,23 @@ test('intermediate connection states retain the pending request until confirmati
   assert.equal(state.deferredTimers.filter(Boolean).length, 0);
   assert.equal(radio.connectedCount(), 1);
   await radio.stop();
+});
+
+test('API 20-22 phones rely on the NearLink syscap because isNearLinkSupported() starts at API 23', async () => {
+  const { radio, state } = makeHarness({ apiVersion: 22 });
+  const status = await radio.probe();
+  assert.equal(status.supported, true);
+  assert.equal(status.state, 'available');
+  assert.equal(state.errors.length, 0, 'the API 23 capability query must not be called on API 22');
+  assert.equal(await radio.start({}), true);
+  assert.equal(state.advertisements, 1);
+});
+
+test('from API 23 the platform capability query decides support', async () => {
+  const { radio, state } = makeHarness({ apiVersion: 23, hardware: false });
+  const status = await radio.probe();
+  assert.equal(status.supported, false);
+  assert.equal(status.state, 'unsupported');
+  assert.equal(await radio.start({}), false);
+  assert.equal(state.advertisements, 0);
 });

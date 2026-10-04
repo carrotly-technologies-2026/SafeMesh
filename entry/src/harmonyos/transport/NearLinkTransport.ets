@@ -1,6 +1,6 @@
 import { abilityAccessCtrl, common, Permissions } from '@kit.AbilityKit';
 import { util } from '@kit.ArkTS';
-import { BusinessError } from '@kit.BasicServicesKit';
+import { BusinessError, deviceInfo } from '@kit.BasicServicesKit';
 // Kit bindings resolve lazily (API 18+); capability is checked before first use.
 import lazy { manager, advertising, dataTransfer, scan } from '@kit.NearLinkKit';
 import type { NearLinkCallbacks, NearLinkPeer, NearLinkStatus } from '../../main/ets/transport/RelayTransport';
@@ -62,7 +62,9 @@ export class NearLinkTransport {
     try {
       // Loading an unsupported Huawei Kit statically can crash an emulator at startup.
       this.loaded = true;
-      this.supported = manager.isNearLinkSupported();
+      // isNearLinkSupported() exists from API 23 (HarmonyOS 6.1.0). On API 20-22 the NearLink syscap
+      // checked above gates scan and advertising (API 13) and data transfer (API 18).
+      this.supported = deviceInfo.sdkApiVersion >= 23 ? manager.isNearLinkSupported() : true;
       if (!this.supported) {
         return this.notify('unsupported', 'NearLink needs supported physical hardware; this emulator has no NearLink radio.');
       }
