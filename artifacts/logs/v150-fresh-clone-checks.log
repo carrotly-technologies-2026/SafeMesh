@@ -1,0 +1,490 @@
+﻿✔ PL/EN selection displays only signed variants and preserves identity, packet bytes and storage (771.1121ms)
+✔ a forged alternate is rejected without changing the authentic localized alert (336.3378ms)
+✔ missing signed alternate falls back explicitly to the original and never synthesizes content (351.0717ms)
+✔ legacy v1 content remains original with an unknown-language fallback in both interface languages (214.8547ms)
+✔ restoration verifies before selecting requested content; corrupt persisted alternate stays hidden (222.111ms)
+✔ the actual expiry timer selects an older valid cached alert, then clears every display identity field (138.9488ms)
+✔ dispose blocks timer revival by late restore, and resume reselects after expiry while hidden (126.6039ms)
+✔ the public lab fixture helper preserves v2 signature validity and derives only intended faults (94.1636ms)
+✔ publishing needs an authorized session; malformed token never goes to the network (718.4659ms)
+✔ authority session must match pinned key and exercise-only identity (315.1684ms)
+✔ native HTTP uses only loopback, disables redirects/proxy/cache and bounds responses (346.6147ms)
+✔ a mismatched returned draft is rejected before entering the recipient verifier (197.7743ms)
+✔ unauthorized response erases session; logout rejects a late successful login (133.9229ms)
+✔ publisher never forwards a rejected signature; signing privilege is separate from relay role (163.5066ms)
+✔ successful publication enters the verifier then seeds forwarding automatically (115.663ms)
+✔ uncertain response retry retains request ID; confirmed or edited drafts get a new ID (84.6649ms)
+✔ failed mobile persistence retains the draft and retry ID and never claims saved or queues a volatile publication (81.8771ms)
+✔ expired idempotency receipts are distinguished from a conflicting draft by the HTTP client (89.1881ms)
+✔ expired uncertain publication keeps its text and only a later explicit attempt creates a fresh request ID (63.3146ms)
+✔ preparation reuses local key/token; only explicit rotation replaces them; corrupt secrets fail closed (34.2128ms)
+✔ fixture refresh preserves the authority pin and requires explicit adoption of a new public key (32.0323ms)
+✔ health reveals no key/token; session and issuance require the separate bearer credential (201.2286ms)
+✔ actual recipient protocol accepts issued v2 signatures and rejects tampering and unpinned authorities (910.7113ms)
+✔ distinct client request IDs produce distinct signed alert identities; metadata logs omit alert content and secrets (32.0878ms)
+✔ same request retries return byte-equivalent receipt after a restart; changed drafts cannot reuse its ID (29.9013ms)
+✔ concurrent duplicate requests persist and return exactly one issued envelope (25.1475ms)
+✔ strict draft schema rejects signer-controlled fields, bad IDs, limits, controls and invalid text (66.1434ms)
+✔ HTTP boundary rejects browser Origin, foreign Host, wrong media type, malformed UTF-8 and oversized bodies (32.1168ms)
+✔ failed durable write does not publish or acknowledge an alert; retry can succeed (21.9502ms)
+✔ new-signature rate budget does not prevent an idempotent retry and resets after its window (26.229ms)
+✔ request budget also bounds unauthenticated traffic (18.1035ms)
+✔ journal is bounded to 128 active receipts and expired entries allow subsequent new requests (713.1103ms)
+✔ tampered durable receipt causes startup refusal instead of resetting idempotency history (17.6133ms)
+✔ the Oniro stub reports NearLink as unsupported and never claims a link or delivery (1.6198ms)
+✔ both NearLink variants expose the same public API to the relay (243.75ms)
+✔ NearLink Kit stays in the HarmonyOS source root and the relay resolves the adapter per target (86.2996ms)
+✔ build profiles keep the HarmonyOS product unchanged and add an Oniro product (75.2614ms)
+SAFEMESH_TRANSPORT_PEER mode=nearlink connected=true name=B
+✔ delivery codecs bound packets and never confuse acknowledgements with alerts (10.6666ms)
+✔ all current messages enter a delayed peer queue and each pump is bounded to four writes (15.8235ms)
+✔ only an expected peer, sent token, issuer, alert ID and revision can acknowledge an item (2.4645ms)
+✔ loss uses bounded 2s/4s retries, then reports failure instead of claiming delivery (1.9646ms)
+✔ a lost ACK triggers a duplicate ACK without forwarding the alert twice to the next peer (7.1762ms)
+✔ expiry prunes pending packets and stale acknowledgements cannot revive them (1.8971ms)
+SAFEMESH_RELAY_RECEIVE node=nearlink status=ack_matched alertId=cached-0 hops=-1
+SAFEMESH_RELAY_RECEIVE node=nearlink status=ack_matched alertId=cached-1 hops=-1
+SAFEMESH_RELAY_RECEIVE node=nearlink status=ack_matched alertId=cached-2 hops=-1
+SAFEMESH_TRANSPORT_PEER mode=nearlink connected=false name=B
+SAFEMESH_TRANSPORT_PEER mode=nearlink connected=true name=B
+SAFEMESH_TRANSPORT_PEER mode=nearlink connected=true name=A
+✔ restored ViewModel synchronizes all messages to a late peer and re-syncs on reconnect (61.6087ms)
+SAFEMESH_TRANSPORT_PEER mode=nearlink connected=true name=C
+SAFEMESH_RELAY_RECEIVE node=nearlink status=invalid alertId=alert-A hops=0
+SAFEMESH_RELAY_RECEIVE node=nearlink status=expired alertId=expired hops=0
+SAFEMESH_RELAY_RECEIVE node=nearlink status=malformed alertId= hops=-1
+SAFEMESH_RELAY_RECEIVE node=nearlink status=accepted alertId=alert-A hops=0
+SAFEMESH_RELAY_RECEIVE node=nearlink status=duplicate alertId=alert-A hops=0
+SAFEMESH_RESTORE_ERROR Error: disk unavailable
+SAFEMESH_TRANSPORT_PEER mode=nearlink connected=true name=B
+SAFEMESH_RESTORE_ERROR Error: disk unavailable
+✔ VM sends success ACK only for verified current data; duplicates ACK without re-flooding (4.9954ms)
+SAFEMESH_RESTORE_ERROR Error: disk unavailable
+SAFEMESH_RELAY_RECEIVE node=nearlink status=invalid alertId=alert-A hops=0
+SAFEMESH_RELAY_RECEIVE node=nearlink status=accepted alertId=alert-A hops=0
+SAFEMESH_TRANSPORT_PEER mode=nearlink connected=true name=B
+✔ startup read failure blocks relay and a later successful restoration can recover (3.2664ms)
+✔ stop cancels queued work and late callbacks cannot restart radio transmission (3.7778ms)
+✔ queue bounds retain no more than eight peers and 128 alerts per peer (140.0787ms)
+✔ a hung native send has a three-second app deadline and remains pending without a false receipt (1.2476ms)
+✔ stop releases a hung send immediately and handles a later native rejection (2.8611ms)
+SAFEMESH_TRANSPORT_STATUS mode=emulator state=lab_ready peers=0
+SAFEMESH_TRANSPORT_PEER mode=emulator connected=true name=B
+✔ stop during restore, native startup or discovery cannot revive foreground radio work (3.9812ms)
+SAFEMESH_TRANSPORT_STATUS mode=emulator state=lab_ready peers=0
+SAFEMESH_TRANSPORT_STATUS mode=nearlink state=available peers=0
+✔ switching emulator roles and back to hardware ignores all callbacks from the retired transport (10.2547ms)
+SAFEMESH_TRANSPORT_STATUS mode=emulator state=lab_ready peers=0
+SAFEMESH_TRANSPORT_STATUS mode=emulator state=lab_ready peers=0
+SAFEMESH_TRANSPORT_PEER mode=emulator connected=true name=Emulator B
+SAFEMESH_TRANSPORT_STATUS mode=emulator state=lab_ready peers=1
+SAFEMESH_TRANSPORT_PEER mode=emulator connected=true name=Emulator A
+SAFEMESH_TRANSPORT_STATUS mode=emulator state=lab_ready peers=1
+SAFEMESH_RELAY_RECEIVE node=B status=accepted alertId=three-app-hop hops=1
+SAFEMESH_RELAY_RECEIVE node=A status=ack_matched alertId=three-app-hop hops=-1
+✔ a stopped or superseded emulator startup cannot overwrite or close the replacement link (9.6512ms)
+SAFEMESH_TRANSPORT_PEER mode=emulator connected=false name=Emulator A
+SAFEMESH_TRANSPORT_STATUS mode=emulator state=lab_ready peers=0
+SAFEMESH_TRANSPORT_PEER mode=emulator connected=true name=Emulator C
+SAFEMESH_TRANSPORT_STATUS mode=emulator state=lab_ready peers=1
+SAFEMESH_TRANSPORT_PEER mode=emulator connected=true name=Emulator B
+SAFEMESH_TRANSPORT_STATUS mode=emulator state=lab_ready peers=1
+SAFEMESH_RELAY_RECEIVE node=C status=accepted alertId=three-app-hop hops=2
+SAFEMESH_RELAY_RECEIVE node=B status=ack_matched alertId=three-app-hop hops=-1
+SAFEMESH_TRANSPORT_PEER mode=emulator connected=false name=Emulator B
+SAFEMESH_TRANSPORT_STATUS mode=emulator state=lab_ready peers=0
+SAFEMESH_TRANSPORT_STATUS mode=emulator state=lab_ready peers=0
+SAFEMESH_TRANSPORT_PEER mode=emulator connected=true name=A
+✔ three independent app ViewModels relay A to B then to delayed C after A disconnects (13.4153ms)
+SAFEMESH_RELAY_RECEIVE node=B status=expired alertId=expired hops=0
+SAFEMESH_RELAY_RECEIVE node=B status=invalid alertId=forged hops=0
+SAFEMESH_TRANSPORT_STATUS mode=emulator state=lab_ready peers=0
+SAFEMESH_TRANSPORT_PEER mode=emulator connected=true name=B
+✔ emulator delivery still rejects forged and expired content without success acknowledgements (5.0942ms)
+SAFEMESH_TRANSPORT_STATUS mode=emulator state=lab_ready peers=0
+SAFEMESH_TRANSPORT_PEER mode=emulator connected=true name=B
+SAFEMESH_TRANSPORT_STATUS mode=emulator state=lab_ready peers=0
+✔ foreground does not start an unused link, but resumes the active role and cached delivery after suspension (3.826ms)
+✔ explicit stop cancels auto-resume even when foreground is waiting on background cleanup (0.8231ms)
+SAFEMESH_TRANSPORT_PEER mode=nearlink connected=true name=B
+✔ suspension during connection startup cancels it and does not manufacture a resume intent (1.452ms)
+SAFEMESH_RELAY_RECEIVE node=nearlink status=ack_matched alertId=localized-state hops=-1
+SAFEMESH_RELAY_RECEIVE node=nearlink status=ack_unmatched alertId=localized-state hops=-1
+SAFEMESH_RELAY_RECEIVE node=nearlink status=malformed alertId= hops=-1
+SAFEMESH_RELAY_RECEIVE node=nearlink status=accepted alertId=new-localized-state hops=0
+SAFEMESH_RELAY_RECEIVE node=nearlink status=duplicate alertId=new-localized-state hops=0
+SAFEMESH_RELAY_RECEIVE node=nearlink status=invalid alertId=forged-localized hops=0
+SAFEMESH_TRANSPORT_STATUS mode=emulator state=lab_ready peers=0
+SAFEMESH_TRANSPORT_PEER mode=emulator connected=true name=C
+✔ packet verdicts and acknowledgements expose localization states without diagnostic sentences (5.9993ms)
+SAFEMESH_TRANSPORT_ERROR mode=emulator op=send code=401 message=Invalid individual packet
+SAFEMESH_TRANSPORT_STATUS mode=emulator state=lab_disconnected peers=0
+SAFEMESH_TRANSPORT_ERROR mode=emulator op=receive code=401 message=Unknown individual sender
+SAFEMESH_TRANSPORT_STATUS mode=emulator state=lab_ready peers=0
+SAFEMESH_TRANSPORT_ERROR mode=emulator op=socket code=200 message=Hard connection failure
+SAFEMESH_TRANSPORT_STATUS mode=emulator state=lab_ready peers=0
+SAFEMESH_TRANSPORT_STATUS mode=emulator state=lab_error peers=0
+SAFEMESH_TRANSPORT_ERROR mode=emulator op=receive code=401 message=Malformed hub protocol
+SAFEMESH_TRANSPORT_ERROR mode=nearlink op=discover code=401 message=Invalid name
+SAFEMESH_TRANSPORT_ERROR mode=nearlink op=send code=1009700023 message=Busy
+SAFEMESH_TRANSPORT_STATUS mode=nearlink state=off peers=0
+SAFEMESH_TRANSPORT_PEER mode=nearlink connected=true name=B
+✔ public connection state survives queued or rejected packets but clears on socket closure and hard failures (3.3505ms)
+✔ NearLink operation errors preserve its active listener while radio-off status ends the session (0.6506ms)
+✔ loading the bundled exercise on an active link queues it for already-connected peers (5.434ms)
+(node:192) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ probing the lab neither creates a native socket nor fabricates peers; invalid roles cannot connect (18.7252ms)
+✔ start is shared and readiness requires open plus the server peer handshake (53.0709ms)
+✔ only topology peers are emitted, and removed or unknown senders cannot deliver packets (5.3941ms)
+✔ each fixed emulator role uses its own reverse port and diagnostics exclude packet contents (5.9551ms)
+✔ outgoing and incoming packet limits count UTF-8 bytes, and JSON expansion is bounded separately (15.0316ms)
+✔ malformed, extra-field and invalid peer handshakes fail closed without partially accepting peers (9.6548ms)
+✔ binary frames and packets before a completed handshake cannot bypass the protocol (6.4393ms)
+✔ stop cancels an in-flight write, detaches handlers, emits peer losses and ignores late callbacks (6.3663ms)
+✔ stop during a deferred native connect settles start and prevents late connection revival (3.1327ms)
+✔ handshake and send deadlines settle callers; cleanup remains bounded if native close never resolves (2.7823ms)
+✔ hub rejection, failed native connect and close events report truthful disconnected state (2.0861ms)
+✔ fatal errors preserve the final diagnostic after peer cleanup and a reconnect clears the old failure (1.6321ms)
+✔ multiple verified arrivals form an unread inbox; selecting older detail never changes latest Home (994.0868ms)
+✔ duplicate cannot overwrite receipts or read state; a higher revision replaces one row and becomes unread (244.3207ms)
+✔ atomic inbox restore re-verifies content and retains read/provenance without arrival banners (265.3031ms)
+✔ legacy caches restore as known/read with unknown receipt time; metadata never invents alerts (187.9901ms)
+✔ concurrent restore, opening a saved item and receiving a new item preserve both read-state updates (127.9041ms)
+✔ queued writes do not let a slow accepted snapshot overwrite a later read or second arrival (133.7689ms)
+✔ failed atomic commit retains prior durable inbox while authenticated session content remains visible (96.7715ms)
+✔ a duplicate repairs a failed first commit without new unread, arrival, receipt time or source (93.9954ms)
+✔ opening an already-read item retries a failed read-state commit and survives restart without a new banner (72.1462ms)
+✔ all inbox rows localize signed content with detached snapshots and no new arrival event (58.5258ms)
+✔ the earliest inbox expiry prunes an unselected row, unread count and banner before the Home alert expires (50.2718ms)
+✔ inbox shares the 128-message bound and constrains unsigned source metadata (173.1355ms)
+SAFEMESH_TRANSPORT_PEER mode=nearlink connected=true name=peer-B
+✔ a forged incoming packet preserves the authentic displayed title and badge (24.265ms)
+✔ an expired incoming packet cannot replace an active verified alert (4.1443ms)
+✔ persisted replay history restores and re-verifies before the first network packet (6.4206ms)
+✔ disk failure leaves the authenticated in-memory alert intact and reports save failure (2.8265ms)
+SAFEMESH_RELAY_RECEIVE node=nearlink status=invalid alertId=krakow-hackyeah-exercise-001 hops=0
+SAFEMESH_RELAY_RECEIVE node=nearlink status=malformed alertId= hops=-1
+SAFEMESH_TRANSPORT_PEER mode=nearlink connected=true name=peer-B
+✔ forged and malformed packets produce no outgoing radio traffic (19.0363ms)
+SAFEMESH_RELAY_RECEIVE node=nearlink status=accepted alertId=krakow-hackyeah-exercise-001 hops=0
+SAFEMESH_TRANSPORT_PEER mode=nearlink connected=true name=peer-B
+✔ a genuine arrival forwards its exact signature at hop one while excluding its sender (14.4637ms)
+SAFEMESH_RELAY_RECEIVE node=nearlink status=duplicate alertId=krakow-hackyeah-exercise-001 hops=0
+SAFEMESH_RELAY_RECEIVE node=nearlink status=accepted alertId=krakow-hackyeah-exercise-001 hops=0
+SAFEMESH_TRANSPORT_PEER mode=nearlink connected=true name=peer-B
+✔ concurrent arrivals forward once and busy remains set until persistence finishes (10.7945ms)
+SAFEMESH_RELAY_RECEIVE node=nearlink status=accepted alertId=krakow-hackyeah-exercise-001 hops=0
+SAFEMESH_TRANSPORT_PEER mode=nearlink connected=true name=C
+✔ fire-and-forget receive/send failures are handled without losing verified content (6.1777ms)
+✔ exact expiry clears the displayed alert and prevents any further relay (1.7451ms)
+SAFEMESH_NATIVE_DIAGNOSTICS PASS [{"id":"0","titleKey":"relay_event_a","detailKey":"relay_detail_a","status":"accepted","good":true},{"id":"1","titleKey":"relay_event_b","detailKey":"relay_detail_b","status":"accepted","good":true},{"id":"2","titleKey":"relay_event_c","detailKey":"relay_detail_c","status":"accepted","good":true},{"id":"3","titleKey":"relay_event_duplicate","detailKey":"relay_detail_duplicate","status":"duplicate","good":true},{"id":"4","titleKey":"relay_event_tampered","detailKey":"relay_detail_tampered","status":"invalid","good":true},{"id":"5","titleKey":"relay_event_expired","detailKey":"relay_detail_expired","status":"expired","good":true}]
+✔ native-diagnostic workflow exposes stable localization keys and verdicts for all six checks (839.0137ms)
+✔ base and English resources agree, all locales have complete unique nonempty UTF-8 keys (8.7594ms)
+✔ packet verdicts, test events and map access states have localized labels rather than raw enum values (0.4591ms)
+✔ every literal UI string key resolves in all languages (34.767ms)
+✔ Polish copy has no old English diagnostic or exercise-body text and preserves essential limits (0.4699ms)
+(node:17340) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ foreground location requests permissions only when supported and respects denial or disabled services (2.002ms)
+✔ one-shot location uses a bounded request, permits approximate-only consent and returns provider accuracy (1.3294ms)
+✔ invalid locations and provider failures never become successful fixes (1.5326ms)
+(node:7700) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ compiled reference data preserves JSON source records, licensing and finite pack bounds (6.6487ms)
+✔ all source geometry and cached shape bounds are finite, complete and consistent (45.4949ms)
+✔ straight-line distance uses metres, stays finite at antipodes and orders real points (2.5852ms)
+✔ unknown selected IDs cannot mutate any model state or move the map to 0,0 (32.0661ms)
+✔ valid selection centers an existing source point; recenter retains origin and sensible zoom (4.9976ms)
+✔ native map coordinate methods align east/north and use near-isotropic local distance (1.1463ms)
+✔ map waits for native readiness and batches actual geometry within a small stroke budget (8.3613ms)
+✔ marker picking reports a visible source ID and leaves empty locations unselected (1.8662ms)
+✔ save badge changes only after durable success, keeps the original requested point during selection changes (1.9881ms)
+✔ saved-point restore ignores unknown IDs, handles errors and cannot overwrite a concurrent newer save (1.9817ms)
+✔ device origin only accepts a usable fix in the downloaded area and reorders real distances (2.2472ms)
+✔ a late location response cannot replace a user-selected reset to the demo origin (1.0261ms)
+✔ address search accepts an accent-free Polish keyboard, token order and whitespace without changing map selection (30.1524ms)
+✔ access categories expose only stable localization keys and retain point provenance after origin changes (2.6043ms)
+✔ distance presentation follows the selected language and guards unavailable values (0.6606ms)
+✔ saved-point entry is absent for missing IDs and returns the durable point independently of current selection (1.7474ms)
+✔ selected marker paints above coincident points and origin, and hit testing agrees with the visible marker (9.8278ms)
+✔ theme revision re-reads Canvas resources for the selected marker (5.1369ms)
+✔ real WebSocket peers enforce A-B-C topology and forward unchanged opaque packets without alert logs (229.5204ms)
+✔ topology controls update neighbors, offline sends have no hub backlog, and disconnect releases role (85.0441ms)
+✔ a stale-peer send after topology loss does not disconnect the healthy sender or its other neighbor (86.7829ms)
+✔ duplicate roles, invalid hello and fourth connections cannot replace real peers (76.9514ms)
+✔ explicit drop fixtures count data/ACK loss and never synthesize acknowledgements (24.3939ms)
+✔ fault injection is explicit, counted and opaque; invalid control is atomic (35.0343ms)
+✔ UTF-8 packet limits and hello deadline close only the offending client (155.6577ms)
+✔ HTTP control requires local Host, same origin and JSON; body and topology are bounded (53.2423ms)
+✔ HDC WebSocket aliases 8765/8766/8767 accept matching origins without permitting HTTP administration (19.0505ms)
+✔ WebSocket aliases reject unrelated ports/origins and diagnostics exclude secrets and query strings (12.1474ms)
+✔ HarmonyOS API24 portless loopback Origin works only for matching WebSocket Host, never HTTP admin (12.4289ms)
+✔ RFC6455 masked fragmented text and interleaved ping work across TCP chunk boundaries (17.9474ms)
+✔ RFC6455 rejects unmasked, binary, reserved-bit, malformed control and invalid UTF-8 frames (46.5208ms)
+✔ RFC6455 oversized frame declaration and cumulative fragment size fail without unbounded allocation (21.4975ms)
+✔ RFC6455 empty-fragment floods have a bounded fragment count (18.5399ms)
+✔ heartbeat reaps a silent session, publishes peer loss and releases its role without dropping healthy apps (688.3522ms)
+✔ only the outstanding heartbeat nonce is acknowledged; stale, unrelated pongs and data cannot keep a session alive (326.5871ms)
+✔ hub shutdown cancels an outstanding heartbeat without delayed disconnect activity (232.5951ms)
+✔ unsupported emulator neither imports NearLink Kit nor fabricates peers (15.5199ms)
+✔ discovery requires a nonempty valid exact name filter (1.7564ms)
+✔ peer is counted only after an SDK connection callback (2.7536ms)
+✔ MTU-sized writes and arbitrary 7-byte reads preserve UTF-8 packets (15.532ms)
+✔ coalesced frames are decoded as separate messages (16.7831ms)
+✔ oversized payloads, malformed headers and invalid UTF-8 are rejected (2.8576ms)
+✔ stop releases listeners, clears channel count and rejects further writes (4.3031ms)
+✔ stopping during a permission request prevents port creation and advertising after consent arrives (25.8989ms)
+✔ concurrent starts share one request and a late advertisement is stopped after cancellation (3.4036ms)
+✔ confirmed connections clear deadlines and a late connect cannot survive stop (3.6669ms)
+✔ stop interrupts a multi-chunk send without claiming a completed local write (2.115ms)
+✔ intermediate connection states retain the pending request until confirmation or timeout (1.6188ms)
+✔ empty persisted alerts and empty wire frames are rejected with the native empty-encoder behavior (3.8141ms)
+✔ real P-256 signed fixture verifies; every security-relevant field is signed (15.125ms)
+✔ v2 authenticates the original language and every alternate string, including alternate removal (2.2467ms)
+✔ malformed, duplicate, unsupported and oversized translations fail before verification (1.2619ms)
+✔ v1 canonical bytes and real signature verification remain compatible; unsigned language metadata is rejected (2.4177ms)
+✔ version 2 allows a source-only signed alert without inventing a translation (0.6589ms)
+✔ forgery cannot poison replay state; duplicate and concurrent replay suppressed (2.5502ms)
+✔ demo authority can never authorize a live alert or unknown key (0.4195ms)
+✔ expired, future, malformed, oversized and hop-exhausted messages handled (1.1963ms)
+✔ three peers relay exact signed content offline and refuse loops (2.0998ms)
+✔ caller mutation cannot modify the authenticated cache or an in-flight candidate (0.7382ms)
+✔ bounded decoder rejects malformed JSON and primitive shape attacks (0.6656ms)
+✔ persistence re-verifies; forged entries not restored and replays still refused (1.8979ms)
+✔ bounded cache fails closed; older revisions cannot replace newer alerts (5.1801ms)
+✔ actual LocalStore round-trips a maximum-size snapshot and respects every native string bound (451.6601ms)
+✔ the prior generation remains the head until all replacement chunks have flushed (83.515ms)
+✔ failed staging put or flush preserves a complete prior generation after restart (209.4522ms)
+✔ failed head publication rolls back memory; any durable generation is complete (130.3257ms)
+✔ uninitialized operations reject and operations during initialization await readiness (25.0675ms)
+✔ serialized concurrent reads and writes cannot mix generations (47.9581ms)
+✔ legacy values and empty values work; corrupt or oversized values fail closed (20.2415ms)
+ℹ tests 172
+ℹ suites 0
+ℹ pass 172
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3071.9927
+ArkTS check: harmonyos source set
+No errors found in 21 file(s).
+powershell : 
+At line:1 char:780
++ ... hecks.log'; powershell -NoProfile -ExecutionPolicy Bypass -File scrip ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Warnings (36):
+entry\src\main\ets\model\AlertProtocol.ets:193:13 - warning: Function may throw exceptions. Special handling is require
+d.
+entry\src\main\ets\model\AlertProtocol.ets:193:13 - warning: Function may throw exceptions. Special handling is require
+d.
+entry\src\main\ets\model\AlertProtocol.ets:194:46 - warning: Function may throw exceptions. Special handling is require
+d.
+entry\src\main\ets\model\AlertProtocol.ets:195:11 - warning: Function may throw exceptions. Special handling is require
+d.
+entry\src\main\ets\model\AlertProtocol.ets:200:12 - warning: Function may throw exceptions. Special handling is require
+d.
+entry\src\main\ets\model\DeliveryProtocol.ets:29:29 - warning: Function may throw exceptions. Special handling is requi
+red.
+entry\src\main\ets\model\DeliveryProtocol.ets:29:29 - warning: Function may throw exceptions. Special handling is requi
+red.
+entry\src\main\ets\model\AuthorityClient.ets:42:49 - warning: Function may throw exceptions. Special handling is requir
+ed.
+entry\src\main\ets\model\AuthorityClient.ets:42:57 - warning: To use this API, you need to apply for the permissions: o
+hos.permission.INTERNET
+entry\src\main\ets\model\DeviceLocation.ets:27:78 - warning: To use this API, you need to apply for the permissions: oh
+os.permission.APPROXIMATELY_LOCATION
+entry\src\main\ets\model\LocalStore.ets:113:24 - warning: Function may throw exceptions. Special handling is required.
+entry\src\main\ets\transport\NearLinkTransport.ets:105:20 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:107:20 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:109:20 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:111:12 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:113:55 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:118:27 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:147:20 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:150:18 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:152:20 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:181:26 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:188:28 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:245:28 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:283:82 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:287:31 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:291:83 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:295:26 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:299:91 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:304:32 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\NearLinkTransport.ets:308:87 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.ACCESS_NEARLINK
+entry\src\main\ets\transport\EmulatorTransport.ets:115:46 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.INTERNET
+entry\src\main\ets\transport\EmulatorTransport.ets:180:16 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.INTERNET
+entry\src\main\ets\transport\EmulatorTransport.ets:324:20 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.INTERNET
+entry\src\main\ets\pages\Index.ets:157:5 - warning: Function may throw exceptions. Special handling is required.
+entry\src\main\ets\pages\Index.ets:307:23 - warning: 'DateTimeFormat' has been deprecated.
+entry\src\main\ets\pages\Index.ets:309:10 - warning: 'format' has been deprecated.
+ArkTS check: oniro source set
+No errors found in 21 file(s).
+
+Warnings (17):
+entry\src\main\ets\model\AlertProtocol.ets:193:13 - warning: Function may throw exceptions. Special handling is require
+d.
+entry\src\main\ets\model\AlertProtocol.ets:193:13 - warning: Function may throw exceptions. Special handling is require
+d.
+entry\src\main\ets\model\AlertProtocol.ets:194:46 - warning: Function may throw exceptions. Special handling is require
+d.
+entry\src\main\ets\model\AlertProtocol.ets:195:11 - warning: Function may throw exceptions. Special handling is require
+d.
+entry\src\main\ets\model\AlertProtocol.ets:200:12 - warning: Function may throw exceptions. Special handling is require
+d.
+entry\src\main\ets\model\DeliveryProtocol.ets:29:29 - warning: Function may throw exceptions. Special handling is requi
+red.
+entry\src\main\ets\model\DeliveryProtocol.ets:29:29 - warning: Function may throw exceptions. Special handling is requi
+red.
+entry\src\main\ets\model\AuthorityClient.ets:42:49 - warning: Function may throw exceptions. Special handling is requir
+ed.
+entry\src\main\ets\model\AuthorityClient.ets:42:57 - warning: To use this API, you need to apply for the permissions: o
+hos.permission.INTERNET
+entry\src\main\ets\model\DeviceLocation.ets:27:78 - warning: To use this API, you need to apply for the permissions: oh
+os.permission.APPROXIMATELY_LOCATION
+entry\src\main\ets\model\LocalStore.ets:113:24 - warning: Function may throw exceptions. Special handling is required.
+entry\src\main\ets\transport\EmulatorTransport.ets:115:46 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.INTERNET
+entry\src\main\ets\transport\EmulatorTransport.ets:180:16 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.INTERNET
+entry\src\main\ets\transport\EmulatorTransport.ets:324:20 - warning: To use this API, you need to apply for the permiss
+ions: ohos.permission.INTERNET
+entry\src\main\ets\pages\Index.ets:157:5 - warning: Function may throw exceptions. Special handling is required.
+entry\src\main\ets\pages\Index.ets:307:23 - warning: 'DateTimeFormat' has been deprecated.
+entry\src\main\ets\pages\Index.ets:309:10 - warning: 'format' has been deprecated.
+No defects found.
+Summary: Issues: 0 | Errors: 0 | Warnings: 0 | Suggestions: 0 | Files with issues: 0
+Ensure the project source is trustworthy before proceeding.
+
+[ohpm install] Running...
+install completed in 0s 292ms
+
+[hvigor sync] Running...
+> hvigor hvigor client: Starting hvigor daemon.
+> hvigor Hvigor Daemon started in 915 ms
+> hvigor Finished :entry:clean... after 2 ms 
+> hvigor Finished ::clean... after 1 ms 
+> hvigor Finished :entry:init... after 1 ms 
+> hvigor Finished ::init... after 1 ms 
+
+[hvigor build] Running...
+> hvigor Finished :entry:default@PreBuild... after 239 ms 
+> hvigor Finished :entry:default@CreateModuleInfo... after 2 ms 
+> hvigor Finished :entry:default@GenerateMetadata... after 5 ms 
+> hvigor Finished :entry:default@ConfigureCmake... after 1 ms 
+> hvigor Finished :entry:default@MergeProfile... after 6 ms 
+> hvigor Finished :entry:default@CreateBuildProfile... after 5 ms 
+> hvigor Finished :entry:default@PreCheckSyscap... after 1 ms 
+> hvigor Finished :entry:default@GeneratePkgContextInfo... after 9 ms 
+> hvigor Finished :entry:default@GeneratePkgSdkInfo... after 4 ms 
+> hvigor Finished :entry:default@ProcessIntegratedHsp... after 2 ms 
+> hvigor Finished :entry:default@BuildNativeWithCmake... after 1 ms 
+> hvigor Finished :entry:default@MakePackInfo... after 6 ms 
+> hvigor Finished :entry:default@SyscapTransform... after 2 ms 
+> hvigor Finished :entry:default@ProcessProfile... after 111 ms 
+> hvigor Finished :entry:default@ProcessRouterMap... after 5 ms 
+> hvigor Finished :entry:default@ProcessShareConfig... after 4 ms 
+> hvigor Finished :entry:default@ProcessStartupConfig... after 3 ms 
+> hvigor Finished :entry:default@BuildNativeWithNinja... after 2 ms 
+> hvigor Finished :entry:default@ProcessResource... after 6 ms 
+> hvigor Finished :entry:default@GenerateLoaderJson... after 11 ms 
+> hvigor Finished :entry:default@ProcessLibs... after 9 ms 
+> hvigor Finished :entry:default@CompileResource... after 289 ms 
+> hvigor Finished :entry:default@DoNativeStrip... after 4 ms 
+> hvigor Finished :entry:default@BuildJS... after 4 ms 
+> hvigor Finished :entry:default@CacheNativeLibs... after 16 ms 
+> hvigor WARN: WARN: ArkTS:WARN File: C:/Users/user/AppData/Local/Temp/claude/C--Users-user/f58d218
+6-9239-4e6b-9866-ab47d6ce2f92/scratchpad/fresh-clone/entry/src/main/ets/model/LocalStore.ets:113:24
+ Function may throw exceptions. Special handling is required.
+
+WARN: ArkTS:WARN File: C:/Users/user/AppData/Local/Temp/claude/C--Users-user/f58d2186-9239-4e6b-9866-ab4
+7d6ce2f92/scratchpad/fresh-clone/entry/src/main/ets/model/AlertProtocol.ets:193:13
+ Function may throw exceptions. Special handling is required.
+
+WARN: ArkTS:WARN File: C:/Users/user/AppData/Local/Temp/claude/C--Users-user/f58d2186-9239-4e6b-9866-ab4
+7d6ce2f92/scratchpad/fresh-clone/entry/src/main/ets/model/AlertProtocol.ets:193:13
+ Function may throw exceptions. Special handling is required.
+
+WARN: ArkTS:WARN File: C:/Users/user/AppData/Local/Temp/claude/C--Users-user/f58d2186-9239-4e6b-9866-ab4
+7d6ce2f92/scratchpad/fresh-clone/entry/src/main/ets/model/AlertProtocol.ets:194:46
+ Function may throw exceptions. Special handling is required.
+
+WARN: ArkTS:WARN File: C:/Users/user/AppData/Local/Temp/claude/C--Users-user/f58d2186-9239-4e6b-9866-ab4
+7d6ce2f92/scratchpad/fresh-clone/entry/src/main/ets/model/AlertProtocol.ets:195:11
+ Function may throw exceptions. Special handling is required.
+
+WARN: ArkTS:WARN File: C:/Users/user/AppData/Local/Temp/claude/C--Users-user/f58d2186-9239-4e6b-9866-ab4
+7d6ce2f92/scratchpad/fresh-clone/entry/src/main/ets/model/AlertProtocol.ets:200:12
+ Function may throw exceptions. Special handling is required.
+
+WARN: ArkTS:WARN File: C:/Users/user/AppData/Local/Temp/claude/C--Users-user/f58d2186-9239-4e6b-9866-ab4
+7d6ce2f92/scratchpad/fresh-clone/entry/src/main/ets/model/DeliveryProtocol.ets:29:29
+ Function may throw exceptions. Special handling is required.
+
+WARN: ArkTS:WARN File: C:/Users/user/AppData/Local/Temp/claude/C--Users-user/f58d2186-9239-4e6b-9866-ab4
+7d6ce2f92/scratchpad/fresh-clone/entry/src/main/ets/model/DeliveryProtocol.ets:29:29
+ Function may throw exceptions. Special handling is required.
+
+WARN: ArkTS:WARN File: C:/Users/user/AppData/Local/Temp/claude/C--Users-user/f58d2186-9239-4e6b-9866-ab4
+7d6ce2f92/scratchpad/fresh-clone/entry/src/main/ets/model/AuthorityClient.ets:42:49
+ Function may throw exceptions. Special handling is required.
+
+WARN: ArkTS:WARN File: C:/Users/user/AppData/Local/Temp/claude/C--Users-user/f58d2186-9239-4e6b-9866-ab4
+7d6ce2f92/scratchpad/fresh-clone/entry/src/main/ets/pages/Index.ets:157:5
+ Function may throw exceptions. Special handling is required.
+
+WARN: ArkTS:WARN File: C:/Users/user/AppData/Local/Temp/claude/C--Users-user/f58d2186-9239-4e6b-9866-ab4
+7d6ce2f92/scratchpad/fresh-clone/entry/src/main/ets/pages/Index.ets:307:23
+ 'DateTimeFormat' has been deprecated.
+
+WARN: ArkTS:WARN File: C:/Users/user/AppData/Local/Temp/claude/C--Users-user/f58d2186-9239-4e6b-9866-ab4
+7d6ce2f92/scratchpad/fresh-clone/entry/src/main/ets/pages/Index.ets:309:10
+ 'format' has been deprecated.
+
+
+> hvigor Finished :entry:default@CompileArkTS... after 11 s 781 ms 
+> hvigor Finished :entry:default@GeneratePkgModuleJson... after 5 ms 
+> hvigor Finished :entry:default@ProcessCompiledResources... after 2 ms 
+> hvigor Finished :entry:default@PackageHap... after 462 ms 
+> hvigor Finished :entry:default@PackingCheck... after 8 ms 
+> hvigor WARN: Will skip sign 'hos_hap'. No signingConfigs profile is configured in current project.
+             If needed, configure the signingConfigs in C:\Users\user\AppData\Local\Temp\claude\C--Users-user\f58d2186-
+9239-4e6b-9866-ab47d6ce2f92\scratchpad\fresh-clone\build-profile.json5.
+> hvigor Finished :entry:default@SignHap... after 2 ms 
+> hvigor Finished :entry:default@CollectDebugSymbol... after 2 ms 
+> hvigor Finished :entry:assembleHap... after 1 ms 
+> hvigor BUILD SUCCESSFUL in 16 s 90 ms 
+
+Merged central compile_commands.json for C++ language server.
+
+Build completed successfully
+DEVECOCLI_BUILD_EXIT_CODE=0
+CHECKS: PASS

@@ -8,6 +8,7 @@ HackYeah 2026 · Huawei challenge **“Imagine What’s Next”** · native Harm
 
 - **Demo video, 2 min 13 s, captioned:** [SafeMesh-1.4.1-demo.mp4](https://github.com/carrotly-technologies-2026/SafeMesh/releases/download/v1.4.1/SafeMesh-1.4.1-demo.mp4), recorded on v1.4.1. The relay flow is unchanged in v1.5.0. Three separate emulator apps side by side: an authenticated issuer on A publishes a custom English alert; B verifies, stores, ACKs and relays it; after A leaves, C receives it from B at hop 2; a forged copy is rejected; then the offline map and the NearLink capability check.
 - **Install:** [SafeMesh-1.5.0.hap](https://github.com/carrotly-technologies-2026/SafeMesh/releases/download/v1.5.0/SafeMesh-1.5.0.hap) with its [SHA-256 manifest](https://github.com/carrotly-technologies-2026/SafeMesh/releases/download/v1.5.0/SafeMesh-1.5.0.sha256.txt), both in [Release v1.5.0](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/v1.5.0). It is an unsigned debug package for an API 20+ emulator; see [Install the packaged demo](#install-the-packaged-demo).
+- **How to run and test everything:** [docs/TEAM_GUIDE.md](docs/TEAM_GUIDE.md) covers commands, expected output of every check, all 172 host tests, the single- and three-emulator walkthroughs, hub fault injection, recording and releases.
 - **Challenge areas:** **Human-Centric Technology** (lead) and **Spatial Experiences**. See [Challenge fit](#challenge-fit).
 - **HarmonyOS and the open stack:** one codebase builds two products. `default` targets HarmonyOS with the NearLink Kit adapter. `oniro` targets OpenHarmony API 23 for the Eclipse Oniro emulator on Linux, with a NearLink stub. See [OpenHarmony / Oniro build](#openharmony--oniro-build).
 - **Platform capabilities:** NearLink Kit, Crypto Architecture Kit, Network Kit, Location Kit, ArkData, Accessibility Kit and Localization Kit. See [Platform capabilities used](#platform-capabilities-used).
@@ -386,6 +387,7 @@ artifacts/research/              Primary-source evidence and limitations
 artifacts/logs/                   Build and validation records
 artifacts/screenshots/            Native emulator captures
 docs/PHYSICAL_TESTING.md          Runbook for the first physical NearLink test
+docs/TEAM_GUIDE.md                How to build, run, test, record and release; submission status
 scripts/record-mesh-demo.py       Synchronized three-emulator recorder
 dist/                             Git-ignored local packages; releases are on GitHub
 ```
