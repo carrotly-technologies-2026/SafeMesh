@@ -1,0 +1,109 @@
+{
+  "check": "Pixel comparison of 19 screens before and after splitting pages/Index.ets into view components",
+  "device": "SafeMeshB, HarmonyOS API 24 emulator, 1320x2856, English, light; status bar excluded",
+  "threshold": "per-pixel grey difference > 40",
+  "beforeBuild": "86173eb (v1.6.0 features, monolithic Index.ets)",
+  "identical": 16,
+  "screens": [
+    {
+      "screen": "01-home-empty",
+      "changedPercent": 0.0,
+      "note": "identical"
+    },
+    {
+      "screen": "02-map",
+      "changedPercent": 0.0,
+      "note": "identical"
+    },
+    {
+      "screen": "03-map-bottom",
+      "changedPercent": 0.0,
+      "note": "identical"
+    },
+    {
+      "screen": "04-map-search",
+      "changedPercent": 0.0,
+      "note": "identical"
+    },
+    {
+      "screen": "05-point-detail",
+      "changedPercent": 0.0,
+      "note": "identical"
+    },
+    {
+      "screen": "06-relay-idle",
+      "changedPercent": 0.0,
+      "note": "identical"
+    },
+    {
+      "screen": "07-guide",
+      "changedPercent": 0.0,
+      "note": "identical"
+    },
+    {
+      "screen": "08-guide-item2",
+      "changedPercent": 0.0,
+      "note": "identical"
+    },
+    {
+      "screen": "09-settings",
+      "changedPercent": 0.0,
+      "note": "identical"
+    },
+    {
+      "screen": "10-settings-bottom",
+      "changedPercent": 0.0,
+      "note": "identical"
+    },
+    {
+      "screen": "11-diagnostics",
+      "changedPercent": 0.0,
+      "note": "identical"
+    },
+    {
+      "screen": "12-diagnostics-test",
+      "changedPercent": 6.42,
+      "note": "same content, scroll offset differs by a few pixels after the swipe"
+    },
+    {
+      "screen": "13-diagnostics-bottom",
+      "changedPercent": 0.0,
+      "note": "identical"
+    },
+    {
+      "screen": "14-authority-signed-out",
+      "changedPercent": 0.0,
+      "note": "identical"
+    },
+    {
+      "screen": "15-home-inbox",
+      "changedPercent": 0.0,
+      "note": "identical"
+    },
+    {
+      "screen": "16-message-detail",
+      "changedPercent": 0.01,
+      "note": "receipt timestamp differs between runs"
+    },
+    {
+      "screen": "17-message-detail-bottom",
+      "changedPercent": 0.01,
+      "note": "receipt timestamp differs between runs"
+    },
+    {
+      "screen": "18-relay-connected",
+      "changedPercent": 0.0,
+      "note": "identical"
+    },
+    {
+      "screen": "19-home-to-map",
+      "changedPercent": 0.0,
+      "note": "identical"
+    }
+  ],
+  "functional": [
+    "three-emulator scenario (publish, hop 1, hop 2 with A out of range, forged copy rejected, map search, NearLink check) passed",
+    "language preference flow 5/5",
+    "keep-screen-on lock 0/1/0/1/0 and vibration toggle unchanged"
+  ]
+}
