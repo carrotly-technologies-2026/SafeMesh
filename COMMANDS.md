@@ -47,14 +47,22 @@ node scripts/generate-demo-alerts.mjs --update-public-key   # pins this machine'
 ## Every session
 
 ```bash
-scripts/oniro/emulator.sh          # terminal 1: keep it running; boot takes about a minute
-scripts/oniro/deploy.sh            # sign if needed, build --product oniro, install and launch
-scripts/oniro/services.sh start    # mesh hub (8765) + exercise authority (8768) + port forwards
+scripts/oniro/emulator.sh A        # terminal 1: keep it running; boot takes about a minute
+scripts/oniro/emulator.sh B        # optional, terminal 2: second node (created on first run)
+scripts/oniro/emulator.sh C        # optional, terminal 3: third node
+scripts/oniro/deploy.sh            # sign if needed, build --product oniro, install and launch on every running node
+scripts/oniro/services.sh start    # mesh hub (8765) + exercise authority (8768) + port forwards for every running node
 ```
 
-View the screen in Remmina: protocol **VNC**, address `127.0.0.1:5900`.
+| Node | hdc target | VNC (Remmina, protocol VNC) | In-emulator hub port | Issuer port |
+| --- | --- | --- | --- | --- |
+| A | `127.0.0.1:55555` | `127.0.0.1:5900` | 8765 | 8768 |
+| B | `127.0.0.1:55556` | `127.0.0.1:5901` | 8766 | — |
+| C | `127.0.0.1:55557` | `127.0.0.1:5902` | 8767 | — |
 
-In the app, open **Relay / Łączność**, choose **A** and tap **Connect / Połącz**.
+B and C get their own image folders (`~/oniro/instance-B`, `~/oniro/instance-C`) with a fresh `userdata.img` from `oniro_emulator.zip`. The read-only images are copied with `--reflink=auto`. Start emulators before `deploy.sh` and `services.sh`; both skip nodes that are not running.
+
+In each app, open **Relay / Łączność**, choose its node (**A**, **B** or **C**) and tap **Connect / Połącz**. The hub links only A–B and B–C, the same as on Windows (`node scripts/mesh-lab-control.mjs links AB BC` changes it).
 
 ## Sending an alert
 
@@ -62,7 +70,13 @@ In the app, open **Relay / Łączność**, choose **A** and tap **Connect / Poł
 node scripts/oniro/send-alert.mjs "Tytuł" "Treść komunikatu" "Kraków" critical
 ```
 
-The script acts as emulator B. The local authority signs the alert, the hub delivers it to A, and A verifies, stores and acknowledges it. Severity is `info`, `warning` or `critical`. The alert is in Polish and valid for 60 minutes. A must be connected and in the foreground.
+The local authority signs the alert and the hub delivers it. Severity is `info`, `warning` or `critical`. The alert is in Polish and valid for 60 minutes. Receiving apps must be connected and in the foreground.
+
+- **One emulator (A):** the script connects as a fake emulator B and sends the alert to A.
+- **Three emulators (A, B, C):** the hub has no free node, so it injects the alert as A → B. B verifies it and relays it to C.
+- Override the direction with `FROM=C TO=B node scripts/oniro/send-alert.mjs ...`.
+
+The script needs only Node and the running hub and issuer, so it also works with the three DevEco emulators on Windows. It was checked there on 2026-10-04: injected as A → B, B received it at hop 1 and relayed it to C at hop 2.
 
 To publish from the app instead: Settings → **Tests and diagnostics / Testy i diagnostyka** → **Exercise authority / Nadawca ćwiczeń**. The activation code is in `.cache/demo-authority/session-token.txt`. Do not share it or commit it.
 
