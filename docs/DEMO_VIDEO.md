@@ -1,6 +1,6 @@
 # SafeMesh demo video
 
-**2 min 58 s, 1080p, narrated, with burned-in captions and a separate `.srt` file.** The MP4 and the subtitles are attached to the latest [GitHub release](https://github.com/carrotly-technologies-2026/SafeMesh/releases/latest) as `SafeMesh-demo-1.6.0.mp4` and `SafeMesh-demo-1.6.0.srt`.
+**2 min 58 s, 1080p, narrated, with burned-in captions and a separate `.srt` file.** Watch it on [YouTube](https://youtu.be/oJHTDktnwL4). The subtitles are attached to the [submission pack](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/submission-1.6.0) as `SafeMesh-demo-1.6.0.srt`.
 
 The demo part is one real, synchronized recording of three separate SafeMesh v1.6.0 apps on three HarmonyOS API 24 emulators, driven by a script. The opening, the diagram and the closing scenes are motion graphics. The map in them is drawn from the Kraków map pack that ships inside the app.
 

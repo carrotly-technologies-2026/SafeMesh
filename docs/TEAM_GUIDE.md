@@ -45,7 +45,7 @@ Products:
 | `default` | HarmonyOS, target API 24, min API 20 | Real adapter | No (emulators); phones are signed locally in DevEco | DevEco Studio / `devecocli` on Windows |
 | `oniro` | OpenHarmony API 23, min API 20, device type `default` | Stub ("unsupported") | OpenHarmony public debug key | `oniro-app build --product oniro` on Linux |
 
-Releases: [v1.6.0](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/v1.6.0) is the current app (HAP and SHA-256). The [submission pack `submission-1.6.0`](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/submission-1.6.0) has the same HAP plus the narrated video, subtitles, pitch deck (PDF, PPTX) and the full-resolution gallery. [v1.4.1](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/v1.4.1) holds the earlier silent video.
+Releases: [v1.6.0](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/v1.6.0) is the current app (HAP and SHA-256). The [submission pack `submission-1.6.0`](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/submission-1.6.0) has the same HAP plus the video subtitles, pitch deck (PDF, PPTX) and the full-resolution gallery; the narrated video itself is [on YouTube](https://youtu.be/oJHTDktnwL4). [v1.4.1](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/v1.4.1) holds the earlier silent video.
 
 ## 3. Setup (Windows, HarmonyOS product)
 
@@ -303,7 +303,7 @@ Huawei "Imagine What's Next" deliverables:
 | Public source repository | Done: github.com/carrotly-technologies-2026/SafeMesh |
 | Reproducible setup, build, install and launch | Done: README, this guide and `check.ps1`. A fresh clone of `main` (`fe5d56b`) from GitHub passed `check.ps1 -Build` on the team laptop: 172/172, ArkTS 0/0, lint 0, build OK ([log](../artifacts/logs/v150-fresh-clone-checks.log)). Builds are not byte-identical, so a rebuilt HAP has a different SHA-256 from the released one. This is the same machine, not a second computer. |
 | Working `.hap` | Done: Release v1.6.0 (`SafeMesh-1.6.0.hap`, SHA-256 `a66efd9e…`) |
-| Recorded demonstration | Done: narrated `SafeMesh-demo-1.6.0.mp4` (2:58) with `.srt` in the [submission pack](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/submission-1.6.0). **Open:** upload to YouTube (Unlisted) for the form |
+| Recorded demonstration | Done: narrated demo (2:58) [on YouTube](https://youtu.be/oJHTDktnwL4), linked in the form; `.srt` subtitles in the [submission pack](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/submission-1.6.0) |
 | Presentation | Done: [docs/pitch/SafeMesh-pitch.pdf](pitch/SafeMesh-pitch.pdf), 16 slides; PPTX with speaker notes in the submission pack |
 | Screenshots | Done: [docs/gallery](gallery/README.md), 17 screens × EN/PL × light/dark |
 | Architecture and implementation description | Done: README (*Architecture*, *Platform capabilities*, *Transport and signature design*) |
@@ -317,7 +317,7 @@ Remaining work, in order of value:
 | # | Task | Owner | Why it matters |
 | --- | --- | --- | --- |
 | 1 | Physical NearLink test (A → B → C) with recorded evidence, then the README "Physical NearLink validation" section | Team at the venue | Biggest lever for *Use of platform capabilities* and *Demonstration*: today NearLink is implemented but unverified |
-| 2 | YouTube upload of `SafeMesh-demo-1.6.0.mp4` with the `.srt` subtitles and the chapters from DEMO_VIDEO.md, then the form update (links and texts from SUBMISSION.md) | Team | The form requires a YouTube link |
+| 2 | Done: the video is [on YouTube](https://youtu.be/oJHTDktnwL4) and the form uses the texts in SUBMISSION.md | Team | The form requires a YouTube link |
 | 3 | Done: the team member re-ran the merged `oniro` product on the Oniro emulator. Optional: add a screenshot as `artifacts/screenshots/oniro-*` for the jury | Oniro maintainer | Visible evidence for the open-stack build |
 | 4 | Done: pitch deck (PDF, PPTX with speaker notes, HTML). If the jury invites the team, present from the PPTX; slide 5 and the video show the live run | Team | Rules allow the jury to invite teams |
 | 5 | Done in v1.6.0: `pages/Index.ets` split into screen components, verified by pixel comparison | — | — |

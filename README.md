@@ -6,7 +6,7 @@ HackYeah 2026 · Huawei challenge **“Imagine What’s Next”** · native Harm
 
 ## For the jury: start here
 
-- **Demo video, 2 min 58 s, narrated and captioned:** [SafeMesh-demo-1.6.0.mp4](https://github.com/carrotly-technologies-2026/SafeMesh/releases/download/submission-1.6.0/SafeMesh-demo-1.6.0.mp4) ([subtitles](https://github.com/carrotly-technologies-2026/SafeMesh/releases/download/submission-1.6.0/SafeMesh-demo-1.6.0.srt)), recorded on v1.6.0 in one synchronized take of three separate emulator apps:
+- **Demo video, 2 min 58 s, narrated and captioned:** [watch on YouTube](https://youtu.be/oJHTDktnwL4) ([subtitles](https://github.com/carrotly-technologies-2026/SafeMesh/releases/download/submission-1.6.0/SafeMesh-demo-1.6.0.srt)), recorded on v1.6.0 in one synchronized take of three separate emulator apps:
   - an authenticated issuer on A publishes an English alert;
   - B verifies, stores, ACKs and relays it;
   - after A leaves, C receives it from B at hop 2;
@@ -425,7 +425,7 @@ scripts/record-mesh-demo.py       Synchronized three-emulator recorder
 dist/                             Git-ignored local packages; releases are on GitHub
 ```
 
-Release v1.6.0 on GitHub carries `SafeMesh-1.6.0.hap` and `SafeMesh-1.6.0.sha256.txt`, plus the earlier, silent v1.4.1 demo video. The [submission pack](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/submission-1.6.0) (`submission-1.6.0`) bundles the same HAP with the narrated demo video and its subtitles, the pitch deck (PDF and PPTX) and the full-resolution screen gallery. Earlier releases keep their own HAPs; v1.4.1 also holds that video.
+Release v1.6.0 on GitHub carries `SafeMesh-1.6.0.hap` and `SafeMesh-1.6.0.sha256.txt`, plus the earlier, silent v1.4.1 demo video. The [submission pack](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/submission-1.6.0) (`submission-1.6.0`) bundles the same HAP with the subtitles of the narrated demo video (the video itself is [on YouTube](https://youtu.be/oJHTDktnwL4)), the pitch deck (PDF and PPTX) and the full-resolution screen gallery. Earlier releases keep their own HAPs; v1.4.1 also holds that video.
 
 ## Validation scope
 

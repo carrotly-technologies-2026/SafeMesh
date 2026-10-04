@@ -5,8 +5,8 @@ Paste-ready text for the HackYeah 2026 submission form. Challenge: **Huawei, “
 ## Links
 
 - Code repository: https://github.com/carrotly-technologies-2026/SafeMesh
-- Submission pack (HAP, demo video, subtitles, pitch deck, screen gallery): https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/submission-1.6.0
-- Demo video file, 2 min 58 s, narrated: https://github.com/carrotly-technologies-2026/SafeMesh/releases/download/submission-1.6.0/SafeMesh-demo-1.6.0.mp4. The form asks for a YouTube link: upload this file as *Unlisted* or *Public*, add `SafeMesh-demo-1.6.0.srt` as English subtitles, and paste that link. Chapters for the YouTube description are in [docs/DEMO_VIDEO.md](docs/DEMO_VIDEO.md).
+- Submission pack (HAP, video subtitles, pitch deck, screen gallery): https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/submission-1.6.0
+- Demo video, 2 min 58 s, narrated and captioned: https://youtu.be/oJHTDktnwL4. English subtitles (`SafeMesh-demo-1.6.0.srt`) are in the submission pack; chapters, transcript and every speed-up are in [docs/DEMO_VIDEO.md](docs/DEMO_VIDEO.md).
 - Presentation: https://github.com/carrotly-technologies-2026/SafeMesh/blob/main/docs/pitch/SafeMesh-pitch.pdf (16 slides; a PPTX with speaker notes is in the submission pack)
 - All screens: https://github.com/carrotly-technologies-2026/SafeMesh/blob/main/docs/gallery/README.md
 - Cover image: [artifacts/cover/SafeMesh-cover.png](artifacts/cover/SafeMesh-cover.png). Alt text: *Three real SafeMesh screenshots from the recorded demo: phone A signs an exercise alert, phone B verifies it at hop 1, phone C verifies it at hop 2.* The cover is the title slide of the pitch deck, built from real emulator screenshots.
@@ -73,7 +73,7 @@ The bundled exercise fixture is valid until **2026-10-06 19:57:54 UTC**. Custom 
 ## Files
 
 - `SafeMesh-1.6.0.hap` and `SafeMesh-1.6.0.sha256.txt`, attached to GitHub Release v1.6.0 and to the submission pack `submission-1.6.0`.
-- `SafeMesh-demo-1.6.0.mp4` and `SafeMesh-demo-1.6.0.srt`, `SafeMesh-pitch.pdf`, `SafeMesh-pitch.pptx` and `SafeMesh-gallery-1.6.0.zip`, attached to the submission pack.
+- `SafeMesh-demo-1.6.0.srt` (subtitles of the YouTube video), `SafeMesh-pitch.pdf`, `SafeMesh-pitch.pptx` and `SafeMesh-gallery-1.6.0.zip`, attached to the submission pack.
 - `docs/pitch/SafeMesh-pitch.pdf` and `docs/gallery/` in the repository.
 - `artifacts/cover/SafeMesh-cover.png`: cover image.
 
