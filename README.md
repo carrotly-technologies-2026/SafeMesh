@@ -2,13 +2,13 @@
 
 **Signed warnings. Offline protective-point maps. A path from one phone to the next.**
 
-HackYeah 2026 · Huawei challenge **“Imagine What’s Next”** · native HarmonyOS app (ArkTS + ArkUI) · minimum API 20, validated on API 24 emulators · also builds for OpenHarmony / Oniro · current release **v1.5.1**
+HackYeah 2026 · Huawei challenge **“Imagine What’s Next”** · native HarmonyOS app (ArkTS + ArkUI) · minimum API 20, validated on API 24 emulators · also builds for OpenHarmony / Oniro · current release **v1.6.0**
 
 ## For the jury: start here
 
 - **Demo video, 2 min 13 s, captioned:** [SafeMesh-1.4.1-demo.mp4](https://github.com/carrotly-technologies-2026/SafeMesh/releases/download/v1.4.1/SafeMesh-1.4.1-demo.mp4), recorded on v1.4.1. The relay flow is unchanged in v1.5.1. Three separate emulator apps side by side: an authenticated issuer on A publishes a custom English alert; B verifies, stores, ACKs and relays it; after A leaves, C receives it from B at hop 2; a forged copy is rejected; then the offline map and the NearLink capability check.
-- **Install:** [SafeMesh-1.5.1.hap](https://github.com/carrotly-technologies-2026/SafeMesh/releases/download/v1.5.1/SafeMesh-1.5.1.hap) with its [SHA-256 manifest](https://github.com/carrotly-technologies-2026/SafeMesh/releases/download/v1.5.1/SafeMesh-1.5.1.sha256.txt), both in [Release v1.5.1](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/v1.5.1). It is an unsigned debug package for an API 20+ emulator; see [Install the packaged demo](#install-the-packaged-demo).
-- **How to run and test everything:** [docs/TEAM_GUIDE.md](docs/TEAM_GUIDE.md) covers commands, expected output of every check, all 174 host tests, the single- and three-emulator walkthroughs, hub fault injection, recording and releases.
+- **Install:** [SafeMesh-1.6.0.hap](https://github.com/carrotly-technologies-2026/SafeMesh/releases/download/v1.6.0/SafeMesh-1.6.0.hap) with its [SHA-256 manifest](https://github.com/carrotly-technologies-2026/SafeMesh/releases/download/v1.6.0/SafeMesh-1.6.0.sha256.txt), both in [Release v1.6.0](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/v1.6.0). It is an unsigned debug package for an API 20+ emulator; see [Install the packaged demo](#install-the-packaged-demo).
+- **How to run and test everything:** [docs/TEAM_GUIDE.md](docs/TEAM_GUIDE.md) covers commands, expected output of every check, all 177 host tests, the single- and three-emulator walkthroughs, hub fault injection, recording and releases.
 - **Challenge areas:** **Human-Centric Technology** (lead) and **Spatial Experiences**. See [Challenge fit](#challenge-fit).
 - **HarmonyOS and the open stack:** one codebase builds two products. `default` targets HarmonyOS with the NearLink Kit adapter. `oniro` targets OpenHarmony API 23 for the Eclipse Oniro emulator on Linux, with a NearLink stub. See [OpenHarmony / Oniro build](#openharmony--oniro-build).
 - **Platform capabilities:** NearLink Kit, Crypto Architecture Kit, Network Kit, Location Kit, ArkData, Accessibility Kit and Localization Kit. See [Platform capabilities used](#platform-capabilities-used).
@@ -33,6 +33,8 @@ HackYeah 2026 · Huawei challenge **“Imagine What’s Next”** · native Harm
 | Durable local storage with chunked, generation-committed writes | `@kit.ArkData` (`preferences`) | `model/LocalStore.ets` |
 | Screen-reader announcements for new alerts, expiry and results | `@kit.AccessibilityKit` | `pages/Index.ets` |
 | System language, locale-aware times, explicit PL/EN resource managers | `@kit.LocalizationKit` (`i18n`, `intl`, `resourceManager`) | `pages/Index.ets`, `views/UiCopy.ets` |
+| Keep the screen awake only while a relay link is active (user setting, on by default) | `@kit.ArkUI` `window.setWindowKeepScreenOn` | `pages/Index.ets` |
+| Short vibration for a newly verified alert, stronger for critical; silent mode applies (user setting) | `@kit.SensorServiceKit` `vibrator`, `ohos.permission.VIBRATE` | `model/AlertFeedback.ets` |
 | System dark mode, font scale, system bar colours, `SymbolGlyph` icons, Canvas map | `@kit.AbilityKit` configuration, `@kit.ArkUI` | `entryability/EntryAbility.ets`, `views/OfflineMap.ets` |
 
 ## OpenHarmony / Oniro build
@@ -51,7 +53,7 @@ Everything else is shared: the protocol, relay, inbox, issuer console, map, UI a
 
 Status: the Oniro port and its scripts were contributed by a team member, who ran it on the Oniro emulator before the merge. After the merge, the `oniro` product compiles, packages and signs with the OpenHarmony SDK on Windows (the API 24 OpenHarmony part of the DevEco SDK, which has no HMS kits). The produced HAP declares `default`, has no `ACCESS_NEARLINK` and contains the stub, not the NearLink Kit adapter. The API 23 run on the Oniro emulator must be repeated with `scripts/oniro/deploy.sh` after this merge.
 
-**Background relaying is deliberately not faked.** Relaying runs while the app is in the foreground. HarmonyOS introduced a NearLink continuous-task mode (`MODE_NEARLINK`) only in API 26. On our API 20–24 target the remaining modes (`dataTransfer`, `bluetoothInteraction`) do not describe a NearLink relay, and the system's consistency check would suspend a mismatched task. The next step is API 26 with `MODE_NEARLINK` and the documented `continuousTaskSuspend` reconnect pattern.
+**Background relaying is deliberately not faked.** Relaying runs while the app is in the foreground. HarmonyOS introduced a NearLink continuous-task mode (`MODE_NEARLINK`) only in API 26. On our API 20–24 target the remaining modes (`dataTransfer`, `bluetoothInteraction`) do not describe a NearLink relay, and the system's consistency check would suspend a mismatched task. Within the foreground limit, the **Keep screen on while connected** setting (on by default) holds the screen awake only while a relay link is active, as navigation apps do. Leaving the app or locking the phone still pauses relaying. The next step is API 26 with `MODE_NEARLINK` and the documented `continuousTaskSuspend` reconnect pattern.
 
 ## Architecture
 
@@ -76,7 +78,7 @@ flowchart LR
   BQ -- "store-and-forward, hop 2" --> CE
 ```
 
-The app follows the MVVM layering from the challenge skills. `pages/Index.ets` renders native ArkUI screens. `viewmodel/` holds observable state: `AlertViewModel` for the inbox and verified cache, `RelayViewModel` for transport and delivery, `AuthorityViewModel` for the issuer console and `MapViewModel` for the map. `model/` holds platform-independent policy and I/O: the signed alert protocol, the delivery wire format and queue, storage, location and the authority client. `transport/` implements one `RelayTransport` contract twice, as `NearLinkTransport` for phones and `EmulatorTransport` for the labelled emulator lab. Every phone verifies before it stores, displays, ACKs or forwards; the hub and the transports never sign, store or acknowledge alerts.
+The app follows the MVVM layering from the challenge skills. `pages/Index.ets` is the app shell: state, lifecycle, navigation, the header, the arrival banner and actions. Each screen is its own component in `views/` (`AlertScreens`, `MapScreens`, `RelayScreen`, `GuideScreen`, `SettingsScreen`, `DiagnosticsScreen`, `AuthorityScreen`) and receives ViewModels through `@ObjectLink`. Shared controls are in `views/Controls.ets`. `viewmodel/` holds observable state: `AlertViewModel` for the inbox and verified cache, `RelayViewModel` for transport and delivery, `AuthorityViewModel` for the issuer console and `MapViewModel` for the map. `model/` holds platform-independent policy and I/O: the signed alert protocol, the delivery wire format and queue, storage, location and the authority client. `transport/` implements one `RelayTransport` contract twice, as `NearLinkTransport` for phones and `EmulatorTransport` for the labelled emulator lab. Every phone verifies before it stores, displays, ACKs or forwards; the hub and the transports never sign, store or acknowledge alerts.
 
 ## Overview
 
@@ -88,7 +90,18 @@ Three separate HarmonyOS emulator apps exchange packets through an explicitly la
 
 **Demo only:** SafeMesh is not connected to RCB or an official warning issuer. Bundled and custom alerts are signed exercises. Mapped PSP protective points are reference records; current access, condition and protection are not verified by the app.
 
-**v1.5.1 (current release):** NearLink capability detection works on HarmonyOS 6.0.x phones (API 20–22). `manager.isNearLinkSupported()` exists only from API 23, and on older systems the call failed, so supported phones were reported as "unavailable". The app now asks it only on API 23+ and otherwise relies on the NearLink system capability. The NearLink APIs used start at API 13 (scan, advertising) and API 18 (data transfer). There are two new adapter tests. Checks: **174 host tests**, ArkTS 0 errors for both source sets, Code Linter 0, build OK ([log](artifacts/logs/v151-checks-build.log)). HAP SHA-256 `5d31a1ca02fd67f4d242d1d14482285ef334c76e80d04e5389596cd7eb21d45d`. On the emulators, the in-app verification test passes and the NearLink check still reports "unavailable".
+**v1.6.0 (current release):**
+- Settings → *Relaying and alerts* has two saved switches, both on by default. **Keep screen on while connected** keeps the window awake only while a relay link is active. **Vibrate on new alerts** gives a short vibration, longer for critical alerts, and respects silent mode.
+- The settings footer shows the installed version.
+- The 1,150-line UI page was split into screen components (`pages/Index.ets` is now 482 lines).
+
+Checks: **177 host tests**, ArkTS 0 errors for both source sets, Code Linter 0, build OK ([log](artifacts/logs/v160-checks-build.log)). HAP SHA-256 `a66efd9e8f4b8b71b8856d212d27f8f280d3f3e879a521bacbf6d6fe842e3e7d`. Native checks on API 24 emulators:
+- [16 of 19 screens are pixel-identical](artifacts/logs/v160-ui-refactor-parity.json) to the pre-refactor build; the rest differ only in a receipt time or scroll offset.
+- The three-emulator scenario and the language flow are unchanged.
+- [The screen lock goes 0 → 1 → 0 → 1 → 0](artifacts/logs/v160-relay-settings.json) when connecting, switching off, switching on and disconnecting.
+- Vibration is attempted only when enabled (emulators have no vibrator), and both settings survive a relaunch.
+
+**v1.5.1:** NearLink capability detection works on HarmonyOS 6.0.x phones (API 20–22). `manager.isNearLinkSupported()` exists only from API 23, and on older systems the call failed, so supported phones were reported as "unavailable". The app now asks it only on API 23+ and otherwise relies on the NearLink system capability. The NearLink APIs used start at API 13 (scan, advertising) and API 18 (data transfer). There are two new adapter tests. Checks: **174 host tests**, ArkTS 0 errors for both source sets, Code Linter 0, build OK ([log](artifacts/logs/v151-checks-build.log)). HAP SHA-256 `5d31a1ca02fd67f4d242d1d14482285ef334c76e80d04e5389596cd7eb21d45d`. On the emulators, the in-app verification test passes and the NearLink check still reports "unavailable".
 
 **v1.5.0:**
 - The `oniro` OpenHarmony product was merged next to the HarmonyOS product without changing the HarmonyOS build.
@@ -115,7 +128,7 @@ Checks: **168 host tests**, **21 ArkTS files / zero errors**, **zero Code Linter
 | Map / Mapa | Switch between Map and List; search all 40 central Kraków PSP addresses, including searches without Polish diacritics. Select a marker or row to open point details, save it, or show it on the map. Back returns to the originating screen. |
 | Relay / Łączność | Choose emulator A/B/C, connect to the local test link and inspect neighbors and ACK/retry counters. Verified alerts relay automatically while connected; there is no recipient Send button. Open diagnostics for verification tools. |
 | Guide | Read a short offline preparedness reminder and see what the prototype's verification claim means. |
-| Settings / Ustawienia | Open the header gear to choose saved **System / Polski / English** language and **System / Light / Dark** appearance preferences. System follows the device language or appearance. Where a signed language variant exists, the app selects it; otherwise it shows the original with a language notice. |
+| Settings / Ustawienia | Open the header gear to choose saved **System / Polski / English** language and **System / Light / Dark** appearance preferences, plus **Keep screen on while connected** and **Vibrate on new alerts**. System follows the device language or appearance. Where a signed language variant exists, the app selects it; otherwise it shows the original with a language notice. |
 | Tests and diagnostics / Testy i diagnostyka | Enter from Settings or Relay. Open the authenticated exercise-authority console, load the bundled fixture for verification, run the six-check local test, inspect diagnostics or check NearLink capability. Back returns to the screen that opened diagnostics. |
 | Exercise authority / Nadawca ćwiczeń | Enter the local operator's activation code. An authenticated publisher can write a title, instructions and area, choose PL/EN, priority and validity, then publish. The returned signature is verified on-device before the alert is saved and queued automatically. This is an exercise console, not a government account. |
 
@@ -169,13 +182,13 @@ Use `-Device <serial>` for another target or `-NoRun` to build/package only. If 
 
 ### Install the packaged demo
 
-Download `SafeMesh-1.5.1.hap` and `SafeMesh-1.5.1.sha256.txt` from [Release v1.5.1](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/v1.5.1). The HAP is the HarmonyOS `default` product as a debug **unsigned emulator package**, built as `entry/build/default/outputs/default/entry-default-unsigned.hap`, with SHA-256 `5d31a1ca02fd67f4d242d1d14482285ef334c76e80d04e5389596cd7eb21d45d`. It installs on an API 20+ HarmonyOS emulator. A physical phone needs a debug-signed build; see [docs/PHYSICAL_TESTING.md](docs/PHYSICAL_TESTING.md#3-signing-for-physical-devices).
+Download `SafeMesh-1.6.0.hap` and `SafeMesh-1.6.0.sha256.txt` from [Release v1.6.0](https://github.com/carrotly-technologies-2026/SafeMesh/releases/tag/v1.6.0). The HAP is the HarmonyOS `default` product as a debug **unsigned emulator package**, built as `entry/build/default/outputs/default/entry-default-unsigned.hap`, with SHA-256 `a66efd9e8f4b8b71b8856d212d27f8f280d3f3e879a521bacbf6d6fe842e3e7d`. It installs on an API 20+ HarmonyOS emulator. A physical phone needs a debug-signed build; see [docs/PHYSICAL_TESTING.md](docs/PHYSICAL_TESTING.md#3-signing-for-physical-devices).
 
 ```powershell
 $hdc = Join-Path $env:DEVECO_CLI_STUDIO_PATH 'sdk\default\openharmony\toolchains\hdc.exe'
-(Get-FileHash .\SafeMesh-1.5.1.hap -Algorithm SHA256).Hash   # compare with the manifest
+(Get-FileHash .\SafeMesh-1.6.0.hap -Algorithm SHA256).Hash   # compare with the manifest
 & $hdc list targets
-& $hdc -t 127.0.0.1:5555 install -r .\SafeMesh-1.5.1.hap
+& $hdc -t 127.0.0.1:5555 install -r .\SafeMesh-1.6.0.hap
 & $hdc -t 127.0.0.1:5555 shell aa start -b org.safemesh.alerts -a EntryAbility
 ```
 
@@ -288,6 +301,7 @@ The helper discovers every `tests/*.test.mjs` suite and runs host tests. It runs
 | `tests/delivery.test.mjs` | Full-cache synchronization, delayed/reconnected peers, strict ACK matching, loss/retry policy, expiry, deadlines, transport switching, retired callbacks, foreground lifecycle and three independent ViewModels. |
 | `tests/location.test.mjs` | Native one-shot location permission/capability handling, usable results and failure paths. |
 | `tests/emulator-transport.test.mjs` | Actual ArkTS WebSocket adapter with platform mocks: handshake, peer updates, packet bounds, sender filtering, deadlines, error diagnostics and stop races. |
+| `tests/feedback.test.mjs` | Alert vibration: preset or timed fallback, `alarm` usage for critical alerts, no exception when the device has no vibrator. |
 | `tests/build-variants.test.mjs` | HarmonyOS / Oniro product split: Oniro stub behavior, matching adapter APIs, NearLink Kit confined to `src/harmonyos`, unchanged HarmonyOS product and manifest. |
 | `tests/mesh-lab-server.test.mjs` | Actual local sockets and RFC WebSocket framing, topology, injected loss, malformed input, host/origin checks, heartbeat cleanup and public fixture derivation. |
 
@@ -359,8 +373,11 @@ This refresh contacts public data services and should be run deliberately during
 
 ```text
 entry/src/main/ets/
-  pages/Index.ets                 Native ArkUI app screens
+  pages/Index.ets                 App shell: state, lifecycle, navigation, banner, actions
+  views/*Screen(s).ets            One component per screen (home, map, relay, guide, settings, diagnostics, issuer)
+  views/Controls.ets              Shared controls; Theme.ets colours; Format.ets time formatting
   views/OfflineMap.ets            Canvas vector map
+  model/AlertFeedback.ets         Vibration for new alerts
   viewmodel/                     Inbox, authority, relay and map state
   model/AuthorityClient.ets       Authenticated loopback exercise-publication client
   model/AlertProtocol.ets         Signature, trust and relay policy
@@ -394,7 +411,7 @@ scripts/record-mesh-demo.py       Synchronized three-emulator recorder
 dist/                             Git-ignored local packages; releases are on GitHub
 ```
 
-Release v1.5.1 on GitHub carries `SafeMesh-1.5.1.hap` and `SafeMesh-1.5.1.sha256.txt`, plus the v1.4.1 demo video. Releases v1.5.0 and v1.4.1 keep their own HAPs; v1.4.1 also holds the video.
+Release v1.6.0 on GitHub carries `SafeMesh-1.6.0.hap` and `SafeMesh-1.6.0.sha256.txt`, plus the v1.4.1 demo video. Earlier releases keep their own HAPs; v1.4.1 also holds the video.
 
 ## Validation scope
 
